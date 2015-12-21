@@ -1,0 +1,42 @@
+{ "logconfigs"  :
+  { "climate"   : { "console"           : { "level": "info"  } }
+  , "media"     : { "console"           : { "level": "info"  } }
+  , "motive"    : { "console"           : { "level": "info"  } }
+  , "wearable"  : { "console"           : { "level": "info"  } }
+  , "server"    : { "console"		: { "level": "error"  } }
+  }
+
+, "deviceTypes" :
+  { "include"   : { "gateway"		: [ "insteon-automategreen"
+					  ]
+		  , "lighting"		: [ "insteon-led"
+					  ]
+                  }
+  , "exclude"   : { "gateway"           : [ "example-cloud"
+                                          ]
+		  , "switch"		: [ "zwave-dimmer", "zwave-dimmer", "zwave-onoff"
+					  ]
+		  , "sensor"		: [ "zwave-multilevel"
+					  ]
+		  , "climate"		: [ "samsung-control"
+					  ]
+                  }
+  }
+
+, "discovery" :
+  { "include"	: [ "qwe"
+		  ]
+  , "exclude"	: [
+		  ]
+  }
+
+, "serialPorts" :
+  { "insteon-automategreen"
+                : { "/dev/ttyUSB0"       : { "vendor"       : "INSTEON"
+                                           , "modelName"    : "PowerLinc #2413U"
+                                           , "description"  : "Insteon PowerLinc USB (Dual-Band) #2413U"
+                                           , "manufacturer" : "FTDI"
+                                           }
+                  }
+  }
+}
