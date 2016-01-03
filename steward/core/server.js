@@ -23,18 +23,18 @@ var fs          = require('fs')
 
 var logger = utility.logger('server');
 
-if ((process.arch !== 'arm') || (process.platform !== 'linux')) {
-  var mdns      = require('mdns');
-} else {
-  try {
-    var avahi     = require('avahi_pub');
+try {
+	if ((process.arch !== 'arm') || (process.platform !== 'linux')) {
+	  var mdns      = require('mdns');
+	} else {
+		var avahi     = require('avahi_pub');
 
-    if (!avahi.isSupported()) {
-      logger.info('failing Avahi publisher (continuing)');
-      avahi = null;
-    }
-  } catch(ex) {}
-}
+		if (!avahi.isSupported()) {
+		  logger.info('failing Avahi publisher (continuing)');
+		  avahi = null;
+		}
+	}
+} catch(ex) {}
 
 
 var places = null;
