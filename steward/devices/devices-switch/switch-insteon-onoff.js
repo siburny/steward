@@ -38,6 +38,19 @@ var Insteon_OnOff = exports.Device = function(deviceID, deviceUID, info) {
   self.info = {};
 
   self.light = self.gateway.insteon.light(self.insteonID);
+  
+  self.light.on("turnOn", function() {
+    self.onoff(self, true);
+  });
+  self.light.on("turnOnFast", function() {
+    self.onoff(self, true);
+  });
+  self.light.on("turnOff", function() {
+    self.onoff(self, false);
+  });
+  self.light.on("turnOffFast", function() {
+    self.onoff(self, false);
+  });
 
   utility.broker.subscribe('actors', function(request, taskID, actor, perform, parameter) {
     if (actor !== ('device/' + self.deviceID)) return;
