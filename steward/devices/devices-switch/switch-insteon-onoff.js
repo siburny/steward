@@ -47,7 +47,8 @@ var Insteon_OnOff = exports.Device = function(deviceID, deviceUID, info) {
 
   if (!!self.gateway.upstream) self.gateway.upstream[self.insteonID] = self;
   self.refresh(self);
-  setInterval(function() { self.refresh(self); }, 30 * 1000);
+  // DEBUG by Max
+  //setInterval(function() { self.refresh(self); }, 30 * 1000);
 };
 util.inherits(Insteon_OnOff, plug.Device);
 

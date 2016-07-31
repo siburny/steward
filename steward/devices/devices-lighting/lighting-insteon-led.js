@@ -46,8 +46,9 @@ var Insteon_LED = exports.Device = function(deviceID, deviceUID, info) {
   });
 
   if (!!self.gateway.upstream) self.gateway.upstream[self.insteonID] = self;
-  self.refresh(self);
-  setInterval(function() { self.refresh(self); }, 30 * 1000);
+  // DEBUG by Max
+  //self.refresh(self);
+  //setInterval(function() { self.refresh(self); }, 30 * 1000);
 };
 util.inherits(Insteon_LED, lighting.Device);
 

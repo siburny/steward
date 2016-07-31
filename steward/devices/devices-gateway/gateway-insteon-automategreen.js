@@ -112,7 +112,8 @@ Gateway.prototype.scan = function(self) {
     });
   } catch(ex) { return self.emit('error', ex); }
 
-  self.refreshID = setTimeout(function() { self.scan(self); }, 60 * 1000);
+  // DEBUG by Max
+  //self.refreshID = setTimeout(function() { self.scan(self); }, 60 * 1000);
 };
 
 Gateway.prototype.announce = function(self, data) {
