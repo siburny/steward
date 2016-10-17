@@ -424,14 +424,14 @@ Place.prototype.getWoeID = function(self, tries) {
     tries = 1;
   }
 
-  new yql.exec2('SELECT * FROM geo.placefinder WHERE (text = @text) AND (gflags = "R")',
-                { text: self.info.location[0] + ',' + self.info.location[1] }, {}, function (err, response) {
+  new yql.exec2('SELECT * FROM geo.places WHERE text = "('+self.info.location[0] + ',' + self.info.location[1]+')"',
+                {}, {}, function (err, response) {
     var woeid;
 
     if (!!err) return retry({ diagnostic: err.message });
 
     try {
-      woeid = parseInt(response.query.results.Result.woeid, 10);
+      woeid = parseInt(response.query.results.place.woeid, 10);
       if (isNaN(woeid)) throw new Error('invalid WoeID');
     } catch(ex) {
       return retry({ response: response, diagnostic: ex.message });
