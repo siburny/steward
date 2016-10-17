@@ -1,10 +1,10 @@
 exports.actors = {};
 exports.status  = {};
 
-var ifTable     = require('arp-a').ifTable
+var ifTable     = require('arp-a').ifTable    
   , net         = require('net')
   , os          = require('os')
-  , pcap        = require('pcap')
+  , pcap
   , util        = require('util')
   , devices     = require('./device')
   , server      = require('./server')
@@ -18,9 +18,13 @@ var ifTable     = require('arp-a').ifTable
   , broker      = utility.broker
   ;
 
+try {
+	pcap = require('pcap');
+}
+catch(ex) {
+}
 
 var logger = exports.logger = utility.logger('steward');
-
 
 exports.observed = function(eventID) {
   var event = events.id2event(eventID);
@@ -436,7 +440,7 @@ exports.clientInfo = function(connection, secureP) {
           };
 
 // NB: note that https://127.0.0.1 is remote access
-  if (connection.remoteAddress === '127.0.0.1') props.loopback = !secureP;
+  if (connection.remoteAddress === '127.0.0.1') props.loopback = true;
   else {
 // TBD: in node 0.11, this should be reworked....
 //      would prefer to distinguish between on the same subnet or not
@@ -513,7 +517,7 @@ var pass1 = function() {
 
       logger.info('scanning ' + ifname);
       ifaces[ifname] = { addresses: ifaddrs, arp: {} };
-      if (!!ifmac[ifname]) ifaces[ifname].macaddrs = ifmac[ifname];
+      if (!!ifmac[ifname]) ifaces[ifname].mac = ifmac[ifname];
       try {
         pcap.createSession(ifname, 'arp').on('packet', listen(ifname, ifaddrs[ifa].address));
         captureP = true;
@@ -531,7 +535,8 @@ var pass1 = function() {
       if ((!ifaddrs[ifa].internal) && (ifaddrs[ifa].family === 'IPv4')) prime(ifaddrs[ifa].address);
     }
   }
-  if (noneP) {
+  // Windows doesn't have pcap module
+  if (noneP && false) {
     logger.error('no network interfaces');
     if (errorP) {
       if ((!!process.getgid) && ((!process.getuid) || (process.getuid() !== 0))) {
@@ -558,7 +563,7 @@ var pass1 = function() {
 var failedN = 0;
 
 var pass2 = function() {
-  var ifname;
+  var ifname, address;
 
   if (utility.acquiring > 0) return setTimeout(pass2, 10);
 
@@ -579,12 +584,17 @@ var pass2 = function() {
   if (failedN < 100) return setTimeout(pass2, 10);
 
   logger.info('start', { diagnostic: 'determine UUID address using method #2' });
+  
   for (ifname in ifaces) {
-    if ((!ifaces[ifname].macaddrs) || (ifaces[ifname].macaddrs.length === 0)) continue;
+    if (!!ifaces[ifname].addresses) {
+      for (address in ifaces[ifname].addresses) {
+        if ((!ifaces[ifname].addresses[address].mac) || (ifaces[ifname].addresses[address].mac.length === 0)) continue;
 
-    logger.info('start', { diagnostic: 'determining UUID using method #2' });
-    exports.uuid = '2f402f80-da50-11e1-9b23-' + ifaces[ifname].macaddrs[0].split(':').join('');
-    return pass2();
+        logger.info('start', { diagnostic: 'determining UUID using method #2' });
+        exports.uuid = '2f402f80-da50-11e1-9b23-' + ifaces[ifname].addresses[address].mac.split(':').join('');
+        return pass2();
+      }
+    }
   }
 
   logger.fatal('start', { diagnostic: 'unable to determine MAC address of any interface' });
