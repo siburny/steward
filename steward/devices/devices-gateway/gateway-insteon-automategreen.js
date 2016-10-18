@@ -59,6 +59,7 @@ Gateway.prototype.setup = function(self) {
   }
 
   self.insteon = new Insteon();
+  self.insteon.defaultTempUnits = 'C';
   self.status = 'waiting';
   self.changed();
 
@@ -94,9 +95,12 @@ Gateway.prototype.scan = function(self) {
 
       var f = function(id) {
         return function(err, info) {
-          if (!!err) return logger.error('device/' + self.deviceID, { event: 'info', id: id, diagnostic: err.message });
+          if (!!err) {
+            self.seen[id] = true;
+            return logger.error('device/' + self.deviceID, { event: 'info', id: id, diagnostic: err.message });
+          }
 
-            self.announce(self, info);
+          self.announce(self, info);
         };
       };
 
@@ -105,7 +109,6 @@ Gateway.prototype.scan = function(self) {
         id = links[i].id;
 
         if (!!self.seen[id]) continue;
-        self.seen[id] = true;
 
         self.insteon.info(id, f(id));
       }
@@ -121,6 +124,8 @@ Gateway.prototype.announce = function(self, data) {
   if ((!data) || (!data.deviceCategory) || (!data.deviceSubcategory)) {
     return logger.warning('device/' + self.deviceID, { event: 'unable to determine device category', data: data });
   }
+
+  self.seen[data.id] = true;
   productCode = (new Buffer([data.deviceCategory.id, data.deviceSubcategory.id])).toString('hex');
   if (!deviceTypes[productCode]) {
     return logger.warning('device/' + self.deviceID,
