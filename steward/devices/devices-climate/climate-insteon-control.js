@@ -56,7 +56,14 @@ util.inherits(Thermostat, climate.Device);
 
 
 Thermostat.prototype.refresh = function(self) {
-// get information using self.thermostat.details() here and then call self.update();
+  self.thermostat.status(function(err, status) {
+    if(!!err) {
+      self.status = 'warning';
+      self.changed();
+    } else {
+      self.update(self, status);
+    }
+  });
 };
 
 Thermostat.prototype.update = function(self, params) {
@@ -239,10 +246,8 @@ exports.start = function() {
         , $validate : { perform    : validate_perform }
       };
 
-// do not enable yet!
-return;
-  pair ({ '/device/switch/insteon/onoff' : { maker   :   Thermostat
-                                           , entries : [ '0508', '050b', '090d'  ]
-                                           }
+  pair ({ '/device/climate/insteon/control' : { maker   :   Thermostat
+                                            , entries : [ '0508', '050b', '090d'  ]
+                                            }
         });
 };

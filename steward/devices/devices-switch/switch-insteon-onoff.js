@@ -175,6 +175,7 @@ exports.start = function() {
       };
 // other Insteon devices corresponding to an on/off switch may also be listed here...
   devices.makers['Insteon.0209'] = Insteon_OnOff;
+  devices.makers['Insteon.022a'] = Insteon_OnOff;
   devices.makers['Insteon.022d'] = Insteon_OnOff;
   devices.makers['Insteon.0230'] = Insteon_OnOff;
   devices.makers['Insteon.0235'] = Insteon_OnOff;
@@ -183,7 +184,7 @@ exports.start = function() {
   devices.makers['Insteon.0238'] = Insteon_OnOff;
 
   pair ({ '/device/switch/insteon/onoff' : { maker   :   Insteon_OnOff
-                                           , entries : [ '0209', '022d', '0230', '0235', '0236', '0237', '0238' ]
+                                           , entries : [ '0209', '022a', '022d', '0230', '0235', '0236', '0237', '0238' ]
                                            }
         });
 };
