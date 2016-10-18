@@ -43,6 +43,11 @@ var Thermostat = exports.Device = function(deviceID, deviceUID, info) {
 
   self.thermostat = self.gateway.insteon.thermostat(self.insteonID);
 
+  // 'cooling', 'heating', 'highHumidity', 'lowHumidity'
+  //self.light.on("cooling", function() {
+    //self.update(self, true);
+  //});
+
   utility.broker.subscribe('actors', function(request, taskID, actor, perform, parameter) {
     if (actor !== ('device/' + self.deviceID)) return;
 
