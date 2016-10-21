@@ -51,7 +51,7 @@
     , "node-dweetio"              : "0.0.8"
     , "node-hid"                  : "0.3.2"
     , "node-red"                  : "^0.15.1"
-    , "node-red-contrib-bigtimer" : "^1.2.96"
+    , "node-red-contrib-schedex"  : "*"
     , "lsof"                      : "0.1.0"
     , "node-netatmo"              : "git://github.com/TheThingSystem/node-netatmo.git"
     , "node-prowl"                : "0.1.7"
