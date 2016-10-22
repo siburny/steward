@@ -298,7 +298,7 @@ var start = function(port, secureP) {
 
       addresses = [];
       for (ifname in steward.ifaces) if (steward.ifaces.hasOwnProperty(ifname)) {
-        ifaddrs = steward.ifaces[ifname].addresses;
+        ifaddrs = steward.ifaces[ifname];
         for (i = 0; i < ifaddrs.length; i++) {
           ifaddr = ifaddrs[i];
           if ((!ifaddr.internal) && (ifaddr.family === 'IPv4')) addresses.push(ifaddr.address);

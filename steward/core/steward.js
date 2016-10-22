@@ -1,32 +1,31 @@
 exports.actors = {};
-exports.status  = {};
+exports.status = {};
 
-var ifTable     = require('arp-a').ifTable    
-  , net         = require('net')
-  , os          = require('os')
+var net = require('net')
+  , os = require('os')
   , pcap
-  , util        = require('util')
-  , devices     = require('./device')
-  , server      = require('./server')
-  , utility     = require('./utility')
+  , util = require('util')
+  , devices = require('./device')
+  , server = require('./server')
+  , utility = require('./utility')
   , discovered1 = require('./../discovery/discovery-mac').arp
   , discovered2 = require('./../discovery/discovery-ssdp').arp
-  , activities  = require('./../api/api-manage-activity')
-  , events      = require('./../api/api-manage-event')
-  , groups      = require('./../api/api-manage-group')
-  , tasks       = require('./../api/api-manage-task')
-  , broker      = utility.broker
+  , activities = require('./../api/api-manage-activity')
+  , events = require('./../api/api-manage-event')
+  , groups = require('./../api/api-manage-group')
+  , tasks = require('./../api/api-manage-task')
+  , broker = utility.broker
   ;
 
 try {
-	pcap = require('pcap');
+  pcap = require('pcap');
 }
-catch(ex) {
+catch (ex) {
 }
 
 var logger = exports.logger = utility.logger('steward');
 
-exports.observed = function(eventID) {
+exports.observed = function (eventID) {
   var event = events.id2event(eventID);
 
   if (!!event) {
@@ -36,7 +35,7 @@ exports.observed = function(eventID) {
 };
 
 
-exports.report = function(eventID, meta) {
+exports.report = function (eventID, meta) {
   var event = events.id2event(eventID);
 
   if (!event) return;
@@ -52,7 +51,7 @@ exports.report = function(eventID, meta) {
 };
 
 
-exports.performed = function(taskID) {
+exports.performed = function (taskID) {
   var task = tasks.id2task(taskID);
 
   if (!!task) task.lastTime = new Date();
@@ -61,7 +60,7 @@ exports.performed = function(taskID) {
 };
 
 
-var scan = function() {
+var scan = function () {
   var activity, device, event, i, now, performance, performances, task, uuid;
 
   now = new Date();
@@ -101,19 +100,21 @@ var scan = function() {
 
     task.performP = false;
 
-    performances.push({ taskID:    task.taskID
-                      , devices:   participants(task.actor)
-                      , perform:   task.perform
-                      , parameter: task.parameter });
+    performances.push({
+      taskID: task.taskID
+      , devices: participants(task.actor)
+      , perform: task.perform
+      , parameter: task.parameter
+    });
   }
 
   for (i = 0; i < performances.length; i++) {
     performance = performances[i];
-// TBD: i rather dislike double notices...
+    // TBD: i rather dislike double notices...
     if (performance.perform !== 'growl') {
-// .info
+      // .info
       logger.notice('perform',
-                  { taskID: performance.taskID, perform: performance.perform, parameter: performance.parameter });
+        { taskID: performance.taskID, perform: performance.perform, parameter: performance.parameter });
     }
 
     for (device in performance.devices) {
@@ -125,7 +126,7 @@ var scan = function() {
 };
 
 
-var check = function(event, now) {
+var check = function (event, now) {
   var actor, entity, info, params, previous, proplist;
 
   actor = exports.actors[event.actorType];
@@ -136,13 +137,13 @@ var check = function(event, now) {
   info = utility.clone(proplist.info);
   info.status = proplist.status;
 
-  try { params = JSON.parse(event.parameter); } catch(ex) { params = null; }
+  try { params = JSON.parse(event.parameter); } catch (ex) { params = null; }
   previous = event.observeP;
   event.observeP = (!!params) && evaluate(params, entity, info);
   if ((event.observeP) && (!previous)) event.lastTime = now;
 };
 
-var evaluate = function(params, entity, info) {
+var evaluate = function (params, entity, info) {
   var operand1P, operand2P, p, result;
 
   operand1P = typeof params.operand1 !== 'undefined';
@@ -221,7 +222,7 @@ var evaluate = function(params, entity, info) {
   return false;
 };
 
-var observedP = function(whoami) {
+var observedP = function (whoami) {
   var event, group, i, parts, result;
 
   parts = whoami.split('/');
@@ -261,7 +262,7 @@ var observedP = function(whoami) {
 
 var zero = new Date(0);
 
-var observedT = function(whoami) {
+var observedT = function (whoami) {
   var event, group, i, lastTime, parts, result;
 
   parts = whoami.split('/');
@@ -275,7 +276,7 @@ var observedT = function(whoami) {
       if ((!group) || (group.members.length < 1)) return zero;
 
       if (!!group.modifiedP) {
-        delete(group.modifiedP);
+        delete (group.modifiedP);
         return new Date();
       }
 
@@ -292,7 +293,7 @@ var observedT = function(whoami) {
 };
 
 
-var prepare = exports.prepare = function(whoami) {
+var prepare = exports.prepare = function (whoami) {
   var task, group, i, parts;
 
   parts = whoami.split('/');
@@ -303,7 +304,7 @@ var prepare = exports.prepare = function(whoami) {
       task.performP = (task.guardType === '') || (observedP(task.guardType + '/' + task.guardID));
       break;
 
-// TBD: temporal ordering
+    // TBD: temporal ordering
     case 'group':
       group = groups.id2group(parts[1]);
       if (!!group) for (i = 0; i < group.members.length; i++) prepare(group.members[i].actor);
@@ -316,7 +317,7 @@ var prepare = exports.prepare = function(whoami) {
 
 // TBD: temporal ordering
 
-var participants = exports.participants = function(whoami) {
+var participants = exports.participants = function (whoami) {
   var device, group, i, parts, result, results, task;
 
   results = {};
@@ -346,7 +347,7 @@ var participants = exports.participants = function(whoami) {
 };
 
 
-var report = function(module, entry, now) {
+var report = function (module, entry, now) {
   var last;
 
   if (!!entry.busyP) return;
@@ -354,17 +355,19 @@ var report = function(module, entry, now) {
   if (last >= devices.lastupdated) return;
 
   entry.busyP = true;
-  entry.reporter(logger, { send: function(data) {/* jshint unused: false */
-    entry.busyP = false;
-    entry.last = now;
-  }});
+  entry.reporter(logger, {
+    send: function (data) {/* jshint unused: false */
+      entry.busyP = false;
+      entry.last = now;
+    }
+  });
 };
 
 
 var ifaces = exports.ifaces = utility.clone(os.networkInterfaces());
 
-var listen = function(ifname, ifaddr) {
-  return function(raw) {
+var listen = function (ifname, ifaddr) {
+  return function (raw) {
     var arp, packet;
 
     packet = pcap.decode.packet(raw);
@@ -384,7 +387,7 @@ var listen = function(ifname, ifaddr) {
   };
 };
 
-var prime = function(ifaddr) {
+var prime = function (ifaddr) {
   var i, ipaddr, prefix;
 
   prefix = ifaddr.split('.').slice(0, 3).join('.');
@@ -394,27 +397,27 @@ var prime = function(ifaddr) {
   }
 };
 
-var pinger = function(ipaddr) {
+var pinger = function (ipaddr) {
   var socket = new net.Socket({ type: 'tcp4' });
 
   socket.setTimeout(500);
-  socket.on('connect', function() {
+  socket.on('connect', function () {
     socket.destroy();
-  }).on('timeout', function() {
+  }).on('timeout', function () {
     socket.destroy();
-  }).on('error', function(error) {/* jshint unused: false */
-  }).on('close', function(errorP) {/* jshint unused: false */
+  }).on('error', function (error) {/* jshint unused: false */
+  }).on('close', function (errorP) {/* jshint unused: false */
   }).connect(8888, ipaddr);
 };
 
 
-exports.forEachAddress = function(callback) {
+exports.forEachAddress = function (callback) {
   var ifa, ifaddrs, ifname;
 
   for (ifname in ifaces) {
     if (!ifaces.hasOwnProperty(ifname)) continue;
 
-    ifaddrs = ifaces[ifname].addresses;
+    ifaddrs = ifaces[ifname];
     for (ifa = 0; ifa < ifaddrs.length; ifa++) {
       if ((!ifaddrs[ifa].internal) && (ifaddrs[ifa].family === 'IPv4')) callback(ifaddrs[ifa].address);
     }
@@ -424,37 +427,38 @@ exports.forEachAddress = function(callback) {
 
 var clientN = 0;
 
-exports.clientInfo = function(connection, secureP) {
+exports.clientInfo = function (connection, secureP) {
   var props;
-/*
-  var ifname;
- */
+  /*
+    var ifname;
+   */
 
-  props = { loopback       : false
-          , subnet         : false
-          , local          : false
-          , remoteAddress  : connection.remoteAddress
-          , remotePort     : connection.remotePort
-          , secure         : secureP
-          , clientSerialNo : clientN++
-          };
+  props = {
+    loopback: false
+    , subnet: false
+    , local: false
+    , remoteAddress: connection.remoteAddress
+    , remotePort: connection.remotePort
+    , secure: secureP
+    , clientSerialNo: clientN++
+  };
 
-// NB: note that https://127.0.0.1 is remote access
+  // NB: note that https://127.0.0.1 is remote access
   if (connection.remoteAddress === '127.0.0.1') props.loopback = true;
   else {
-// TBD: in node 0.11, this should be reworked....
-//      would prefer to distinguish between on the same subnet or not
+    // TBD: in node 0.11, this should be reworked....
+    //      would prefer to distinguish between on the same subnet or not
     props.subnet = true;
-/*
-    for (ifname in ifaces) {
-      if (!ifaces.hasOwnProperty(ifname)) continue;
-
-      if (!!ifaces[ifname].arp[connection.remoteAddress]) {
-        props.subnet = true;
-        break;
-      }
-    }
- */
+    /*
+        for (ifname in ifaces) {
+          if (!ifaces.hasOwnProperty(ifname)) continue;
+    
+          if (!!ifaces[ifname].arp[connection.remoteAddress]) {
+            props.subnet = true;
+            break;
+          }
+        }
+     */
   }
 
   props.local = props.loopback || props.subnet;
@@ -465,7 +469,7 @@ exports.clientInfo = function(connection, secureP) {
 // NB: this is the access policy for read-only access
 var places = null;
 
-exports.readP = function(clientInfo) {
+exports.readP = function (clientInfo) {
   if ((!clientInfo.local) && (!clientInfo.userID)) return false;
 
   if (!places) places = require('./../actors/actor-place');
@@ -477,92 +481,16 @@ exports.readP = function(clientInfo) {
 
 var ifmac = {};
 
-exports.start = function() {
-  ifTable(function(err, entry) {
-    var mac;
-
-    if ((!!err) || (!entry)) {
-      if (!!err) logger.error('arp-a.ifTable', { diagnostic: err.message });
-      return pass1();
-    }
-
-    mac = entry.mac.split(':').join('');
-    if (mac.length === 0) return;
-    while (mac.substring(0, 1) === '0') mac = mac.substring(1);
-    if (mac.length === 0) return;
-
-    if (!ifmac[entry.name]) ifmac[entry.name] = [];
-    ifmac[entry.name].push(entry.mac);
-  });
-};
-
-var pass1 = function() {
-  var captureP, errorP, ifa, ifaddrs, ifname, ifname2, noneP;
-
-  errorP = false;
-  noneP = true;
-  for (ifname in ifaces) {
-    if ((!ifaces.hasOwnProperty(ifname))
-          || (ifname.indexOf('vmnet') === 0)
-          || (ifname.indexOf('vboxnet') === 0)
-          || (ifname.indexOf('vnic') === 0)
-          || (ifname.indexOf('tun') !== -1)) continue;
-
-    ifaddrs = ifaces[ifname];
-    if (ifaddrs.length === 0) continue;
-
-    captureP = false;
-    for (ifa = 0; ifa < ifaddrs.length; ifa++) {
-      if ((ifaddrs[ifa].internal) || (ifaddrs[ifa].family !== 'IPv4')) continue;
-
-      logger.info('scanning ' + ifname);
-      ifaces[ifname] = { addresses: ifaddrs, arp: {} };
-      if (!!ifmac[ifname]) ifaces[ifname].mac = ifmac[ifname];
-      try {
-        pcap.createSession(ifname, 'arp').on('packet', listen(ifname, ifaddrs[ifa].address));
-        captureP = true;
-      } catch(ex) {
-        logger.error('unable to scan ' + ifname, { diagnostic: ex.message });
-        errorP = true;
-      }
-
-      break;
-    }
-    if (!captureP) continue;
-    noneP = false;
-
-    for (ifa = 0; ifa < ifaddrs.length; ifa++) {
-      if ((!ifaddrs[ifa].internal) && (ifaddrs[ifa].family === 'IPv4')) prime(ifaddrs[ifa].address);
-    }
-  }
-  // Windows doesn't have pcap module
-  if (noneP && false) {
-    logger.error('no network interfaces');
-    if (errorP) {
-      if ((!!process.getgid) && ((!process.getuid) || (process.getuid() !== 0))) {
-        if (os.platform() === 'darwin') {
-          console.log('hint: $ sudo sh -c "chmod g+r /dev/bpf*; chgrp ' + process.getgid() + ' /dev/bpf*"');
-        } else {
-          console.log('hint: $ sudo sh -c ./run.sh');
-        }
-      }
-      process.exit(1);
-    }
-  }
-
-  for (ifname2 in ifaces) if ((ifaces.hasOwnProperty(ifname2)) && (util.isArray(ifaces[ifname2]))) delete(ifaces[ifname2]);
-
-  exports.status.logs = { reporter: function(logger, ws) { ws.send(JSON.stringify(utility.signals)); } };
+exports.start = function () {
+  exports.status.logs = { reporter: function (logger, ws) { ws.send(JSON.stringify(utility.signals)); } };
 
   utility.acquire(logger, __dirname + '/../actors', /^actor-.*\.js$/, 6, -3, ' actor');
 
   return pass2();
 };
 
-
 var failedN = 0;
-
-var pass2 = function() {
+var pass2 = function () {
   var ifname, address;
 
   if (utility.acquiring > 0) return setTimeout(pass2, 10);
@@ -571,7 +499,7 @@ var pass2 = function() {
     logger.notice('start', { uuid: exports.uuid });
     server.start();
     setInterval(scan, 3 * 1000);
-    setInterval(function() {
+    setInterval(function () {
       var module, now;
 
       now = new Date();
@@ -584,14 +512,14 @@ var pass2 = function() {
   if (failedN < 100) return setTimeout(pass2, 10);
 
   logger.info('start', { diagnostic: 'determine UUID address using method #2' });
-  
+
   for (ifname in ifaces) {
-    if (!!ifaces[ifname].addresses) {
-      for (address in ifaces[ifname].addresses) {
-        if ((!ifaces[ifname].addresses[address].mac) || (ifaces[ifname].addresses[address].mac.length === 0)) continue;
+    if (!!ifaces[ifname]) {
+      for (address in ifaces[ifname]) {
+        if ((!ifaces[ifname][address].mac) || (ifaces[ifname][address].mac.length === 0)) continue;
 
         logger.info('start', { diagnostic: 'determining UUID using method #2' });
-        exports.uuid = '2f402f80-da50-11e1-9b23-' + ifaces[ifname].addresses[address].mac.split(':').join('');
+        exports.uuid = '2f402f80-da50-11e1-9b23-' + ifaces[ifname][address].mac.split(':').join('');
         return pass2();
       }
     }
