@@ -3,36 +3,26 @@ var utility = require('./../core/utility');
 
 var logger = exports.logger = utility.logger('ui');
 
-var nodes_whitelist = [
-  //"node-red/sentiment",
-  "node-red-contrib-schedex/schedex",
-  "node-red/inject",
-  "node-red/catch",
-  "node-red/status",
-  "node-red/debug",
-  "node-red/link",
-  "node-red/exec",
-  "node-red/function",
-  "node-red/template",
-  "node-red/delay",
-  "node-red/trigger",
-  "node-red/comment",
+var nodes_blacklist = [
+  "node-red/sentiment",
+  "node-red/CSV",
+  "node-red/HTML",
+  "node-red/JSON",
+  "node-red/XML",
+  "node-red/tail",
+  "node-red/file",
+  "node-red-node-feedparser/feedparse",
+  "node-red-node-serialport/serialport",
+  "node-red-node-twitter/twitter",
+  "node-red/tcpin",
+  "node-red/udp",
+  "node-red/websocket",
+  "node-red/httpin",
   "node-red/httprequest",
-  "node-red/switch",
-  "node-red/change",
-  "node-red/range",
-  "node-red/split",
-  //"node-red/CSV",
-  //"node-red/HTML",
-  //"node-red/JSON",
-  //"node-red/XML",
-  //"node-red/tail",
-  //"node-red/file",
-  "node-red-node-email/email",
-  //"node-red-node-feedparser/feedparse",
-  "node-red-node-rbe/rbe",
-  //"node-red-node-serialport/serialport",
-  //"node-red-node-twitter/twitter"
+  "node-red/mqtt",
+  "node-red/tls",
+  "node-red/rpi-gpio",
+  "node-red/unknown"
 ]
 
 exports.start = function () {
@@ -64,7 +54,7 @@ exports.start = function () {
     .then(function () {
       var nodes = RED.nodes.getNodeList();
       for (i = 0; i < nodes.length; i++) {
-        if (nodes_whitelist.indexOf(nodes[i].id) === -1) {
+        if (nodes_blacklist.indexOf(nodes[i].id) !== -1) {
           RED.nodes.disableNode(nodes[i].id);
         } else {
           RED.nodes.enableNode(nodes[i].id);

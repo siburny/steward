@@ -52,6 +52,7 @@
     , "node-hid"                  : "0.3.2"
     , "node-red"                  : "^0.15.1"
     , "node-red-contrib-schedex"  : "*"
+	, "node-red-contrib-thethingsystem" : ""
     , "lsof"                      : "0.1.0"
     , "node-netatmo"              : "git://github.com/TheThingSystem/node-netatmo.git"
     , "node-prowl"                : "0.1.7"
