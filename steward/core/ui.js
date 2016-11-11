@@ -25,6 +25,24 @@ var nodes_blacklist = [
   "node-red/unknown"
 ]
 
+function disable_nodes(RED) {
+  if (RED.nodes.getFlows() == null) {
+    setTimeout(function () {
+      disable_nodes(RED);
+    }, 100);
+    return;
+  }
+
+  var nodes = RED.nodes.getNodeList();
+  for (i = 0; i < nodes.length; i++) {
+    if (nodes_blacklist.indexOf(nodes[i].id) !== -1) {
+      RED.nodes.disableNode(nodes[i].id);
+    } else {
+      RED.nodes.enableNode(nodes[i].id);
+    }
+  }
+}
+
 exports.start = function () {
   var http = require('http');
   var express = require("express");
@@ -49,16 +67,7 @@ exports.start = function () {
 
   RED.start()
     .then(function () {
-      return RED.nodes.loadFlows();
-    })
-    .then(function () {
-      var nodes = RED.nodes.getNodeList();
-      for (i = 0; i < nodes.length; i++) {
-        if (nodes_blacklist.indexOf(nodes[i].id) !== -1) {
-          RED.nodes.disableNode(nodes[i].id);
-        } else {
-          RED.nodes.enableNode(nodes[i].id);
-        }
-      }
+      disable_nodes(RED);
     });
 };
+
