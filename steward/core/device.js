@@ -114,6 +114,23 @@ exports.start = function() {
 };
 
 
+exports.getDeviceType = function(deviceUID, callback) {
+  db.get('SELECT deviceType FROM devices WHERE deviceUID=$deviceUID',
+         { $deviceUID : deviceUID }, function(err, row) {
+
+    if (err) {
+      logger.error('devices', { event: 'SELECT device.deviceName for ' + deviceUID, diagnostic: err.message });
+      return;
+    }
+
+    if ((row !== undefined) && (!!row.deviceType)) {
+      if(!!callback) {
+        callback(row.deviceType);
+      }
+    }
+  });
+};
+
 exports.review = function() {
   var state, states, d, i, ids;
 
