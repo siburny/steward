@@ -7,6 +7,7 @@ var fs          = require('fs')
   , stringify   = require('json-stringify-safe')
   , winston     = require('winston')
   , util        = require('util')
+  , _           = require('underscore')
   ;
 
 
@@ -352,13 +353,7 @@ exports.relativity = function(time) {
 
 
 var clone = exports.clone = function(o) {
-  var prop, result;
-
-  if ((!o) || ((typeof o) !== 'object')) return o;
-
-  result = util.isArray(o) ? [] : {};
-  for (prop in o) if (o.hasOwnProperty(prop)) result[prop] = clone(o[prop]);
-  return result;
+  return _.clone(o);
 };
 
 
