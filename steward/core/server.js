@@ -66,8 +66,6 @@ var start = function(port, secureP) {
       , key     = __dirname + '/../db/server.key'
       , options = { port : portno }
       , stasis  = new static.Server(__dirname + '/../sandbox')
-      , static_jQuery = new static.Server(__dirname + '/../node_modules/jquery/dist')
-      , static_materialize = new static.Server(__dirname + '/../node_modules/materialize-css/dist')
       ;
 
     if (err) return logger.error('server', { event: 'portfinder.getPort ' + port, diagnostic: err.message });
@@ -175,12 +173,19 @@ var start = function(port, secureP) {
       }
 
       var handled = false;
-      ['/jquery', '/materialize'].forEach(function(prefix) {
+      var prefixes = {
+        '/jquery': static_jQuery,
+        '/materialize': static_materialize,
+        '/font-awesome': static_fontawesome,
+        '/material-design-icons': static_iconfont
+      };
+
+      for(var prefix in prefixes) {
         if(pathname.startsWith(prefix))
         {
           u.pathname = pathname.replace(prefix, '');
           request.url = url.format(u);
-          static_jQuery.serve(request, response, function(err, result) {
+          prefixes[prefix].serve(request, response, function(err, result) {
             if (!!err) {
               response.writeHead(err.status, err.headers);
               response.end();
@@ -189,13 +194,9 @@ var start = function(port, secureP) {
 
             logger.info(tag, { code: result.status, type: result.headers['Content-Type'], octets: result.headers['Content-Length'] });
           });
-          handled = true;
+          return;
         }
-      });
-      if(handled)
-      {
-        return;
-      }
+      };
 
       u.pathname = pathname;
       request.url = url.format(u);
@@ -209,36 +210,6 @@ var start = function(port, secureP) {
         logger.info(tag,
                     { code: result.status, type: result.headers['Content-Type'], octets: result.headers['Content-Length'] });
       });
-
-/*
-      pathname = __dirname + '/../sandbox/' + decodeURI(pathname.slice(1));
-
-      var ct = mime.lookup(pathname);
-
-      fs.readFile(pathname, function(err, data) {
-        var code, diagnostic;
-
-        if (err) {
-          if (err.code === 'ENOENT') {
-            code = 404;
-            diagnostic = '404 not found';
-          } else {
-            code = 404;
-            diagnostic = err.message + '\n';
-          }
-          logger.info(tag, { code: code, diagnostic: err.message });
-          response.writeHead(code, { 'Content-Type': 'text/plain' });
-          return response.end(diagnostic);
-        }
-
-        logger.info(tag, { code: 200, type: ct, octets: data.length });
-        response.writeHead(200, { 'Content-Type'   : ct
-                                , 'Content-Length' : data.length
-                                , 'Cache-Control'  : 'max-age=86400, public'
-                                });
-        response.end(request.method === 'GET' ? data : '');
-      });
-*/
     });
 
     if (!wssP) wssP = portno;

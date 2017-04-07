@@ -49,10 +49,11 @@ exports.start = function () {
   var RED = require("node-red");
 
   var app = express();
+  var mustacheExpress = require('mustache-express');
   var server = http.createServer(app);
 
   var settings = {
-    httpAdminRoot: '/',
+    httpAdminRoot: '/red/',
     httpNodeRoot: '/api/',
     userDir: './db/node-red/',
     functionGlobalContext: {}
@@ -62,6 +63,21 @@ exports.start = function () {
 
   app.use(settings.httpAdminRoot, RED.httpAdmin);
   app.use(settings.httpNodeRoot, RED.httpNode);
+
+  app.use('/jquery', express.static('node_modules/jquery/dist'));
+  app.use('/materialize', express.static('node_modules/materialize-css/dist'));
+  app.use('/font-awesome', express.static('node_modules/font-awesome'));
+  app.use('/material-design-icons', express.static('node_modules/material-design-icons-iconfont/dist'));
+  app.use('/images', express.static('images'));
+
+  app.engine('html', mustacheExpress());
+  app.set('view engine', 'html');
+  app.set('views', __dirname + '/../sandbox/tiles/views');
+  app.disable('view cache');
+
+  app.get('/', function (req, res) {
+    res.render('index');
+  });
 
   server.listen(8000);
 
