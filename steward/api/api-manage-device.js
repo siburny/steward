@@ -4,6 +4,7 @@ var stringify  = require('json-stringify-safe')
   , database   = require('./../core/database')
   , devices    = require('./../core/device')
   , manage     = require('./../routes/route-manage')
+  , _          = require('underscore')
   ;
 
 
@@ -83,7 +84,7 @@ var list = function(logger, ws, api, message, tag) {/* jshint unused: false */
 
     id = device.device.deviceID;
     if ((!suffix) || (suffix === id)) {
-      props = clone(device.device.proplist());
+      var props = clone(device.device.proplist());
       delete(props.whoami);
       results.result.devices['device/' + id] = props;
       if (allP) {
