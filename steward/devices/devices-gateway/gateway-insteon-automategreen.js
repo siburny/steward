@@ -96,11 +96,14 @@ Gateway.prototype.scan = function(self) {
       var f = function(id) {
         return function(err, info) {
           if (!!err) {
-            self.seen[id] = true;
             return logger.error('device/' + self.deviceID, { event: 'info', id: id, diagnostic: err.message });
           }
 
-          self.announce(self, info);
+          if(!!info) {
+            self.announce(self, info);
+          } else {
+            self.announce(self, { id: id });
+          }
         };
       };
 
@@ -110,28 +113,35 @@ Gateway.prototype.scan = function(self) {
 
         if (!!self.seen[id]) continue;
 
+        self.seen[id] = true;
+
         self.insteon.info(id, f(id));
       }
     });
   } catch(ex) { return self.emit('error', ex); }
 
-  // DEBUG by Max
-  //self.refreshID = setTimeout(function() { self.scan(self); }, 60 * 1000);
+  self.refreshID = setTimeout(function() { self.scan(self); }, 5 * 60 * 1000);
 };
 
 Gateway.prototype.announce = function(self, data) {
   var address, info, productCode;
 
   if ((!data) || (!data.deviceCategory) || (!data.deviceSubcategory)) {
-    return logger.warning('device/' + self.deviceID, { event: 'unable to determine device category', data: data });
+    logger.warning('device/' + self.deviceID, { event: 'unable to determine device category', data: data });
+    data = {
+      id: data.id,
+      deviceCategory: {
+        id: '',
+        name: ''
+      },
+      deviceSubcategory: {
+        id: '',
+        name: ''
+      }
+    };
   }
 
-  self.seen[data.id] = true;
   productCode = (new Buffer([data.deviceCategory.id, data.deviceSubcategory.id])).toString('hex');
-  if (!deviceTypes[productCode]) {
-    return logger.warning('device/' + self.deviceID,
-                          { event: 'unable to determine product category for ' + productCode, data: data });
-  }
   address = sixtoid(data.id);
 
   info = { source: self.deviceID, gateway: self };
@@ -148,9 +158,24 @@ Gateway.prototype.announce = function(self, data) {
                                  }
                 };
   info.url = info.device.url;
-  info.deviceType = deviceTypes[productCode];
   info.id = info.device.unit.udn;
+
   if (!!devices.devices[info.id]) return;
+
+  if (!deviceTypes[productCode] && productCode == '0000') {
+    logger.warning('device/' + self.deviceID, { event: 'unable to determine product category for ' + productCode, data: data });
+    devices.getDeviceType(info.id, function(type) {
+      info.deviceType = type;
+
+      logger.info('device/' + self.deviceID, { id: sixtoid(data.id), category: data.deviceCategory.name });
+      devices.discover(info);
+    });
+    return;
+  } else if(!deviceTypes[productCode]) {
+    return logger.warning('device/' + self.deviceID, { event: 'unable to determine product category for ' + productCode, data: data });
+  } else {
+    info.deviceType = deviceTypes[productCode];
+  }
 
   logger.info('device/' + self.deviceID, { id: sixtoid(data.id), category: data.deviceCategory.name });
   devices.discover(info);
@@ -292,6 +317,8 @@ exports.pair = function(pairings) {
 var scanning      = {};
 
 var scan = function() {
+  var scan_timeout = setTimeout(scan, 30 * 1000);
+
   serialport.list(function(err, info) {
     var configuration, fingerprint, i, j;
 
@@ -318,8 +345,6 @@ var scan = function() {
       scan1(info[i]);
     }
   });
-
-  setTimeout(scan, 30 * 1000);
 };
 
 var scan1 = function(driver) {
@@ -337,7 +362,7 @@ var scan1 = function(driver) {
   buffer = null;
   silentP = false;
 
-  stream = new serialport.SerialPort(comName, { baudrate: 19200, databits: 8, parity: 'none', stopbits: 1 });
+  stream = new serialport(comName, { baudrate: 19200, databits: 8, parity: 'none', stopbits: 1 });
   stream.on('open', function() {
     stream.write(new Buffer('0260', 'hex'));
   }).on('data', function(data) {
@@ -442,10 +467,10 @@ exports.start = function() {
   steward.actors.device.gateway.insteon.powerlinc.$info.type = '/device/gateway/insteon/powerlinc';
   devices.makers['/device/gateway/insteon/powerlinc'] = Gateway;
 
-  utility.acquire2(__dirname + '/../*/*-insteon-*.js', function(err) {
-    if (!!err) logger('insteon-automategreen', { event: 'glob', diagnostic: err.message });
+  //utility.acquire2(__dirname + '/../*/*-insteon-*.js', function(err) {
+    //if (!!err) logger('insteon-automategreen', { event: 'glob', diagnostic: err.message });
 
-    require('./../../discovery/discovery-portscan').pairing([ 9761 ], pair);
-    scan();
-  });
+  require('./../../discovery/discovery-portscan').pairing([ 9761 ], pair);
+  scan();
+  //});
 };

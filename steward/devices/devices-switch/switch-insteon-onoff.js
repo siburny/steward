@@ -60,7 +60,7 @@ var Insteon_OnOff = exports.Device = function(deviceID, deviceUID, info) {
 
   if (!!self.gateway.upstream) self.gateway.upstream[self.insteonID] = self;
   self.refresh(self);
-  // DEBUG by Max
+  // debug
   //setInterval(function() { self.refresh(self); }, 30 * 1000);
 };
 util.inherits(Insteon_OnOff, plug.Device);
@@ -72,39 +72,6 @@ Insteon_OnOff.prototype.refresh = function(self) {
 
     self.onoff(self, brightness > 0);
   });
-};
-
-Insteon_OnOff.prototype.callback = function(self, messageType, message) {
-  switch (message.substr(0, 4)) {
-    case '0250':
-      switch (message.substr(message.length - 6, 2)) {
-        case '20':
-          return self.onoff(self, message.substr(-2) !== '00');
-
-        default:
-          break;
-      }
-      break;
-
-    case '0262':
-      if (message.substr(-2) !== '06') {
-        return logger.error('device/' + self.deviceID, { event: 'request failed', response: message });
-      }
-
-      switch (message.substr(message.length - 8, 4)) {
-        case '0011':
-        case '0013':
-          return self.onoff(self, message.substr(-4) !== '00');
-
-        default:
-          break;
-      }
-      break;
-
-    default:
-      break;
-  }
-  return logger.warning('device/' + self.deviceID, { event: 'unexpected message', message: message });
 };
 
 Insteon_OnOff.prototype.onoff = function(self, onoff) {

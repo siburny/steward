@@ -45,49 +45,6 @@ exports.start = function() {
   start(8888, true);
   start(8887, false);
 
-/* TBD: once ssh server module is ready!
-
-  portfinder.getPort({ port: 8889 }, function(err, portno) {
-    var key = __dirname + '/../db/server_rsa'
-      , pub = __dirname + '/../sandbox/server_rsa.pub'
-      ;
-
-    if (err) return logger.error('server', { event: 'portfinder.getPort 8889', diagnostic: err.message });
-
-    fs.exists(key, function(exists) {
-      if (exists) {
-        exports.ssh = { key: key, pub: pub };
-        return logger.info('TBD: listening on ssh -p ' + portno);
-      }
-
-      ssh_keygen({ location : key
-                 , force    : false
-                 , destroy  : false
-                 , log      : logger
-                 , quiet    : true
-                 }, function(err, sshkey) {
-        if (err) return logger.error('server', { event: 'ssh_keygen', diagnostic: err.message });
-
-        fs.chmod(key, 0400, function(err) {
-          if (err) logger.error('server', { event: 'chmod', file: key, mode: '0400', diagnostic: err.message });
-        });
-
-        fs.rename(key + '.pub', pub, function(err) {
-          if (err) logger.error('server', { event: 'rename', src: key + '.pub', dst: pub, diagnostic: err.message });
-          else sshkey.pubKey = pub;
-
-          fs.chmod(sshkey.pubKey, 0444, function(err) {
-            if (err) logger.error('server', { event: 'chmod', file: sshkey.pubKey, mode: '0444', diagnostic: err.message });
-          });
-
-          exports.sshkey = { key: sshkey.key, pub: sshkey.pubKey };
-          return logger.info('TBD: listening on ssh -p ' + portno);
-        });
-      });
-    });
-  });
- */
-
   utility.acquire(logger, __dirname + '/../routes', /^route-.*\.js$/, 6, -3, ' route');
 };
 
@@ -109,6 +66,8 @@ var start = function(port, secureP) {
       , key     = __dirname + '/../db/server.key'
       , options = { port : portno }
       , stasis  = new static.Server(__dirname + '/../sandbox')
+      , static_jQuery = new static.Server(__dirname + '/../node_modules/jquery/dist')
+      , static_materialize = new static.Server(__dirname + '/../node_modules/materialize-css/dist')
       ;
 
     if (err) return logger.error('server', { event: 'portfinder.getPort ' + port, diagnostic: err.message });
@@ -194,21 +153,6 @@ var start = function(port, secureP) {
                  , '/console' : '/console.html'
                  }[pathname] || pathname;
 
-/* NB: everything "interesting" should be via WebSockets, not HTML...
-       if that changes, we can add an exception list here.
-
-      if (!steward.readP(meta)) {
-        delete(meta.method);
-
-        meta.event = 'access';
-        meta.diagnostic = 'unauthorized';
-        meta.resource = pathname;
-        logger.warning(tag, meta);
-
-        response.writeHead(403, { 'Content-Type': 'text/plain' });
-        return response.end('403 not allowed');
-      }
- */
       if ((places.place1.info.strict !== 'off')
               && (!secureP)
               && (securePort !== 0)
@@ -228,6 +172,29 @@ var start = function(port, secureP) {
         logger.info(tag, { event: 'invalid path', code: 404 });
         response.writeHead(404, { 'Content-Type': 'text/plain' });
         return response.end('404 not found');
+      }
+
+      var handled = false;
+      ['/jquery', '/materialize'].forEach(function(prefix) {
+        if(pathname.startsWith(prefix))
+        {
+          u.pathname = pathname.replace(prefix, '');
+          request.url = url.format(u);
+          static_jQuery.serve(request, response, function(err, result) {
+            if (!!err) {
+              response.writeHead(err.status, err.headers);
+              response.end();
+              return logger.warning(tag, { code: err.status, message: err.message });
+            }
+
+            logger.info(tag, { code: result.status, type: result.headers['Content-Type'], octets: result.headers['Content-Length'] });
+          });
+          handled = true;
+        }
+      });
+      if(handled)
+      {
+        return;
       }
 
       u.pathname = pathname;

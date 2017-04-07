@@ -42,11 +42,29 @@ var Thermostat = exports.Device = function(deviceID, deviceUID, info) {
   self.info = {};
 
   self.thermostat = self.gateway.insteon.thermostat(self.insteonID);
+  self.thermostat.monitor(true);
 
-  // 'cooling', 'heating', 'highHumidity', 'lowHumidity'
-  //self.light.on("cooling", function() {
-    //self.update(self, true);
-  //});
+  self.thermostat.on('status', function(status) {
+    self.update(self, status);
+  });
+  self.thermostat.on('cooling', function(mode) {
+    self.setStatus(self, 'cooling');
+  });
+  self.thermostat.on('heating', function(mode) {
+    self.setStatus(self, 'heating');
+  });
+  self.thermostat.on('highHumidity', function(mode) {
+    self.setStatus(self, 'highHumidity');
+  });
+  self.thermostat.on('lowHumidity', function(mode) {
+    self.setStatus(self, 'lowHumidity');
+  });
+  self.thermostat.on('normalHumidity', function(mode) {
+    self.setStatus(self, 'normalHumidity');
+  });
+  self.thermostat.on('off', function(mode) {
+    self.setStatus(self, 'off');
+  });
 
   utility.broker.subscribe('actors', function(request, taskID, actor, perform, parameter) {
     if (actor !== ('device/' + self.deviceID)) return;
@@ -55,10 +73,10 @@ var Thermostat = exports.Device = function(deviceID, deviceUID, info) {
   });
 
   self.refresh(self);
-  setInterval(function() { self.refresh(self); }, 30 * 1000);
+  // debug
+  //setInterval(function() { self.refresh(self); }, 30 * 1000);
 };
 util.inherits(Thermostat, climate.Device);
-
 
 Thermostat.prototype.refresh = function(self) {
   self.thermostat.status(function(err, status) {
@@ -71,12 +89,20 @@ Thermostat.prototype.refresh = function(self) {
   });
 };
 
+Thermostat.prototype.setStatus = function(self, status) {
+  if(!!status && self.status !== status)
+  {
+    self.status = status;
+    self.changed();
+  }
+}
+
 Thermostat.prototype.update = function(self, params) {
   var p, updateP;
 
   updateP = false;
-  if (self.status !== 'present') {
-    self.status = 'present';
+  if (self.status === 'waiting') {
+    self.status = 'off';
     updateP = true;
   }
 
@@ -108,6 +134,8 @@ Thermostat.prototype.update = function(self, params) {
 
                              self.info.hvac = v;
                              updateP = true;
+
+                             //self.thermostat
                            }
 
           , fan          : function(v) {
@@ -164,7 +192,8 @@ Thermostat.operations =
              case 'off':
              case 'cool':
              case 'heat':
-// set mode to  one of these
+               self.thermostat.mode(value, function(err, value) {
+               });
                break;
 
              case 'fan':
@@ -238,7 +267,7 @@ exports.start = function() {
                     , observe    : [ ]
                     , perform    : [ 'wake' ]
                     , properties : { name            : true
-                                   , status          : [ 'waiting', 'present', 'absent' ]
+                                   , status          : [ 'waiting', 'absent', 'cooling', 'heating', 'highHumidity', 'lowHumidity', 'normalHumidity', 'off' ]
                                    , lastSample      : 'timestamp'
                                    , temperature     : 'celsius'
                                    , humidity        : 'percentage'

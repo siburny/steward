@@ -39,6 +39,26 @@ var Insteon_Dimmer = exports.Device = function(deviceID, deviceUID, info) {
 
   self.light = self.gateway.insteon.light(self.insteonID);
 
+  self.light.on("turnOn", function() {
+    self.level(self, 100);
+  });
+  self.light.on("turnOnFast", function() {
+    self.level(self, 100);
+  });
+  self.light.on("turnOff", function() {
+    self.level(self, 0);
+  });
+  self.light.on("turnOffFast", function() {
+    self.level(self, 0);
+  });
+
+  self.light.on("brightened", function(p1, p2) {
+    self.refresh(self);
+  });
+  self.light.on("dimmed", function(p1, p2) {
+    self.refresh(self);
+  });
+
   utility.broker.subscribe('actors', function(request, taskID, actor, perform, parameter) {
     if (actor !== ('device/' + self.deviceID)) return;
 
@@ -47,7 +67,8 @@ var Insteon_Dimmer = exports.Device = function(deviceID, deviceUID, info) {
 
   if (!!self.gateway.upstream) self.gateway.upstream[self.insteonID] = self;
   self.refresh(self);
-  setInterval(function() { self.refresh(self); }, 30 * 1000);
+  // debug
+  //setInterval(function() { self.refresh(self); }, 30 * 1000);
 };
 util.inherits(Insteon_Dimmer, plug.Device);
 
@@ -58,39 +79,6 @@ Insteon_Dimmer.prototype.refresh = function(self) {
 
     self.level(self, level);
   });
-};
-
-Insteon_Dimmer.prototype.callback = function(self, messageType, message) {
-  switch (message.substr(0, 4)) {
-    case '0250':
-      switch (message.substr(message.length - 6, 2)) {
-        case '20':
-          return self.level(self, devices.percentageValue(parseInt(message.substr(-2), 16), 255));
-
-        default:
-          break;
-      }
-      break;
-
-    case '0262':
-      if (message.substr(-2) !== '06') {
-        return logger.error('device/' + self.deviceID, { event: 'request failed', response: message });
-      }
-
-      switch (message.substr(message.length - 8, 4)) {
-        case '0011':
-        case '0013':
-          return self.level(self, devices.percentageValue(parseInt(message.substr(-4), 16), 255));
-
-        default:
-          break;
-      }
-      break;
-
-    default:
-      break;
-  }
-  return logger.warning('device/' + self.deviceID, { event: 'unexpected message', message: message });
 };
 
 Insteon_Dimmer.prototype.level = function(self, level) {
