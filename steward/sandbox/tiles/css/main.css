@@ -1,7 +1,72 @@
-html, body {
-    background-color: #000;
+* {
+    margin: 0; padding: 0;
 }
-.col.device {
+html, body {
+    background-color: #333;
+}
+
+.grid-container {
+  position: absolute;
+  left: 0;
+  right: 0px;
+  bottom: 0;
+  overflow: hidden;
+}
+.grid {
+  position: relative;
+  height: 100%;
+  list-style: none;
+  /* Will be modified by the grid jquery lib, depending on the items */
+  -webkit-transition: width 0.2s,
+                      height 0.2s;
+          transition: width 0.2s,
+                      height 0.2s;
+}
+  .grid li {
+    position: absolute;
+    z-index: 1;
+    font-weight: bold;
+    line-height: 4em;
+    text-align: center;
+    cursor: pointer;
+    color:fff;
+    -webkit-transition: top 0.2s,
+                        left 0.2s,
+                        width 0.2s,
+                        height 0.2s,
+                        font-size 0.2s,
+                        line-height 0.2s;
+            transition: top 0.2s,
+                        left 0.2s,
+                        width 0.2s,
+                        height 0.2s,
+                        font-size 0.2s,
+                        line-height 0.2s;
+  }
+  .grid li .inner {
+    position: absolute;
+    background: #fff;
+    border: 1px solid #bbb;
+    top: 0;
+    bottom: 2px;
+    left: 2px;
+    right: 0;
+    -webkit-transition: background 3s;
+            transition: background 3s;
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+/*.col.device {
     border: 1px solid #eee;
     margin: 0;
     text-align: center;
@@ -16,8 +81,8 @@ html, body {
 }
 .col.device.off {
     background-color: #FF4136;
-}
-
+}*/
+/*
 @media only screen and (max-width: 992px) {
     .col.device {
         height:16.67vw;
@@ -31,5 +96,10 @@ html, body {
         font-size:12vw;
     }
 }
+
+.col.h2 {
+    height: 16.65vw;
+}
  
 
+*/
