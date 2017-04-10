@@ -1,0 +1,35 @@
+html, body {
+    background-color: #000;
+}
+.col.device {
+    border: 1px solid #eee;
+    margin: 0;
+    text-align: center;
+    font-size: 4vw;
+    background-color: #cccccc;
+    color: white;
+    height:8.33vw;
+}
+
+.col.device.on {
+    background-color: #2ECC40;
+}
+.col.device.off {
+    background-color: #FF4136;
+}
+
+@media only screen and (max-width: 992px) {
+    .col.device {
+        height:16.67vw;
+        font-size:8vw;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .col.device {
+        height:25vw;
+        font-size:12vw;
+    }
+}
+ 
+

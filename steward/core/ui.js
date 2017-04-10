@@ -68,7 +68,7 @@ exports.start = function () {
   app.use('/materialize/', express.static('node_modules/materialize-css/dist'));
   app.use('/font-awesome/', express.static('node_modules/font-awesome'));
   app.use('/material-design-icons/', express.static('node_modules/material-design-icons-iconfont/dist'));
-  app.use('/images/', express.static('sandbox/tiles/images'));
+  app.use('/', express.static('sandbox/tiles/'));
 
   app.engine('html', mustacheExpress());
   app.set('view engine', 'html');
