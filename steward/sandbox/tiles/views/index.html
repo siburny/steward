@@ -15,9 +15,9 @@
     <script type="text/javascript" src="/materialize/js/materialize.min.js"></script>
     <script type="text/javascript" src="/grid-list/gridList.js"></script>
     <script type="text/javascript" src="/grid-list/jquery.gridList.js"></script>
-  
+
   <nav>
-    <div class="nav-wrapper blue darken-2">
+    <div class="nav-wrapper">
       <a href="#!" class="brand-logo center">HOME</a>
       <a href="#" data-activates="slide-out" class="button-collapse show-on-large"><i class="material-icons">menu</i></a>
       <ul id="slide-out" class="side-nav">
@@ -37,34 +37,20 @@
     </div>
   </nav>
 
-  <main>
+  <main class="grid-container">
     
-<!--    <div class="row">
-      <div class="col s3 m2 l1 device"><i class="fa fa-lightbulb-o" aria-hidden="true"></i></div>
-    </div>-->
-    <div class="grid-container">
     <ul id="grid" class="grid">
-      <li data-w="1" data-h="1" data-x="0" data-y="0"><div class="inner">1</div></li>
-      <li data-w="1" data-h="1" data-x="0" data-y="0"><div class="inner">1</div></li>
-      <li data-w="1" data-h="1" data-x="0" data-y="0"><div class="inner">1</div></li>
-      <li data-w="1" data-h="1" data-x="0" data-y="0"><div class="inner">1</div></li>
-      <li data-w="1" data-h="1" data-x="0" data-y="0"><div class="inner">1</div></li>
-      <li data-w="1" data-h="1" data-x="0" data-y="0"><div class="inner">1</div></li>
-      <li data-w="1" data-h="1" data-x="0" data-y="0"><div class="inner">1</div></li>
-      <li data-w="1" data-h="1" data-x="0" data-y="0"><div class="inner">1</div></li>
-      <li data-w="1" data-h="1" data-x="0" data-y="0"><div class="inner">1</div></li>
-      <li data-w="1" data-h="1" data-x="0" data-y="0"><div class="inner">1</div></li>
-      <li data-w="1" data-h="1" data-x="0" data-y="0"><div class="inner">1</div></li>
-      <li data-w="1" data-h="1" data-x="0" data-y="0"><div class="inner">1</div></li>
-      <li data-w="1" data-h="1" data-x="0" data-y="0"><div class="inner">1</div></li>
-      <li data-w="1" data-h="1" data-x="0" data-y="0"><div class="inner">1</div></li>
-      <li data-w="1" data-h="1" data-x="0" data-y="0"><div class="inner">1</div></li>
-      <li data-w="1" data-h="1" data-x="0" data-y="0"><div class="inner">1</div></li>
-      <li data-w="1" data-h="1" data-x="0" data-y="0"><div class="inner">1</div></li>
-      <li data-w="1" data-h="1" data-x="0" data-y="0"><div class="inner">1</div></li>
-      <li data-w="1" data-h="1" data-x="0" data-y="0"><div class="inner">1</div></li>
+      {{#devices}}
+      <li data-w="{{w}}" data-h="{{h}}" data-x="{{x}}" data-y="{{y}}" class="status {{status}} z-depth-3">
+        <div class="device">
+          <div class="icon">
+            <i class="fa fa-lightbulb-o" aria-hidden="true"></i>
+          </div>
+          {{id}}
+        </div>
+      </li>
+      {{/devices}}
     </ul>
-    </div>
      
   </main>
  
@@ -76,25 +62,25 @@
         direction: 'vertical',
         lanes: 16,
         widthHeightRatio: 1,
-        heightToFontSizeRatio: 0.25
+        heightToFontSizeRatio: 0.3
       });
-      grid.gridList('resize');
 
-$(window).resize(function() {
-	var width = $( document ).width();
-	var newsize = 0;	
-	if(width > 1200) {
-		newsize = 16;
-	} else if(width > 992) {
-		newsize = 12;
-	} else if(width > 600) {
-		newsize = 8;
-	} else {
-		newsize = 4;
-	}
-	
-  grid.gridList('resize', newsize);
-});
+      $(window).resize(function() {
+        var width = $(document).width();
+        var newsize = 0;	
+        if(width > 1200) {
+          newsize = 16;
+        } else if(width > 992) {
+          newsize = 12;
+        } else if(width > 600) {
+          newsize = 8;
+        } else {
+          newsize = 4;
+        }
+        
+        grid.gridList('resize', newsize);
+      });
+      $(window).resize();
 
     });
   </script>

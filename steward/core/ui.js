@@ -77,8 +77,12 @@ exports.start = function () {
   app.set('views', __dirname + '/../sandbox/tiles/views');
   app.disable('view cache');
 
+  var devices = [];
+  for(i=0;i<20;i++){
+    devices.push({id: i, status: Math.floor(Math.random() * 6) == 5  ? 'on' : 'off', w: 1, h: 1, x:i, y:0});
+  }
   app.get('/', function (req, res) {
-    res.render('index');
+    res.render('index', {devices: devices});
   });
 
   server.listen(8000);
