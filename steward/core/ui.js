@@ -78,9 +78,25 @@ exports.start = function () {
   app.disable('view cache');
 
   var devices = [];
-  for(i=0;i<20;i++){
-    devices.push({id: i, status: Math.floor(Math.random() * 6) == 5  ? 'on' : 'off', w: 1, h: 1, x:i, y:0});
-  }
+  devices.push({id: 01, status: 'off', w: 1, h: 1, x:01, y:0});
+  devices.push({id: 02, status: 'off', w: 1, h: 1, x:02, y:0});
+  devices.push({id: 03, status: 'on' , w: 1, h: 1, x:03, y:0});
+  devices.push({id: 04, status: 'off', w: 2, h: 2, x:04, y:0});
+  devices.push({id: 05, status: 'off', w: 1, h: 1, x:05, y:0});
+  devices.push({id: 06, status: 'off', w: 1, h: 1, x:06, y:0});
+  devices.push({id: 07, status: 'off', w: 1, h: 1, x:07, y:0});
+  devices.push({id: 08, status: 'on ', w: 2, h: 1, x:08, y:0});
+  devices.push({id: 09, status: 'off', w: 1, h: 1, x:09, y:0});
+  devices.push({id: 10, status: 'off', w: 1, h: 1, x:10, y:0});
+  devices.push({id: 11, status: 'off', w: 1, h: 1, x:11, y:0});
+  devices.push({id: 12, status: 'off', w: 2, h: 1, x:12, y:0});
+  devices.push({id: 13, status: 'off', w: 1, h: 1, x:13, y:0});
+  devices.push({id: 14, status: 'on ', w: 1, h: 1, x:14, y:0});
+  devices.push({id: 15, status: 'off', w: 1, h: 1, x:15, y:0});
+  devices.push({id: 16, status: 'off', w: 1, h: 1, x:16, y:0});
+  devices.push({id: 17, status: 'off', w: 1, h: 1, x:17, y:0});
+  devices.push({id: 18, status: 'on ', w: 1, h: 1, x:18, y:0});
+
   app.get('/', function (req, res) {
     res.render('index', {devices: devices});
   });
