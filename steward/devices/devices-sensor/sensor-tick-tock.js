@@ -34,7 +34,7 @@ var Sensor_Tick_Tock = exports.Device = function(deviceID, deviceUID, info) {
 
   setInterval(function() {
     self.update();
-  }, 10000)
+  }, 2000)
 };
 util.inherits(Sensor_Tick_Tock, sensor.Device);
 
@@ -47,14 +47,14 @@ Sensor_Tick_Tock.prototype.update = function() {
   this.changed();
 }
 
-function announce() {
+function announce(i) {
   var info = {};
   info.device = { url          : null
-                , name         : 'Tick Tock Sensor'
+                , name         : 'Tick Tock Sensor ' + i
                 , manufacturer : ''
                 };
   info.deviceType = "/device/sensor/ticktock";
-  info.id = "tick-tock";
+  info.id = "tick-tock-"+i;
   if (!!devices.devices[info.id]) return;
 
   logger.info('found', { id: info.id });
@@ -78,6 +78,15 @@ exports.start = function() {
   devices.makers['/device/sensor/ticktock'] = Sensor_Tick_Tock;
 
   setTimeout(function() {
-    announce();
+    announce(1);
+    setTimeout(function() {
+      announce(2);
+      setTimeout(function() {
+        announce(3);
+        setTimeout(function() {
+          announce(4);
+        }, 1500);
+      }, 1500);
+    }, 1500);
   }, 500);
 };

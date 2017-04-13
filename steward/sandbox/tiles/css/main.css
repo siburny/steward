@@ -59,6 +59,7 @@ nav {
     font-size: 0.2em;
     text-align: left;
     line-height: 100%;
+    color: #fff;
   }
 
 .status.on .device {
@@ -66,6 +67,13 @@ nav {
 }
 .status.off .device {
     color1: #FF4136;
+}
+
+.status.tick .device {
+    color: #5B85C8;
+}
+.status.tock .device {
+    color: #C8675B;
 }
 
 

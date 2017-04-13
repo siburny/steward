@@ -35,6 +35,11 @@ var widgets = {
     w: 1,
     h: 1,
     icon: 'lightbulb-o'
+  },
+  '/device/sensor/ticktock': {
+    w: 1,
+    h: 1,
+    icon: 'check-square-o'
   }
 }
 
@@ -98,7 +103,7 @@ exports.start = function () {
   app.ws('/api/', function(ws, req) {
     function renderDevice(data) {
       if(widgets[data.whatami]) {
-        var id = data.deviceID;
+        var id = data.deviceID || data.whoami.replace('device/', '');
         var resdata = widgets[data.whatami];
         resdata.id = id;
         resdata.x = id;

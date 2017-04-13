@@ -63,7 +63,10 @@ API.prototype.connect = function() {
   this.websocket.onmessage = function onMessage(evt) {
     if(!!evt && !!evt.data) {
       var msg = JSON.parse(evt.data);
+
+      $('#grid #device-'+msg.id).remove();
       $('#grid').append(msg.html);
+      
       initGrid();
     }
   }
