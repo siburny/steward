@@ -172,32 +172,6 @@ var start = function(port, secureP) {
         return response.end('404 not found');
       }
 
-      var handled = false;
-      var prefixes = {
-        '/jquery': static_jQuery,
-        '/materialize': static_materialize,
-        '/font-awesome': static_fontawesome,
-        '/material-design-icons': static_iconfont
-      };
-
-      for(var prefix in prefixes) {
-        if(pathname.startsWith(prefix))
-        {
-          u.pathname = pathname.replace(prefix, '');
-          request.url = url.format(u);
-          prefixes[prefix].serve(request, response, function(err, result) {
-            if (!!err) {
-              response.writeHead(err.status, err.headers);
-              response.end();
-              return logger.warning(tag, { code: err.status, message: err.message });
-            }
-
-            logger.info(tag, { code: result.status, type: result.headers['Content-Type'], octets: result.headers['Content-Length'] });
-          });
-          return;
-        }
-      };
-
       u.pathname = pathname;
       request.url = url.format(u);
       stasis.serve(request, response, function(err, result) {

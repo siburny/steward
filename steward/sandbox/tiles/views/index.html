@@ -15,6 +15,7 @@
     <script type="text/javascript" src="/materialize/js/materialize.min.js"></script>
     <script type="text/javascript" src="/grid-list/gridList.js"></script>
     <script type="text/javascript" src="/grid-list/jquery.gridList.js"></script>
+    <script type="text/javascript" src="/js/main.js"></script>
 
   <nav>
     <div class="nav-wrapper">
@@ -40,50 +41,10 @@
   <main class="grid-container">
     
     <ul id="grid" class="grid">
-      {{#devices}}
-      <li data-w="{{w}}" data-h="{{h}}" data-x="{{x}}" data-y="{{y}}" class="status {{status}} z-depth-3">
-        <div class="device">
-          <div class="icon">
-            <i class="fa fa-lightbulb-o" aria-hidden="true"></i>
-          </div>
-          {{id}}
-        </div>
-      </li>
-      {{/devices}}
+      
     </ul>
      
   </main>
  
-  <script>
-    $(function() {
-      $(".button-collapse").sideNav();
-
-      var grid = $('#grid').gridList({
-        direction: 'vertical',
-        lanes: 16,
-        widthHeightRatio: 1,
-        heightToFontSizeRatio: 0.3
-      });
-
-      $(window).resize(function() {
-        var width = $(document).width();
-        var newsize = 0;	
-        if(width > 1200) {
-          newsize = 16;
-        } else if(width > 992) {
-          newsize = 12;
-        } else if(width > 600) {
-          newsize = 8;
-        } else {
-          newsize = 4;
-        }
-        
-        grid.gridList('resize', newsize);
-      });
-      $(window).resize();
-
-    });
-  </script>
-  
   </body>
   </html>

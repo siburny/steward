@@ -16,6 +16,7 @@
     "cron-parser": "0.4.1",
     "cycle": "1.0.2",
     "express": "^4.15.2",
+    "express-ws": "^3.0.0",
     "font-awesome": "^4.7.0",
     "geocoder": "0.1.0",
     "glob": "3.2.9",

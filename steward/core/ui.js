@@ -1,7 +1,7 @@
-var utility = require('./../core/utility');
-
-
-var logger = exports.logger = utility.logger('ui');
+var utility = require('./../core/utility'),
+  logger = exports.logger = utility.logger('ui'),
+  devices = require('./device'),
+  utility = require('./../core/utility');
 
 var nodes_blacklist = [
   "node-red/sentiment",
@@ -24,6 +24,19 @@ var nodes_blacklist = [
   "node-red/rpi-gpio",
   "node-red/unknown"
 ]
+
+var widgets = {
+  '/device/switch/insteon/dimmer': {
+    w: 1,
+    h: 1,
+    icon: 'lightbulb-o'
+  },
+  '/device/switch/insteon/onoff': {
+    w: 1,
+    h: 1,
+    icon: 'lightbulb-o'
+  }
+}
 
 function disable_nodes(RED) {
   if (RED.nodes.getFlows() == null) {
@@ -49,6 +62,7 @@ exports.start = function () {
   var RED = require("node-red");
 
   var app = express();
+  var expressWs = require('express-ws')(app);
   var mustacheExpress = require('mustache-express');
   var server = http.createServer(app);
 
@@ -77,31 +91,51 @@ exports.start = function () {
   app.set('views', __dirname + '/../sandbox/tiles/views');
   app.disable('view cache');
 
-  var devices = [];
-  devices.push({id: 01, status: 'off', w: 1, h: 1, x:01, y:0});
-  devices.push({id: 02, status: 'off', w: 1, h: 1, x:02, y:0});
-  devices.push({id: 03, status: 'on' , w: 1, h: 1, x:03, y:0});
-  devices.push({id: 04, status: 'off', w: 2, h: 2, x:04, y:0});
-  devices.push({id: 05, status: 'off', w: 1, h: 1, x:05, y:0});
-  devices.push({id: 06, status: 'off', w: 1, h: 1, x:06, y:0});
-  devices.push({id: 07, status: 'off', w: 1, h: 1, x:07, y:0});
-  devices.push({id: 08, status: 'on ', w: 2, h: 1, x:08, y:0});
-  devices.push({id: 09, status: 'off', w: 1, h: 1, x:09, y:0});
-  devices.push({id: 10, status: 'off', w: 1, h: 1, x:10, y:0});
-  devices.push({id: 11, status: 'off', w: 1, h: 1, x:11, y:0});
-  devices.push({id: 12, status: 'off', w: 2, h: 1, x:12, y:0});
-  devices.push({id: 13, status: 'off', w: 1, h: 1, x:13, y:0});
-  devices.push({id: 14, status: 'on ', w: 1, h: 1, x:14, y:0});
-  devices.push({id: 15, status: 'off', w: 1, h: 1, x:15, y:0});
-  devices.push({id: 16, status: 'off', w: 1, h: 1, x:16, y:0});
-  devices.push({id: 17, status: 'off', w: 1, h: 1, x:17, y:0});
-  devices.push({id: 18, status: 'on ', w: 1, h: 1, x:18, y:0});
-
   app.get('/', function (req, res) {
-    res.render('index', {devices: devices});
+    res.render('index');
   });
 
-  server.listen(8000);
+  app.ws('/api/', function(ws, req) {
+    function renderDevice(data) {
+      if(widgets[data.whatami]) {
+        var id = data.deviceID;
+        var resdata = widgets[data.whatami];
+        resdata.id = id;
+        resdata.x = id;
+        resdata.y = 0;
+        resdata.name = data.name;
+        resdata.status = data.status;
+        resdata.info = data.info;
+
+        app.render(data.whatami.replace(/^a-z0-9-/, '').substr(1), resdata, function(err, out) {
+          var msg = {'action': 'device', 'id': id, 'html': out};
+          if(!!ws && ws.readyState == 1) {
+            ws.send(JSON.stringify(msg));
+          }
+        });
+      }
+    }
+
+    ws.on('message', function(msg) {
+      var msg = JSON.parse(msg);
+      switch(msg.action)
+      {
+        case 'loadDevices':
+          for(var device in devices.devices) {
+            renderDevice(devices.devices[device].device);
+          }
+          break;
+      }
+    });
+
+    utility.broker.subscribe('beacon-egress', function(category, data) {
+      if(category == '.updates') {
+        renderDevice(data);
+      }
+    });
+  });
+
+  app.listen(8000);
 
   RED.start()
     .then(function () {
