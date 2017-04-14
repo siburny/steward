@@ -1,6 +1,7 @@
 var api = new API();
 
 var grid = null;
+var update_functions = [];
 function initGrid() {
   if(!!grid) {
     grid.gridList('destroy');
@@ -65,10 +66,13 @@ API.prototype.connect = function() {
     if(!!evt && !!evt.data) {
       var msg = JSON.parse(evt.data);
 
-      $('#grid #device-'+msg.id).remove();
-      $('#grid').append(msg.html);
-      
-      initGrid();
+      if($('#grid #device-'+msg.id).length == 0) {
+        $('#grid').append(msg.html);
+        initGrid();
+      }
+      if(update_functions.hasOwnProperty('update_'+msg.id)) {
+        update_functions['update_'+msg.id](msg.status, msg.info);
+      }
     }
   }
   this.websocket.onerror = function(evt) {

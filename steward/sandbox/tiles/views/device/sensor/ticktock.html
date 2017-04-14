@@ -1,7 +1,19 @@
-  <li data-w="1" data-h="1" data-x="{{x}}" data-y="{{y}}" class="status {{status}} z-depth-3" id="device-{{id}}">
+<li data-w="{{w}}" data-h="{{h}}" data-x="{{x}}" data-y="{{y}}" class="status {{status}} z-depth-3" id="device-{{id}}">
 	<div class="device">
 		<div class="name">{{name}}</div>
-	  <div class="icon"><span><i class="fa fa-{{icon}}" aria-hidden="true"></span></i>
-	  </div>
+		<div class="icon"><span><i class="fa fa-{{icon}}" aria-hidden="true"></span></i>
+		</div>
 	</div>
-  </li>
+
+  <script>
+		(function() {
+			var current_class = '{{status}}';
+			update_functions['update_{{id}}'] = function(status, info) {
+				if(!!status) {
+					$('#device-{{id}}').removeClass(current_class).addClass(status);
+					current_class = status;
+				}
+			}
+		})();
+  </script>
+</li>
