@@ -40,6 +40,11 @@ var widgets = {
     w: 1,
     h: 1,
     icon: 'check-square-o'
+  },
+  '/device/indicator/clock-widget': {
+    w: 1,
+    h: 1,
+    icon: ''
   }
 }
 
@@ -110,10 +115,10 @@ exports.start = function () {
         resdata.y = 0;
         resdata.name = data.name;
         resdata.status = data.status;
-        resdata.info = data.info;
+        resdata.info = JSON.stringify(data.info);
 
         app.render(data.whatami.replace(/^a-z0-9-/, '').substr(1), resdata, function(err, out) {
-          var msg = {'action': 'device', 'id': id, 'html': out};
+          var msg = {'action': 'device', 'id': id, 'html': out, 'status': data.status, 'info': data.info};
           if(!!ws && ws.readyState == 1) {
             ws.send(JSON.stringify(msg));
           }

@@ -7,16 +7,16 @@ var stringify   = require('json-stringify-safe')
   , utility     = require('./../../core/utility')
   , broker      = utility.broker
   , discovery   = require('./../../discovery/discovery-ssdp')
-  , sensor      = require('./../device-sensor')
+  , indicator      = require('./../device-indicator')
   ;
 
 
-var logger = sensor.logger;
+var logger = indicator.logger;
 
-var Sensor_Tick_Tock = exports.Device = function(deviceID, deviceUID, info) {
+var Indicator_Clock = exports.Device = function(deviceID, deviceUID, info) {
   var self = this;
 
-  self.whatami = '/device/sensor/ticktock';
+  self.whatami = '/device/indicator/clock-widget';
   self.deviceID = deviceID.toString();
   self.deviceUID = deviceUID;
   self.name = info.device.name;
@@ -34,27 +34,26 @@ var Sensor_Tick_Tock = exports.Device = function(deviceID, deviceUID, info) {
 
   setInterval(function() {
     self.update();
-  }, 2000)
+  }, 1000)
 };
-util.inherits(Sensor_Tick_Tock, sensor.Device);
+util.inherits(Indicator_Clock, indicator.Device);
 
-Sensor_Tick_Tock.prototype.update = function() {
+Indicator_Clock.prototype.update = function() {
   if(this.status === 'waiting') {
-    this.status = 'tick';
-  } else {
-    this.status = this.status === 'tick' ? 'tock' : 'tick';
+    this.status = 'live';
   }
+  this.info.date = new Date();
   this.changed();
 }
 
-function announce(i) {
+function announce() {
   var info = {};
   info.device = { url          : null
-                , name         : 'Tick Tock Sensor ' + i
+                , name         : 'Clock'
                 , manufacturer : ''
                 };
-  info.deviceType = "/device/sensor/ticktock";
-  info.id = "tick-tock-"+i;
+  info.deviceType = "/device/indicator/clock-widget";
+  info.id = "clock";
   if (!!devices.devices[info.id]) return;
 
   logger.info('found', { id: info.id });
@@ -63,30 +62,21 @@ function announce(i) {
 
 
 exports.start = function() {
-  steward.actors.device.sensor.ticktock = steward.actors.device.sensor.ticktock ||
-    { $info     : { type       : '/device/sensor/ticktock'
+  steward.actors.device.indicator['clock-widget'] = steward.actors.device.indicator['clock-winget'] ||
+    { $info     : { type       : '/device/indicator/clock-widget'
                   , observe    : [ ]
                   , perform    : [ ]
                   , properties : { name       : true
-                                  , status     : [ 'waiting', 'tick', 'tock' ]
+                                  , status     : [ 'waiting', 'live' ]
                                   , lastSample : 'timestamp'
                                   }
                   }
     , $validate : {
                   }
     };
-  devices.makers['/device/sensor/ticktock'] = Sensor_Tick_Tock;
+  devices.makers['/device/indicator/clock-widget'] = Indicator_Clock;
 
   setTimeout(function() {
-    announce(1);
-    /*setTimeout(function() {
-      announce(2);
-      setTimeout(function() {
-        announce(3);
-        setTimeout(function() {
-          announce(4);
-        }, 1500);
-      }, 1500);
-    }, 1500);*/
-  }, 500);
+    announce();
+  }, 100);
 };
