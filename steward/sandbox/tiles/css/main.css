@@ -5,9 +5,10 @@ html, body {
     background-color: #333;
     height:100%;
     overflow: hidden;
+    user-select: none;
 }
 nav {
-    background-color: #001f3f;
+    background-color: #01579b;
 }
 .grid-container {
     height:100%;
@@ -37,7 +38,7 @@ nav {
       left:0;
       right:0;
       color:#fff;
-      background-color: #222;
+      background-color: #444;
       margin: 1px;
   }
   .device .icon {
@@ -63,12 +64,11 @@ nav {
   }
 
 .status.on .device {
-    background-color: #2ECC40;
+    color: #2ECC40;
 }
 .status.off .device {
-    color1: #FF4136;
+    /*color: #FF4136;*/
 }
-
 .status.tick .device {
     color: #5B85C8;
 }

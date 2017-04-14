@@ -8,6 +8,7 @@ function initGrid() {
   }
 
   grid = $('#grid').gridList({
+    dragAndDrop: false,
     direction: 'vertical',
     lanes: 16,
     widthHeightRatio: 1,
