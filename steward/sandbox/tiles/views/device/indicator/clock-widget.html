@@ -1,7 +1,21 @@
-<li data-w="{{w}}" data-h="{{h}}" data-x="{{x}}" data-y="{{y}}" class="status {{status}} z-depth-3 clock" id="device-{{id}}">
+<li data-w="{{w}}" data-h="{{h}}" data-x="{{x}}" data-y="{{y}}" class="status z-depth-3 clock" id="device-{{id}}">
   <div class="device clock">
-    <div id="hour" style="transform: rotate(0deg) translate(0%, -3px); transform-origin: 0 0; width:25%;height:6px;background-color:#fff;position:absolute;top:50%;left:50%;border-radius:3px;"></div>
-    <div id="minute" style="transform: rotate(0deg) translate(0%, -2px); transform-origin: 0 0; width:45%;height:4px;background-color:#fff;position:absolute;top:50%;left:50%;border-radius:2px;"></div>
+    <div id="hour" style="transform: rotate(0deg) translate(0%, -3px); transform-origin: 0 0; width:20%;height:6px;background-color:#fff;position:absolute;top:50%;left:50%;border-radius:3px;"></div>
+    <div id="minute" style="transform: rotate(0deg) translate(0%, -2px); transform-origin: 0 0; width:35%;height:4px;background-color:#fff;position:absolute;top:50%;left:50%;border-radius:2px;"></div>
+    
+    <div style="transform: rotate(0deg) translate(0%, -1px);" class="dots"><div class="dot"></div></div>
+    <div style="transform: rotate(30deg) translate(0%, -1px);" class="dots"><div class="dot"></div></div>
+    <div style="transform: rotate(60deg) translate(0%, -1px);" class="dots"><div class="dot"></div></div>
+    <div style="transform: rotate(90deg) translate(0%, -1px);" class="dots"><div class="dot"></div></div>
+    <div style="transform: rotate(120deg) translate(0%, -1px);" class="dots"><div class="dot"></div></div>
+    <div style="transform: rotate(150deg) translate(0%, -1px);" class="dots"><div class="dot"></div></div>
+    <div style="transform: rotate(180deg) translate(0%, -1px);" class="dots"><div class="dot"></div></div>
+    <div style="transform: rotate(210deg) translate(0%, -1px);" class="dots"><div class="dot"></div></div>
+    <div style="transform: rotate(240deg) translate(0%, -1px);" class="dots"><div class="dot"></div></div>
+    <div style="transform: rotate(270deg) translate(0%, -1px);" class="dots"><div class="dot"></div></div>
+    <div style="transform: rotate(300deg) translate(0%, -1px);" class="dots"><div class="dot"></div></div>
+    <div style="transform: rotate(330deg) translate(0%, -1px);" class="dots"><div class="dot"></div></div>
+
     <div id="date"></div>
   </div>
 
@@ -19,6 +33,22 @@
     right: 0;
     text-align: center;
     margin: 5px;
+  }
+  .device.clock .dots {
+    position:absolute;
+    top:50%;
+    left:50%;
+    width:35%;
+    height:2px;
+    transform-origin: 0 0;
+  }
+  .device.clock .dots .dot {
+    position:absolute;
+    right:0;
+    background-color:#fff;
+    border-radius:1px;
+    width:2px;
+    height: 2px;
   }
   </style>
 
