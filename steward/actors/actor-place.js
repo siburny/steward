@@ -165,7 +165,6 @@ var Place = exports.Place = function(info) {
     delete(self.info.coordinates);
     self.setInfo();
   }
-  if (!self.info.woeid) self.getWoeID(self);
   self.info.review = [];
   self.info.ipaddrs = [];
   steward.forEachAddress(function(addr) { self.info.ipaddrs.push(addr); });
@@ -179,7 +178,6 @@ var Place = exports.Place = function(info) {
     info = utility.clone(self.info);
     delete(info.name);
     delete(info.ipaddrs);
-    delete(info.woeid);
     if (!!steward.uuid) info.identity = steward.uuid;
     if (!!server.vous) {
       info.remote = server.vous;
@@ -215,7 +213,7 @@ var Place = exports.Place = function(info) {
     if (request === 'perform') return self.perform(self, eventID, observe, parameter);
   });
 
-  if ((!!self.info.woeid) && (!self.weatherID)) {
+  if (!!self.info.location && !self.weatherID) {
     self.weatherID = setInterval(function() { self.getWeather(self); }, 30 * 60 * 1000);
     self.getWeather(self);
   }
@@ -334,7 +332,6 @@ Place.prototype.perform = function(self, taskID, perform, parameter) {
 
         geometry = result.results[0].geometry;
         place1.info.location = [ geometry.location.lat, geometry.location.lng ];
-        self.getWoeID(self);
         if (!!params.displayUnits) return;
 
         place1.info.displayUnits = 'metric';
@@ -349,7 +346,6 @@ Place.prototype.perform = function(self, taskID, perform, parameter) {
 
   if (!!params.location) {
     place1.info.location = utility.location_fuzz(params.location);
-    self.getWoeID(self);
     if (!params.physical) {
       geocoder.reverseGeocode(place1.info.location[0], place1.info.location[1], function(err, result) {
         if (!!err) return logger.warning('place/1', { event      : 'reverseGeocode'
@@ -407,104 +403,39 @@ Place.prototype.makecode = function() {
   this.info.pairingCode = ('000000' + Math.round(Math.random() * 999999)).substr(-6);
 };
 
-Place.prototype.getWoeID = function(self, tries) {
-  var retry = function(args) {
-    if (!args) args = {};
-    args.event = 'getWoeID';
-    logger.error('place/1', args);
-    setTimeout(function() { self.getWoeID(self, tries++); }, 5 * 60 * 1000);
-  };
-
-  if ((!place1.info.location) || !util.isArray(place1.info.location) || (place1.info.location.length < 2)) return;
-
-  if (!!tries) {
-    if (!!self.info.woeid) return;
-  } else {
-    delete(self.info.woeid);
-    tries = 1;
+Place.prototype.getWeather = function(self) {
+  if(!utility.configuration.forecastio.key)
+  {
+    return logger.error('place/1', { event: 'getWeather', diagnostic: 'Forecast.io needs a secret key in the configuration.json' });
   }
 
-  new yql.exec2('SELECT * FROM geo.places WHERE text = "('+self.info.location[0] + ',' + self.info.location[1]+')"',
-                {}, {}, function (err, response) {
-    var woeid;
+  var ForecastIO = require('forecastio');
+  var forecast = new ForecastIO(utility.configuration.forecastio.key);
+  forecast.forecast(self.info.location[0], self.info.location[1]).then(function(data) {
 
-    if (!!err) return retry({ diagnostic: err.message });
-
-    try {
-      woeid = parseInt(response.query.results.place.woeid, 10);
-      if (isNaN(woeid)) throw new Error('invalid WoeID');
-    } catch(ex) {
-      return retry({ response: response, diagnostic: ex.message });
-    }
-
-    self.info.woeid = woeid;
-    self.setInfo();
-    self.changed();
-
-    if (!!self.weatherID) clearInterval(self.weatherID);
-    self.weatherID = setInterval(function() { self.getWeather(self); }, 30 * 60 * 1000);
-    self.getWeather(self);
-  });
-};
-
-Place.prototype.getWeather = function(self) {
-  if (!self.info.woeid) return;
-
-  new yql.exec2('SELECT * FROM weather.forecast WHERE (woeid = @woeid) AND (u = "c")', { woeid: self.info.woeid }, {},
-  function (err, response) {
-    var a, atmosphere, current, diff, forecasts, i, now, pubdate, wind;
-
-    if (!!err) return logger.error('place/1', { event: 'getWeather', diagnostic: err.message });
-
-    try {
-      pubdate = new Date(response.query.results.channel.item.pubDate);
-      now = new Date().getTime();
-      diff = pubdate.getTime() + (75 * 60 * 1000) - now;
-
-      var retry = function() {
-        if (!!self.weatherID) return logger.warning('place/1', { event: 'getWeather', diagnostic: 'previously reset' });
-
-        logger.warning('place/1', { event: 'getWeather', diagnostic: 'reset to every 75 minutes' });
-        self.weatherID = setInterval(function() { self.getWeather(self); }, 75 * 60 * 1000);
-        self.getWeather(self);
-      };
-
-      if (diff > 0) {
-        if (!!self.weatherID) clearInterval(self.weatherID);
-        setTimeout(retry, diff + (5 * 60 * 1000));
-        logger.warning('place/1', { event      : 'getWeather'
-                                  , diagnostic : 'check in ' + ((diff / 1000) + 5 * 60).toFixed(3) + ' seconds' });
-      }
-
-      atmosphere = response.query.results.channel.atmosphere;
-      for (a in atmosphere) if ((atmosphere.hasOwnProperty(a)) && (atmosphere[a].length === 0)) delete(atmosphere[a]);
-      wind = response.query.results.channel.wind;
-      if (!wind) wind = { chill: '' };
-      if (wind.chill.length === 0) delete(wind.chill);
-      current = response.query.results.channel.item.condition;
-      if (current.temp.length === 0) delete(current.temp);
-      self.info.conditions = { code        : current.code
-                             , text        : current.text.toLowerCase()
-                             , temperature : current.temp
-                             , humidity    : atmosphere.humidity
-                             , pressure    : atmosphere.pressure
-                             , windchill   : wind.chill
-                             , visibility  : atmosphere.visibility
-                             , lastSample  : new Date(current.date).getTime()
+    self.info.conditions = { code          : data.currently.icon
+                             , text          : data.currently.summary
+                             , temperature   : data.currently.temperature
+                             , humidity      : data.currently.humidity
+                             , pressure      : data.currently.pressure
+                             , visibility    : data.currently.visibility
+                             , precipitation : data.currently.precipProbability || 0
+                             , lastSample    : new Date(data.currently.time).getTime()
                              };
 
-      self.info.forecasts = [];
-      forecasts = response.query.results.channel.item.forecast;
-      for (i = 0; i < forecasts.length; i++) {
-        self.info.forecasts.push({ code            : forecasts[i].code
-                                 , text            : forecasts[i].text.toLowerCase()
-                                 , highTemperature : forecasts[i].high
-                                 , lowTemperature  : forecasts[i].low
-                                 , nextSample      : new Date(forecasts[i].date).getTime()
-                                 });
-      }
-    } catch(ex) {
-      logger.error('place/1', { event: 'getWeather', diagnostic: ex.message });
+    var forecasts = data.daily.data;
+    self.info.forecasts = [];
+    for (i = 0; i < forecasts.length; i++) {
+      self.info.forecasts.push({ code            : forecasts[i].icon
+                               , text            : forecasts[i].summary
+                               , highTemperature : forecasts[i].high
+                               , lowTemperature  : forecasts[i].low
+                               , humidity        : forecasts[i].humidity
+                               , pressure        : forecasts[i].pressure
+                               , visibility      : forecasts[i].visibility
+                               , precipitation   : forecasts[i].precipProbability || 0
+                               , nextSample      : new Date(forecasts[i].time).getTime()
+                               });
     }
   });
 };
