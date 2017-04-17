@@ -94,6 +94,7 @@ exports.start = function () {
   app.use('/font-awesome/', express.static('node_modules/font-awesome'));
   app.use('/material-design-icons/', express.static('node_modules/material-design-icons-iconfont/dist'));
   app.use('/grid-list/', express.static('node_modules/grid-list/src/'));
+  app.use('/animated-climacons/', express.static('node_modules/animated-climacons/svgs/'));
   app.use('/', express.static('sandbox/tiles/'));
 
   app.engine('html', mustacheExpress());
