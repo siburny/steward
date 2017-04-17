@@ -44,7 +44,8 @@ var widgets = {
   '/device/indicator/clock-widget': {
     w: 1,
     h: 1,
-    icon: ''
+    icon: '',
+    priority: 1
   }
 }
 
@@ -112,7 +113,7 @@ exports.start = function () {
         var id = data.deviceID || data.whoami.replace('device/', '');
         var resdata = widgets[data.whatami];
         resdata.id = id;
-        resdata.x = id;
+        resdata.x = resdata.priority || id;
         resdata.y = 0;
         resdata.name = data.name;
         resdata.status = data.status;
