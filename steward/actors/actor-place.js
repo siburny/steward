@@ -213,7 +213,7 @@ var Place = exports.Place = function(info) {
     if (request === 'perform') return self.perform(self, eventID, observe, parameter);
   });
 
-  if (!!self.info.location && !self.weatherID) {
+  if (!self.weatherID) {
     self.weatherID = setInterval(function() { self.getWeather(self); }, 30 * 60 * 1000);
     self.getWeather(self);
   }
@@ -409,6 +409,10 @@ Place.prototype.getWeather = function(self) {
     return logger.error('place/1', { event: 'getWeather', diagnostic: 'Forecast.io needs a secret key in the configuration.json' });
   }
 
+  if(!self.info.location) {
+    return logger.warning('place/1', { event: 'getWeather', diagnostic: 'Location is not set.' });
+  }
+
   var ForecastIO = require('forecastio');
   var forecast = new ForecastIO(utility.configuration.forecastio.key);
   forecast.forecast(self.info.location[0], self.info.location[1]).then(function(data) {
@@ -428,8 +432,8 @@ Place.prototype.getWeather = function(self) {
     for (i = 0; i < forecasts.length; i++) {
       self.info.forecasts.push({ code            : forecasts[i].icon
                                , text            : forecasts[i].summary
-                               , highTemperature : forecasts[i].high
-                               , lowTemperature  : forecasts[i].low
+                               , highTemperature : forecasts[i].temperatureMax
+                               , lowTemperature  : forecasts[i].temperatureMin
                                , humidity        : forecasts[i].humidity
                                , pressure        : forecasts[i].pressure
                                , visibility      : forecasts[i].visibility
@@ -437,6 +441,10 @@ Place.prototype.getWeather = function(self) {
                                , nextSample      : new Date(forecasts[i].time).getTime()
                                });
     }
+
+    self.changed();
+
+    return logger.info('place/1', { event: 'getWeather', diagnostic: 'Loaded forecast from forecast.io' });
   });
 };
 
