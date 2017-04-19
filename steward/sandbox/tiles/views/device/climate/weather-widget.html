@@ -1,0 +1,52 @@
+<li data-w="{{w}}" data-h="{{h}}" data-x="{{x}}" data-y="{{y}}" class="status z-depth-3" id="device-{{id}}">
+	<div class="device weather">
+		<div class="today_title">Currently</div>
+		<div class="current">
+			<img src="" /><span style="font-size:0.75em;" id="temp"></span> <sup style="font-size:0.4em;">&deg;F</sup>
+		</div>
+		
+		<hr />
+
+		<div class="forecast today">
+			<div class="title">Today</div>
+			<img src="" /><span class="temp"><span id="high"></span>&deg;/<span id="low"></span>&deg;</span>
+			<div class="precip"><i class="fa fa-umbrella" aria-hidden="true"></i><span id="precip"></span>%</div>
+		</div>
+		<div class="forecast tomorrow">
+			<div class="title">Tomorrow</div>
+			<img src="" /><span class="temp"><span id="high"></span>&deg;/<span id="low"></span>&deg;</span>
+			<div class="precip"><i class="fa fa-umbrella" aria-hidden="true"></i><span id="precip"></span>%</div>
+		</div>
+	</div>
+
+  <style>
+    .device.weather .climacon { fill: #fff; height: 150%; vertical-align:top; margin-top:-5%; }
+    .device.weather .today_title { font-size:0.3em; margin:5px; top:0; line-height:100%; }
+    .device.weather .current { width:100%; height:1em; text-align:center; }
+    .device.weather .forecast { float:left; width:50%; height:1em; line-height:100%; margin-top:0.5em; font-size:0.4em; text-align:center; }
+    .device.weather hr { width:90%; margin:0 auto; border:1px solid #666; }
+    .device.weather .forecast .temp { font-size:0.75em; }
+    .device.weather .forecast .title { font-size:0.6em; }
+    .device.weather .forecast .precip { font-size:0.75em; }
+  </style>
+
+  <script>
+    update_functions['update_{{id}}'] = function(status, info) {
+      if(!!info) {
+        console.log(info);
+        if(!!info.conditions) {
+          $("#device-{{id}} .current #temp").text(Math.round(info.conditions.temperature));
+        }
+        if(!!info.forecasts && info.forecasts.length > 1) {
+          $("#device-{{id}} .forecast.today #high").text(Math.round(info.forecasts[0].temperatureMax));
+          $("#device-{{id}} .forecast.today #low").text(Math.round(info.forecasts[0].temperatureMin));
+          $("#device-{{id}} .forecast.today #precip").text(Math.round(info.forecasts[0].precipitation * 100));
+
+          $("#device-{{id}} .forecast.tomorrow #high").text(Math.round(info.forecasts[1].temperatureMax));
+          $("#device-{{id}} .forecast.tomorrow #low").text(Math.round(info.forecasts[1].temperatureMin));
+          $("#device-{{id}} .forecast.tomorrow #precip").text(Math.round(info.forecasts[1].precipitation * 100));
+        }
+      }
+    }
+  </script>
+</li>

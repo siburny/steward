@@ -8,6 +8,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "animated-climacons": "github:siburny/animated-climacons",
     "arp-a": "0.x",
     "async": "0.2.9",
     "color-convert": "1.x",
