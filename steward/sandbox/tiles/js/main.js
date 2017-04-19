@@ -1,7 +1,7 @@
 var api = new API();
 
 var grid = null;
-var update_functions = [];
+var update_functions = {};
 function initGrid() {
   if(!!grid) {
     grid.gridList('destroy');
@@ -112,7 +112,7 @@ API.prototype.reconnect = function() {
 /*
  * Replace all SVG images with inline SVG
  */
-$(function() {
+$.embedSVG = function() {
 	$('img[src$=".svg"]').each(function(){
 		var $img = $(this);
 		var imgID = $img.attr('id');
@@ -140,5 +140,5 @@ $(function() {
 		}, 'xml');
 
 	});
-});
+};
 

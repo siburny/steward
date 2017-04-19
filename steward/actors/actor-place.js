@@ -432,8 +432,8 @@ Place.prototype.getWeather = function(self) {
     for (i = 0; i < forecasts.length; i++) {
       self.info.forecasts.push({ code            : forecasts[i].icon
                                , text            : forecasts[i].summary
-                               , highTemperature : forecasts[i].temperatureMax
-                               , lowTemperature  : forecasts[i].temperatureMin
+                               , temperatureMax : forecasts[i].temperatureMax
+                               , temperatureMin  : forecasts[i].temperatureMin
                                , humidity        : forecasts[i].humidity
                                , pressure        : forecasts[i].pressure
                                , visibility      : forecasts[i].visibility

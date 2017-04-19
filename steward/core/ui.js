@@ -28,24 +28,25 @@ var nodes_blacklist = [
 var widgets = {
   '/device/switch/insteon/dimmer': {
     w: 1,
-    h: 1,
-    icon: 'lightbulb-o'
+    h: 1
   },
   '/device/switch/insteon/onoff': {
     w: 1,
-    h: 1,
-    icon: 'lightbulb-o'
+    h: 1
   },
   '/device/sensor/ticktock': {
     w: 1,
-    h: 1,
-    icon: 'check-square-o'
+    h: 1
   },
   '/device/indicator/clock-widget': {
     w: 1,
     h: 1,
-    icon: '',
     priority: 1
+  },
+  '/device/climate/weather-widget': {
+    w: 2,
+    h: 2,
+    priority: 2
   }
 }
 
@@ -113,7 +114,7 @@ exports.start = function () {
         var id = data.deviceID || data.whoami.replace('device/', '');
         var resdata = widgets[data.whatami];
         resdata.id = id;
-        resdata.x = resdata.priority || id;
+        resdata.x = -resdata.priority || id;
         resdata.y = 0;
         resdata.name = data.name;
         resdata.status = data.status;

@@ -34,7 +34,7 @@ var Sensor_Tick_Tock = exports.Device = function(deviceID, deviceUID, info) {
 
   setInterval(function() {
     self.update();
-  }, 2000)
+  }, 10000)
 };
 util.inherits(Sensor_Tick_Tock, sensor.Device);
 
@@ -79,14 +79,5 @@ exports.start = function() {
 
   setTimeout(function() {
     announce(1);
-    /*setTimeout(function() {
-      announce(2);
-      setTimeout(function() {
-        announce(3);
-        setTimeout(function() {
-          announce(4);
-        }, 1500);
-      }, 1500);
-    }, 1500);*/
   }, 500);
 };

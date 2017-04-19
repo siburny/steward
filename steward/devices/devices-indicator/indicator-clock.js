@@ -34,7 +34,7 @@ var Indicator_Clock = exports.Device = function(deviceID, deviceUID, info) {
 
   setInterval(function() {
     self.update();
-  }, 1000)
+  }, 10000)
 };
 util.inherits(Indicator_Clock, indicator.Device);
 
