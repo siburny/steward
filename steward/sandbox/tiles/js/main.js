@@ -24,17 +24,7 @@ $(function() {
   $(".button-collapse").sideNav();
 
   $(window).resize(function() {
-    var width = $(document).width();
-    var newsize = 0;	
-    if(width > 1200) {
-      newsize = 12;
-    } else if(width > 992) {
-      newsize = 10;
-    } else if(width > 600) {
-      newsize = 6;
-    } else {
-      newsize = 4;
-    }
+    newsize = Math.ceil(1.0 * $(document).width() / 175);
     
     grid.gridList('resize', newsize);
   });
