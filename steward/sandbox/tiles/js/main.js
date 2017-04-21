@@ -98,6 +98,11 @@ API.prototype.reconnect = function() {
     self.connect();
   }, this.timeout * 1000);
 }
+API.prototype.perform = function(id, action, params) {
+  if(!!this.websocket) {
+    this.websocket.send(JSON.stringify({ 'id': id, 'action': 'perform', 'method': action, 'params': params }));
+  }
+}
 
 /*
  * Replace all SVG images with inline SVG

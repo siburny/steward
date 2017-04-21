@@ -38,6 +38,19 @@ var Sensor_Tick_Tock = exports.Device = function(deviceID, deviceUID, info) {
 };
 util.inherits(Sensor_Tick_Tock, sensor.Device);
 
+Sensor_Tick_Tock.prototype.perform = function(self, taskID, perform, parameter) {
+  if (perform === 'set') return devices.perform(self, taskID, perform, parameter);
+
+  if (perform === 'toggle') {
+    logger.info('device/' + self.deviceID, { perform: perform });
+
+    self.update();
+
+    return steward.performed(taskID);
+  }
+};
+
+
 Sensor_Tick_Tock.prototype.update = function() {
   if(this.status === 'waiting') {
     this.status = 'tick';

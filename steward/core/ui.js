@@ -138,6 +138,14 @@ exports.start = function () {
             renderDevice(devices.devices[device].device);
           }
           break;
+        case 'perform':
+          if(!!msg.id) {
+            var device = devices.id2device(msg.id);
+            if(!!device) {
+              device.perform(device, null, msg.method, msg.params);
+            }
+          }
+          break;
       }
     });
 

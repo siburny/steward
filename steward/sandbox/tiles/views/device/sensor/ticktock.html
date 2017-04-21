@@ -1,4 +1,4 @@
-<li data-w="{{w}}" data-h="{{h}}" data-x="{{x}}" data-y="{{y}}" class="status {{status}} z-depth-3" id="device-{{id}}">
+<li data-w="{{w}}" data-h="{{h}}" data-x="{{x}}" data-y="{{y}}" class="status {{status}} z-depth-3 clickable" id="device-{{id}}">
 	<div class="device">
 		<div class="name">{{name}}</div>
 		<div class="icon"><span><i class="fa fa-check-square-o" aria-hidden="true"></span></i>
@@ -14,6 +14,9 @@
 					current_class = status;
 				}
 			}
+			$('#device-{{id}}').on('click', function() {
+				api.perform('{{id}}', 'toggle');
+			});
 		})();
   </script>
 </li>
