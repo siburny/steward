@@ -2,12 +2,12 @@
 	<div class="device weather">
 		<div class="today_title">Right now</div>
 		<div class="current">
-      <div style="float:left;width:2em;">
+      <div style="float:left;width:1.75em;">
 			  <img src="" />
       </div>
-      <div style="text-align: center;font-size:0.5em;line-height:100%;padding-top:1em;">
+      <div style="text-align: center;padding-top:0.3em;padding-right:0.5em;font-size:0.7em;line-height:0.75em;">
         <span id="temp"></span><sup style="font-size:0.6em;">&deg;F</sup><br />
-        <span><i class="fa fa-umbrella" aria-hidden="true"></i><span id="precip"></span>%</span>
+        <span style="font-size:0.5em;line-height:100%;"><i class="fa fa-umbrella" aria-hidden="true"></i> <span id="precip"></span>%</span>
       </div>
 		</div>
 		
@@ -33,11 +33,11 @@
 
   <style>
     .device.weather { background-color: #C8675B; }
-    .device.weather .climacon { fill: #fff; margin:-10% -10% -10% 0;}
+    .device.weather .climacon { fill: #fff; margin:-10% -10% -10% 10%;}
     .device.weather .today_title { font-size:0.3em; margin:5px; top:0; line-height:100%; }
-    .device.weather .current { }
+    .device.weather .current { margin-top: 0.2em; margin-bottom: 0.3em; }
     .device.weather .forecast { float:left; width:50%; height:1em; line-height:100%; margin-top:0.5em; font-size:0.4em; text-align:center; }
-    .device.weather hr { width:90%; margin:0 auto; border:1px solid #ccc; }
+    .device.weather hr { width:80%; margin:0 auto; border:1px solid #eee; }
     .device.weather .forecast .temp { font-size:0.65em; }
     .device.weather .forecast .title { font-size:0.55em; }
     .device.weather .forecast .precip { font-size:0.65em; }

@@ -445,6 +445,8 @@ Place.prototype.getWeather = function(self) {
     self.changed();
 
     return logger.info('place/1', { event: 'getWeather', diagnostic: 'Loaded forecast from forecast.io' });
+  }).catch(function(err) {
+    return logger.error('place/1', { event: 'getWeather', diagnostic: 'Cannot connect to Forecast.io' });
   });
 };
 

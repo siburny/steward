@@ -85,21 +85,21 @@ exports.start = function() {
 
 
 var logconfigs = {
-    climate   : { console: { level: 'debug'  } }
-  , devices   : { console: { level: 'info'   } }
-  , discovery : { console: { level: 'info'   } }
-  , gateway   : { console: { level: 'info'   } }
-  , indicator : { console: { level: 'info'   } }
-  , lighting  : { console: { level: 'info'   } }
-  , manage    : { console: { level: 'notice' } }
-  , media     : { console: { level: 'debug'  } }
-  , motive    : { console: { level: 'debug'  } }
-  , presence  : { console: { level: 'info'   } }
-  , sensor    : { console: { level: 'info'   } }
-  , server    : { console: { level: 'info'   } }
-  , steward   : { console: { level: 'notice' } }
-  , 'switch'  : { console: { level: 'info'   } }
-  , wearable  : { console: { level: 'debug'  } }
+    climate   : { console: { level: 'info' } }
+  , devices   : { console: { level: 'info' } }
+  , discovery : { console: { level: 'info' } }
+  , gateway   : { console: { level: 'info' } }
+  , indicator : { console: { level: 'info' } }
+  , lighting  : { console: { level: 'info' } }
+  , manage    : { console: { level: 'info' } }
+  , media     : { console: { level: 'info' } }
+  , motive    : { console: { level: 'info' } }
+  , presence  : { console: { level: 'info' } }
+  , sensor    : { console: { level: 'info' } }
+  , server    : { console: { level: 'info' } }
+  , steward   : { console: { level: 'info' } }
+  , 'switch'  : { console: { level: 'info' } }
+  , wearable  : { console: { level: 'info' } }
 };
 
 var devices = null;
