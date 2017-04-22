@@ -1,7 +1,30 @@
-  <li data-w="1" data-h="1" data-x="{{x}}" data-y="{{y}}" class="status {{status}} z-depth-3" id="device-{{id}}">
+<li data-w="1" data-h="1" data-x="{{x}}" data-y="{{y}}" class="status {{status}} z-depth-3" id="device-{{id}}">
 	<div class="device">
 		<div class="name">{{name}}</div>
-	  <div class="icon"><span><i class="fa fa-lightbulb-o" aria-hidden="true"></span></i>
-	  </div>
+		<div class="icon"><span><i class="fa fa-lightbulb-o" aria-hidden="true"></span></i>
+		</div>
 	</div>
-  </li>
+  
+	<script>
+		(function() {
+			var current = {'status': ''};
+			update_functions['update_{{id}}'] = function(status, info) {
+				if(!!status) {
+					current.status = status;
+					if(status === 'on') {
+						$('#device-{{id}}').removeClass('off').addClass('on');	
+					} else if(status === 'off') {
+						$('#device-{{id}}').removeClass('on').addClass('off');	
+					}
+				}
+			}
+			$('#device-{{id}}').on('click', function() {
+				if(current.status === 'on') {
+					api.perform('{{id}}', 'off');
+				} else if(current.status === 'off') {
+					api.perform('{{id}}', 'on');
+				}
+			});
+		});
+  </script>
+</li>
