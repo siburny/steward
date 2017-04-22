@@ -1,21 +1,33 @@
-<li data-w="1" data-h="1" data-x="{{x}}" data-y="{{y}}" class="status {{status}} z-depth-3" id="device-{{id}}">
+<li data-w="1" data-h="1" data-x="{{x}}" data-y="{{y}}" class="status {{status}} z-depth-3 clickable" id="device-{{id}}">
 	<div class="device">
 		<div class="name">{{name}}</div>
-		<div class="icon"><span><i class="fa fa-lightbulb-o" aria-hidden="true"></span></i>
+		<div class="icon"><span><i class="fa fa-lightbulb-o" aria-hidden="true"></span></i></div>
+		<div class="level">
+			<div class="brighten">+</div>
+			<span id="level">100</span>%
+			<div class="dim">-</div>
 		</div>
 	</div>
+
+	<style>
+		.device .level { font-size: 0.2em; text-align: center; position: absolute; left: 0; right: 0; bottom: 0; line-height: 150%;}
+		.device .level .dim { position: absolute; right: 0; bottom: 0; font-size: 2em; width: 2em; height: 1.5em; padding: 0.25em 0; }
+		.device .level .brighten { position: absolute; left: 0; bottom: 0; font-size: 2em; width: 2em; height: 1.5em; padding: 0.25em 0; }
+	</style>
   
 	<script>
 		(function() {
-			var current = {'status': ''};
+			var current = {'status': '', 'level': 0};
 			update_functions['update_{{id}}'] = function(status, info) {
 				if(!!status) {
 					current.status = status;
+					current.level = info.level;
 					if(status === 'on') {
 						$('#device-{{id}}').removeClass('off').addClass('on');	
 					} else if(status === 'off') {
 						$('#device-{{id}}').removeClass('on').addClass('off');	
 					}
+					$('#device-{{id}} #level').text(info.level);	
 				}
 			}
 			$('#device-{{id}}').on('click', function() {
@@ -25,6 +37,22 @@
 					api.perform('{{id}}', 'on');
 				}
 			});
-		});
+			$('#device-{{id}} .dim').on('click', function() {
+				current.level -= 10;
+				current.status = 'on';
+				if(current.level <= 0) { current.status = 'off'; current.level = 0 };
+
+				api.perform('{{id}}', current.status, { level: current.level });
+				return false;
+			});
+			$('#device-{{id}} .brighten').on('click', function() {
+				current.level += 10;
+				current.status = 'on';
+				if(current.level > 100) current.level = 100;
+
+				api.perform('{{id}}', current.status, { level: current.level });
+				return false;
+			});
+		})();
   </script>
 </li>

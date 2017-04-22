@@ -59,7 +59,6 @@
       };
 
       if(!!info) {
-        console.log(info);
         if(!!info.conditions) {
           $("#device-{{id}} .current #temp").text(Math.round(info.conditions.temperature));
           $("#device-{{id}} .current #precip").text(Math.round(info.conditions.precipitation * 100));

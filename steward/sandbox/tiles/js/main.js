@@ -100,7 +100,7 @@ API.prototype.reconnect = function() {
 }
 API.prototype.perform = function(id, action, params) {
   if(!!this.websocket) {
-    this.websocket.send(JSON.stringify({ 'id': id, 'action': 'perform', 'method': action, 'params': params }));
+    this.websocket.send(JSON.stringify({ 'id': id, 'action': 'perform', 'method': action, 'params': JSON.stringify(params) }));
   }
 }
 
