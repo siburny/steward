@@ -1,7 +1,8 @@
 var utility = require('./../core/utility'),
   logger = exports.logger = utility.logger('ui'),
   devices = require('./device'),
-  utility = require('./../core/utility');
+  utility = require('./../core/utility'),
+  fs = require('fs');
 
 var nodes_blacklist = [
   "node-red/sentiment",
@@ -26,28 +27,12 @@ var nodes_blacklist = [
 ]
 
 var widgets = {
-  '/device/switch/insteon/dimmer': {
-    w: 1,
-    h: 1
-  },
-  '/device/switch/insteon/onoff': {
-    w: 1,
-    h: 1
-  },
-  '/device/sensor/ticktock': {
-    w: 1,
-    h: 1
-  },
-  '/device/indicator/clock-widget': {
-    w: 1,
-    h: 1,
-    priority: 1
-  },
-  '/device/climate/weather-widget': {
-    w: 2,
-    h: 2,
-    priority: 2
-  }
+  '/device/switch/insteon/dimmer': { },
+  '/device/switch/insteon/onoff': { },
+  '/device/sensor/ticktock': { },
+  '/device/indicator/clock-widget': { priority: 1 },
+  '/device/climate/weather-widget': { priority: 3 },
+  '/device/climate/insteon/control': { priority: 2 }
 }
 
 function disable_nodes(RED) {
@@ -69,14 +54,14 @@ function disable_nodes(RED) {
 }
 
 exports.start = function () {
-  var http = require('http');
+  var https = require('https');
   var express = require("express");
   var RED = require("node-red");
 
   var app = express();
-  var expressWs = require('express-ws')(app);
   var mustacheExpress = require('mustache-express');
-  var server = http.createServer(app);
+  var server = https.createServer({ key  : fs.readFileSync(__dirname + '/../db/server.key').toString(), cert : fs.readFileSync(__dirname + '/../sandbox/server.crt').toString() }, app);
+  var expressWs = require('express-ws')(app, server);
 
   var settings = {
     httpAdminRoot: '/red/',
@@ -156,7 +141,7 @@ exports.start = function () {
     });
   });
 
-  app.listen(8000);
+  server.listen(8000);
 
   RED.start()
     .then(function () {
