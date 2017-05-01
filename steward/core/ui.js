@@ -75,13 +75,14 @@ exports.start = function () {
   app.use(settings.httpAdminRoot, RED.httpAdmin);
   app.use(settings.httpNodeRoot, RED.httpNode);
 
-  app.use('/jquery/', express.static('node_modules/jquery/dist/'));
-  app.use('/jquery-ui/', express.static('node_modules/jquery-ui-bundle/'));
-  app.use('/materialize/', express.static('node_modules/materialize-css/dist'));
-  app.use('/font-awesome/', express.static('node_modules/font-awesome'));
-  app.use('/material-design-icons/', express.static('node_modules/material-design-icons-iconfont/dist'));
-  app.use('/grid-list/', express.static('node_modules/grid-list/src/'));
-  app.use('/animated-climacons/', express.static('node_modules/animated-climacons/svgs/'));
+  app.use('/modules/jquery/', express.static('node_modules/jquery/dist/'));
+  app.use('/modules/jquery-ui/', express.static('node_modules/jquery-ui-bundle/'));
+  app.use('/modules/materialize/', express.static('node_modules/materialize-css/dist'));
+  app.use('/modules/font-awesome/', express.static('node_modules/font-awesome'));
+  app.use('/modules/material-design-icons/', express.static('node_modules/material-design-icons-iconfont/dist'));
+  app.use('/modules/grid-list/', express.static('node_modules/grid-list/src/'));
+  app.use('/modules/animated-climacons/', express.static('node_modules/animated-climacons/svgs/'));
+  app.use('/modules/jquery-taphold/', express.static('node_modules/jquery-taphold/'));
   app.use('/', express.static('sandbox/tiles/'));
 
   app.engine('html', mustacheExpress());
