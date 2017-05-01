@@ -1,86 +1,31 @@
 <li data-w="1" data-h="2" data-x="{{x}}" data-y="{{y}}" class="status z-depth-3" id="device-{{id}}">
-	<div class="device weather">
-		<div class="today_title">Right now</div>
-		<div class="current">
-      <div style="float:left;width:1.75em;">
-			  <img src="" />
-      </div>
-      <div style="text-align: center;padding-top:0.3em;padding-right:0.5em;font-size:0.7em;line-height:0.75em;">
-        <span id="temp"></span><sup style="font-size:0.6em;">&deg;F</sup><br />
-        <span style="font-size:0.5em;line-height:100%;"><i class="fa fa-umbrella" aria-hidden="true"></i> <span id="precip"></span>%</span>
-      </div>
+	<div class="device.thermostat">
+		<div class="name">Aiden's Room</div>
+
+		<div class="valign-wrapper" style="position:absolute;top:0;bottom:0;left:0;right:0;">
+			<div style="font-size:0.6em;text-align:center;width:100%;"><i style="font-size:1em;" class="fa fa-fire" aria-hidden="true"></i> 75&deg;<sup style="font-size:0.6em;">F</sup></div>
 		</div>
 		
-		<hr />
-
-		<div class="forecast today">
-			<div class="title">Today</div>
-      <div style="float:left;width:2em;">
-			  <img src="" />
-      </div>
-      <div class="temp"><span id="high"></span>&deg;/<span id="low"></span>&deg;</div>
-			<div class="precip"><i class="fa fa-umbrella" aria-hidden="true"></i> <span id="precip"></span>%</div>
+		<div class="valign-wrapper" style="position:absolute;top:0;bottom:0;left:0;right:0;">
+			<div style="width:100%;">
+				<div style="margin-bottom:0.8em;">
+					<i class="fa fa-chevron-up" aria-hidden="true"></i>
+				</div>
+				<div style="margin-bottom:0.125em;">
+					<i class="fa fa-chevron-down" aria-hidden="true"></i>
+				</div>
+			</div>
 		</div>
-		<div class="forecast tomorrow">
-			<div class="title">Tomorrow</div>
-      <div style="float:left;width:2em;">
-  			<img src="" />
-      </div>
-      <div class="temp"><span id="high"></span>&deg;/<span id="low"></span>&deg;</div>
-			<div class="precip"><i class="fa fa-umbrella" aria-hidden="true"></i> <span id="precip"></span>%</div>
-		</div>
+		
+		<div style="position:absolute;bottom:0;left:0;right:0;font-size:0.2em;line-height:100%;margin:5px;text-align:right;">21&deg;, 35%, Heat</div>
 	</div>
 
   <style>
     .device.weather { background-color: #C8675B; }
-    .device.weather .climacon { fill: #fff; margin:-10% -10% -10% 10%;}
-    .device.weather .today_title { font-size:0.3em; margin:5px; top:0; line-height:100%; }
-    .device.weather .current { margin-top: 0.2em; margin-bottom: 0.3em; }
-    .device.weather .forecast { float:left; width:50%; height:1em; line-height:100%; margin-top:0.5em; font-size:0.4em; text-align:center; }
-    .device.weather hr { width:80%; margin:0 auto; border:1px solid #eee; }
-    .device.weather .forecast .temp { font-size:0.65em; }
-    .device.weather .forecast .title { font-size:0.55em; }
-    .device.weather .forecast .precip { font-size:0.65em; }
   </style>
 
   <script>
     update_functions['update_{{id}}'] = function(status, info) {
-      var weather_icons = {
-        'clear-day': 'sun.svg',
-        'clear-night': 'moon.svg',
-        'rain': 'cloudRainAlt.svg',
-        'snow': 'cloudSnowAlt.svg',
-        'sleet': 'cloudDrizzle.svg',
-        'wind': 'wind.svg',
-        'fog': 'cloudFog.svg',
-        'cloudy': 'cloud.svg',
-        'partly-cloudy-day': 'cloudSun.svg',
-        'partly-cloudy-night': 'cloudMoon.svg',
-      };
-
-      if(!!info) {
-        if(!!info.conditions) {
-          $("#device-{{id}} .current #temp").text(Math.round(info.conditions.temperature));
-          $("#device-{{id}} .current #precip").text(Math.round(info.conditions.precipitation * 100));
-          if(!!weather_icons[info.conditions.code]) {
-            $("#device-{{id}} .current img").attr('src', '/animated-climacons/' + weather_icons[info.conditions.code]);
-            $.embedSVG();
-          }
-        }
-        if(!!info.forecasts && info.forecasts.length > 1) {
-          $("#device-{{id}} .forecast.today #high").text(Math.round(info.forecasts[0].temperatureMax));
-          $("#device-{{id}} .forecast.today #low").text(Math.round(info.forecasts[0].temperatureMin));
-          $("#device-{{id}} .forecast.today #precip").text(Math.round(info.forecasts[0].precipitation * 100));
-
-          $("#device-{{id}} .forecast.tomorrow #high").text(Math.round(info.forecasts[1].temperatureMax));
-          $("#device-{{id}} .forecast.tomorrow #low").text(Math.round(info.forecasts[1].temperatureMin));
-          $("#device-{{id}} .forecast.tomorrow #precip").text(Math.round(info.forecasts[1].precipitation * 100));
-
-          $("#device-{{id}} .forecast.today img").attr('src', '/animated-climacons/' + weather_icons[info.forecasts[0].code]);
-          $("#device-{{id}} .forecast.tomorrow img").attr('src', '/animated-climacons/' + weather_icons[info.forecasts[1].code]);
-          $.embedSVG();
-        }
-      }
     }
   </script>
 </li>
