@@ -129,13 +129,10 @@ Thermostat.prototype.update = function(self, params) {
                            }
 
           , mode         : function(v) {
-                             if (v == 'auto') v = 'fan';
                              if (self.info.hvac === v) return;
 
                              self.info.hvac = v;
                              updateP = true;
-
-                             //self.thermostat
                            }
 
           , fan          : function(v) {
@@ -143,12 +140,6 @@ Thermostat.prototype.update = function(self, params) {
 
                              if (self.info.fan !== fan) {
                                self.info.fan = fan;
-                               updateP = true;
-                             }
-                             if (!v) return;
-
-                             if (self.info.hvac !== 'fan') {
-                               self.info.hvac = 'fan';
                                updateP = true;
                              }
                            }
@@ -192,24 +183,20 @@ Thermostat.operations =
              case 'off':
              case 'cool':
              case 'heat':
+             case 'auto':
                self.thermostat.mode(value, function(err, value) {
+                 self.update(self, { 'mode': value });
                });
                break;
-
-             case 'fan':
-// set mode to auto
-               break;
-           }
+            }
          });
 
          devices.attempt_perform('fan', params, function(value) {
            switch (value) {
              case 'on':
-// set fan to true
                break;
 
              case 'auto':
-// set mode to auto
                break;
            }
          });
@@ -219,7 +206,7 @@ Thermostat.operations =
 
            goalTemperature = parseInt(value, 10);
            if (isNaN(goalTemperature)) return;
-// set setpoints.cool and setpoints.heat
+            // set setpoints.cool and setpoints.heat
          });
        }
 };
@@ -247,12 +234,12 @@ var validate_perform = function(perform, parameter) {
 
   if (!params) return result;
 
-  devices.validate_param('name',            params, result, false, {                                   });
-  devices.validate_param('ikon',            params, result, false, {                                   });
-  devices.validate_param('away',            params, result, false, { off:  1, on:  1                   });
-  devices.validate_param('hvac',            params, result, false, { off:  1, fan: 1, heat: 1, cool: 1 });
-  devices.validate_param('fan',             params, result, false, {          on:  1, auto: 1          });
-  devices.validate_param('goalTemperature', params, result, true,  {                                   });
+  devices.validate_param('name',            params, result, false, {                                    });
+  devices.validate_param('ikon',            params, result, false, {                                    });
+  devices.validate_param('away',            params, result, false, { off:  1, on:  1                    });
+  devices.validate_param('hvac',            params, result, false, { off:  1, auto: 1, heat: 1, cool: 1 });
+  devices.validate_param('fan',             params, result, false, {          on:  1, auto: 1           });
+  devices.validate_param('goalTemperature', params, result, true,  {                                    });
 
   return result;
 };
@@ -272,7 +259,7 @@ exports.start = function() {
                                    , temperature     : 'celsius'
                                    , humidity        : 'percentage'
                                    , away            : [ 'on', 'off' ]
-                                   , hvac            : [ 'cool', 'heat', 'fan', 'off' ]
+                                   , hvac            : [ 'cool', 'heat', 'auto', 'off' ]
                                    , fan             : [ 'on', 'auto' ]
                                    , goalTemperature : 'celsius'
                                    }
