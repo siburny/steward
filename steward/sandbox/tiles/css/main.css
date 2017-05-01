@@ -28,9 +28,6 @@ nav {
     text-align: center;
     line-height: 100%;
   }
-  .grid li.clickable {
-    cursor: pointer;
-  }
   li .device {
       position:absolute;
       top:0;
