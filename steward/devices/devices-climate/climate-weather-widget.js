@@ -29,7 +29,7 @@ var Weather_Widget = exports.Device = function (deviceID, deviceUID, info) {
     if (request === 'perform') return self.perform(self, eventID, observe, parameter);
   });
 
-  utility.broker.subscribe('beacon-egress', function(category, data) {
+  broker.subscribe('beacon-egress', function(category, data) {
     if(category == '.updates'){
       if(!Array.isArray(data))
       {
@@ -41,6 +41,7 @@ var Weather_Widget = exports.Device = function (deviceID, deviceUID, info) {
         var item = data[i];
         if(!!item && !!item.whatami && item.whatami ==='/place' && !!item.info.conditions)
         {
+          self.status = 'live';
           self.info.conditions = item.info.conditions;
           self.info.forecasts = item.info.forecasts;
           self.changed();
