@@ -17,13 +17,15 @@
 			$('#device-{{id}}').on('click', function() {
 				api.perform('{{id}}', 'toggle');
 			});
+			$('.modal').modal();
 			$('#device-{{id}}').on('taphold', function() {
 				Materialize.toast('I am a toast', 4000);
+				$('#settings-{{id}}').modal('open');
 			});
 		})();
   </script>
 
-	<div id="modal1" class="modal">
+	<div id="settings-{{id}}" class="modal">
     <div class="modal-content">
       <h4>Modal Header</h4>
       <p>A bunch of text</p>
