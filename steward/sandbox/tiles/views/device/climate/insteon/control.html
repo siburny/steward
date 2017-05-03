@@ -1,5 +1,5 @@
 <li data-w="1" data-h="2" data-x="{{x}}" data-y="{{y}}" class="status z-depth-3" id="device-{{id}}">
-	<div class="device.thermostat">
+	<div class="device thermostat">
 		<div class="name">Aiden's Room</div>
 
 		<div class="valign-wrapper" style="position:absolute;top:0;bottom:0;left:0;right:0;">
@@ -8,10 +8,10 @@
 		
 		<div class="valign-wrapper" style="position:absolute;top:0;bottom:0;left:0;right:0;">
 			<div style="width:100%;">
-				<div style="margin-bottom:0.8em;">
+				<div style="padding-bottom:0.4em;overflow:visible;" class="waves-effect waves-light">
 					<i class="fa fa-chevron-up" aria-hidden="true"></i>
 				</div>
-				<div style="margin-bottom:0.125em;">
+				<div style="margin-bottom:0.125em;padding-top:0.4em;overflow:visible;" class="waves-effect waves-light">
 					<i class="fa fa-chevron-down" aria-hidden="true"></i>
 				</div>
 			</div>
@@ -21,11 +21,14 @@
 	</div>
 
   <style>
-    .device.weather { background-color: #C8675B; }
+    .device.thermostat { background-color: #5BBBC8; }
   </style>
 
   <script>
     update_functions['update_{{id}}'] = function(status, info) {
     }
+    $('#device-{{id}}').on('taphold', function() {
+			Materialize.toast('I am a toast', 4000);
+		});
   </script>
 </li>

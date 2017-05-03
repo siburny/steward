@@ -28,6 +28,19 @@ nav {
     text-align: center;
     line-height: 100%;
   }
+    .grid li.unknown .device * {
+      display: none;
+    }
+    .grid li.unknown .device:before {
+      z-index: 999;
+      font-family: FontAwesome;
+      content: "\f021";
+      position: absolute;
+      left:0;right: 0;top:0;bottom: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
   li .device {
       position:absolute;
       top:0;
@@ -37,6 +50,9 @@ nav {
       color:#fff;
       background-color: #444;
       margin: 1px;
+  }
+  li.unknown .device {
+    background-color: #444;
   }
   .device .icon {
     position:absolute;
