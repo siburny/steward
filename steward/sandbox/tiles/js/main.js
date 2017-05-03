@@ -61,6 +61,9 @@ API.prototype.connect = function() {
         initGrid();
       }
       if(update_functions.hasOwnProperty('update_'+msg.id)) {
+        if(msg.status !== 'waiting') {
+          $('#device-'+msg.id).removeClass('waiting');
+        }
         update_functions['update_'+msg.id](msg.status, msg.info);
       }
     }

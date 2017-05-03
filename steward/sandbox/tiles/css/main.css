@@ -28,10 +28,10 @@ nav {
     text-align: center;
     line-height: 100%;
   }
-    .grid li.unknown .device * {
+    .grid li.waiting .device *:not(.name):not(.today_title) {
       display: none;
     }
-    .grid li.unknown .device:before {
+    .grid li.waiting .device:before {
       z-index: 999;
       font-family: FontAwesome;
       content: "\f021";
@@ -40,6 +40,8 @@ nav {
       display: flex;
       justify-content: center;
       align-items: center;
+      animation: fa-spin 2s infinite linear;
+      font-size: 1em;
     }
   li .device {
       position:absolute;
@@ -88,51 +90,3 @@ nav {
 .status.tock .device {
     color: #C8675B;
 }
-
-
-
-
-
-
-
-
-
-
-
-/*.col.device {
-    border: 1px solid #eee;
-    margin: 0;
-    text-align: center;
-    font-size: 4vw;
-    background-color: #cccccc;
-    color: white;
-    height:8.33vw;
-}
-
-.col.device.on {
-    background-color: #2ECC40;
-}
-.col.device.off {
-    background-color: #FF4136;
-}*/
-/*
-@media only screen and (max-width: 992px) {
-    .col.device {
-        height:16.67vw;
-        font-size:8vw;
-    }
-}
-
-@media only screen and (max-width: 600px) {
-    .col.device {
-        height:25vw;
-        font-size:12vw;
-    }
-}
-
-.col.h2 {
-    height: 16.65vw;
-}
- 
-
-*/
