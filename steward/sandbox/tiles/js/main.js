@@ -39,7 +39,7 @@ function API() {
 API.prototype.connect = function() {
   var self = this;
   
-  this.websocket = new WebSocket('wss://' + window.location.hostname + ':8000/api/');
+  this.websocket = new WebSocket((window.location.protocol === 'http:' ? 'ws:' : 'wss:') + '//' + window.location.host + '/api/');
   this.websocket.onopen = function(evt) { 
     self.timeout = 5;
     Materialize.toast('Connected.', 2000);
