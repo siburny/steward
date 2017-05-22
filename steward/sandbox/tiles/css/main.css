@@ -89,3 +89,8 @@ nav {
 .status.tock .device {
     color: #C8675B;
 }
+.modal {
+  line-height: 100%;
+  font-size: 1rem;
+  text-align: left;
+}
