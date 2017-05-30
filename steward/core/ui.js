@@ -29,9 +29,10 @@ var nodes_blacklist = [
 ]
 
 var widgets = {
-  '/device/switch/insteon/dimmer': { },
-  '/device/switch/insteon/onoff': { },
-  '/device/sensor/ticktock': { },
+  '/device/gateway/insteon/usb': {},
+  '/device/switch/insteon/dimmer': {},
+  '/device/switch/insteon/onoff': {},
+  '/device/sensor/ticktock': {},
   '/device/indicator/clock-widget': { priority: 1 },
   '/device/climate/weather-widget': { priority: 3 },
   '/device/climate/insteon/control': { priority: 2 }
@@ -55,18 +56,10 @@ function disable_nodes(RED) {
   }
 }
 
-exports.start = function () {
-  var http = require('http');
-  var https = require('https');
-  var express = require("express");
+exports.start = function (server, serverSecure, app) {
   var RED = require("node-red");
-
-  var app = express();
   var mustacheExpress = require('mustache-express');
-  var server = http.createServer(app);
-  var serverSecure = https.createServer({ key  : fs.readFileSync(__dirname + '/../db/server.key').toString(), cert : fs.readFileSync(__dirname + '/../sandbox/server.crt').toString() }, app);
-  var expressWs = require('express-ws')(app, server);
-  var expressWss = require('express-ws')(app, serverSecure);
+  var express = require("express");
 
   var settings = {
     httpAdminRoot: '/red/',
@@ -92,7 +85,8 @@ exports.start = function () {
   app.use('/', express.static('sandbox/tiles/'));
 
   app.use(bodyParser.json());
-  app.use(bodyParser.urlencoded({extended: true}));
+  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(require('res-error'));
 
   app.engine('html', mustacheExpress());
   app.set('view engine', 'html');
@@ -104,12 +98,12 @@ exports.start = function () {
   });
 
   app.get('/cloud/endpoint', function (req, res) {
-    res.json({'index': 'ok'});
+    res.json({ 'index': 'ok' });
   });
 
-  app.ws('/api/', function(ws, req) {
+  app.ws('/api/', function (ws, req) {
     function renderDevice(data) {
-      if(widgets[data.whatami]) {
+      if (widgets[data.whatami]) {
         var id = data.deviceID || data.whoami.replace('device/', '');
         var resdata = widgets[data.whatami];
         resdata.id = id;
@@ -119,28 +113,27 @@ exports.start = function () {
         resdata.status = data.status;
         resdata.info = JSON.stringify(data.info);
 
-        app.render(data.whatami.replace(/^a-z0-9-/, '').substr(1), resdata, function(err, out) {
-          var msg = {'action': 'device', 'id': id, 'html': out, 'status': data.status, 'info': data.info};
-          if(!!ws && ws.readyState == 1) {
+        app.render(data.whatami.replace(/^a-z0-9-/, '').substr(1), resdata, function (err, out) {
+          var msg = { 'action': 'device', 'id': id, 'html': out, 'status': data.status, 'info': data.info };
+          if (!!ws && ws.readyState == 1) {
             ws.send(JSON.stringify(msg));
           }
         });
       }
     }
 
-    ws.on('message', function(msg) {
+    ws.on('message', function (msg) {
       var msg = JSON.parse(msg);
-      switch(msg.action)
-      {
+      switch (msg.action) {
         case 'loadDevices':
-          for(var device in devices.devices) {
+          for (var device in devices.devices) {
             renderDevice(devices.devices[device].device);
           }
           break;
         case 'perform':
-          if(!!msg.id) {
+          if (!!msg.id) {
             var device = devices.id2device(msg.id);
-            if(!!device) {
+            if (!!device) {
               device.perform(device, null, msg.method, msg.params);
             }
           }
@@ -148,8 +141,13 @@ exports.start = function () {
       }
     });
 
-    utility.broker.subscribe('beacon-egress', function(category, data) {
-      if(category == '.updates') {
+    ws.on('close', function() {
+
+    });
+
+    utility.broker.subscribe('beacon-egress', function (category, data) {
+      console.log(data);
+      if (category == '.updates') {
         renderDevice(data);
       }
     });
@@ -195,7 +193,7 @@ exports.start = function () {
 
   });
 
-app.all('/cloud/token', function (req, res) {
+  app.all('/cloud/token', function (req, res) {
     console.log('/token query', req.query);
     console.log('/token body', req.body);
     let client_id = req.query.client_id ? req.query.client_id : req.body.client_id;
@@ -267,9 +265,6 @@ app.all('/cloud/token', function (req, res) {
         path, req.body.client_id, req.body.redirect_uri, req.body.state));
     }
   });
-
-  server.listen(8000);
-  serverSecure.listen(8443);
 
   RED.start()
     .then(function () {
