@@ -39,3 +39,4 @@ typescript
 .idea
 *.iml
 *.backup
+*.pem
