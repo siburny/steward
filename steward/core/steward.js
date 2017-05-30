@@ -444,11 +444,14 @@ exports.clientInfo = function (connection, secureP) {
   };
 
   // NB: note that https://127.0.0.1 is remote access
-  if (connection.remoteAddress === '127.0.0.1') props.loopback = true;
-  else {
+  if (connection.remoteAddress === '127.0.0.1'
+    || connection.remoteAddress === '::1'
+    || connection.remoteAddress === '::ffff:127.0.0.1') {
+    props.loopback = true;
+  } else {
     // TBD: in node 0.11, this should be reworked....
     //      would prefer to distinguish between on the same subnet or not
-    props.subnet = true;
+    props.subnet = false;
     /*
         for (ifname in ifaces) {
           if (!ifaces.hasOwnProperty(ifname)) continue;
@@ -498,6 +501,7 @@ var pass2 = function () {
   if (!!exports.uuid) {
     logger.notice('start', { uuid: exports.uuid });
     server.start();
+
     setInterval(scan, 3 * 1000);
     setInterval(function () {
       var module, now;
