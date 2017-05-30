@@ -1,0 +1,870 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>&#x24e3; client bootstrap</title>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<style>
+  body {
+    background: #16161D;
+    color: white;
+  	font-size: 13pt;
+	font-family: "Trebuchet MS";    
+	text-align: center;
+  }
+  
+a { color: #fff; }  
+h1 { text-transform: uppercase; font-size: 22pt; font-family: "Roadgeek 2005 Series D";  }
+
+#main { text-align: left; margin: 20px 72px; }
+
+table.short-form td { padding: 10px; }
+
+.form-container { background: url('d3/popovers/assets/window.form.svg') no-repeat; width: 600px; height: 250px; padding: 30px; margin: 30px auto; }
+.form-container-short { background: url('d3/popovers/assets/window.form.short.svg') no-repeat; width: 600px; height: 180px; padding: 30px; margin: 30px auto; }
+.form-container table { width: 600px; }
+.clickable-text { text-decoration: underline; cursor: pointer; }
+
+/* log in screen elements */
+#login {
+        position: absolute;
+        width: 600px;
+        height: 210px;
+        text-align: center;
+}
+
+#login form {
+		width: 420px;
+		margin: -10px 90px;
+}
+
+#qr-replay {
+        position: absolute;
+        width: 600px;
+        height: 220px;
+        text-align: left;
+}
+
+#qr-replay table {
+		width: 420px;
+		margin: -14px 20px;
+		vertical-align: top;
+}
+
+#closeme { position: absolute; top: -15px; left: 616px; }
+
+@font-face {
+  font-family: "Roadgeek 2004 Series C";
+  src: url("/images/roadgeek2005v2-complete/Roadgeek 2005 Series C.otf");
+}
+
+@font-face {
+  font-family: "Roadgeek 2005 Series D";
+  src: url("/images/roadgeek2005v2-complete/Roadgeek 2005 Series D.otf");
+}
+
+  
+</style>
+
+<script type='text/javascript' src='/js/d3.v2.js'></script>
+
+<script>
+
+var loginInfo = { role: '', hasUsers: false, clients: {}, users: {} };
+
+var reqno = 1;
+var callbacks = {};
+
+var users = {};
+var nextClientID = 1;
+
+var add_callback = function(cb) {
+  callbacks[reqno.toString()] = cb;
+
+  return reqno++;
+};
+
+var create_user = function(ws, name, comments, role, cb) {
+  var u, x = name.indexOf('/');
+
+  if ((x === -1) && (!!users['user/' + name])) {
+    name += '/' + nextClientID;
+    x = name.indexOf('/');
+  }
+  if (role !== 'master') {
+    for (u in users) if (users.hasOwnProperty(u)) break;
+    if (!u) role = 'master';
+  }
+
+  ws.send(JSON.stringify({ path       : '/api/v1/user/create/' + name
+                         , requestID  : add_callback(cb)
+                         , name       : (x !== -1) ? name.slice(x + 1) : name
+                         , comments   : (x !== -1) ? '' : comments
+                         , role       : role
+                         , clientName : (x !== -1) ? comments : 'bootstrap'
+                         }));
+};
+
+var authenticate_user = function(ws, name, code, cb) {
+  ws.send(JSON.stringify({ path      : '/api/v1/user/authenticate/' + name
+                         , requestID : add_callback(cb)
+                         , response  : code
+                         }));
+};
+
+var list_users = function(ws, cb) {
+  ws.send(JSON.stringify({ path      : '/api/v1/user/list/'
+                         , requestID : add_callback(cb)
+                         , options   : { depth: 'all' }
+                         }));
+};
+
+
+var ws = null;
+
+var validate_create = function() {
+  var create   = document.forms.createForm
+    , name     = create.userName.value
+    , comments = create.userComments.value
+    , role     = create.userRole.value
+    , qrcode   = document.images.qrcode
+    , otpURL   = document.getElementById('otpURL')
+    , otpWords  = document.getElementById('otpWords')
+    , status   = document.getElementById('status')
+    , test     = document.forms.testForm
+    ;
+
+  qrcode.src = 'qrcode.png';
+  otpURL.href = '';
+  status.innerHTML = '';
+
+  if (!!name) name = name.replace(/^\s+|\s+$/g, '');
+  if ((!name)
+        || (name.length       ===  0)
+        || (name.search(/\s/) !== -1)
+        || (name.indexOf('-') ===  0)
+        || (name.indexOf('.') !== -1)
+        || (name.indexOf(':') !== -1)) {
+    alert('invalid short name');
+    return false;
+  }
+
+  if (!!comments) comments = comments.replace(/^\s+|\s+$/g, '');
+  if (!role) role = 'guest';
+
+  create_user(ws, name, comments, role, function(message) {
+    var w, x, y, z;
+
+    if (!!message.result) {
+      listall(true);
+
+      qrcode.src = message.result.authenticatorURL;
+      otpURL.href = message.result.otpURL;
+      status.innerHTML = '<strong><font color="green">success.</strong></font>';
+
+      otpWords.innerHTML = extractOTP(otpURL);
+
+      x = name.indexOf('/');
+      if (x !== -1) name = name.slice(0, x);
+      test.userName.value = name + '/' + message.result.client;
+      return true;
+    }
+
+    if (!!message.error) {
+      status.innerHTML = '<strong><font color="red">' + message.error.diagnostic + '</strong></font>';
+      return true;
+    }
+
+    return false;
+  });
+
+  return false;
+};
+
+var extractOTP = function(elem) {
+  var w, x, y, z;
+  w = elem.search;
+  x = w.indexOf('secret=');
+  if (x !== -1) {
+    w = w.substring(x + 7);
+    x = w.indexOf('&');
+    if (x !== -1) w = w.substring(0, x);
+    y = '';
+    z = 0;
+    while (w.length > 0) {
+      if (!(z++ % 8)) y += '</tr><tr>';
+      y += '<td>' + w.substring(0, 4) + '</td>';
+      w = w.substring(4);
+    }
+    y = '<table><tr>' + y + '</tr></table>';
+    return y;
+  }
+}
+
+var validate_test = function() {
+  var test     = document.forms.testForm
+    , name     = test.userName.value
+    , code     = test.userCode.value
+    , status2  = document.getElementById('status2')
+    ;
+
+  status2.innerHTML = '';
+
+  if (!!code) code = code.replace(/^\s+|\s+$/g, '');
+  if ((!code) || (code.length === 0)) {
+    alert('invalid login code');
+    return false;
+  }
+
+  authenticate_user(ws, name, code, function(message) {
+    if (!!message.result) {
+      listall(true);
+      status2.innerHTML = '<strong><font color="green">authorized as ' + message.result.role  + '.</strong></font>';
+      return true;
+    }
+
+    if (!!message.error) {
+      status2.innerHTML = '<strong><font color="red">' + message.error.diagnostic + '</strong></font>';
+      return true;
+    }
+
+    return false;
+  });
+
+  return false;
+};
+
+var listall = function(fromCreation) {
+  list_users(ws, function(message) {
+    var client, clientID, firstP, table, text, user, x, y;
+    
+    table = '';
+    
+    if (message.hasOwnProperty('result') && message.result.hasOwnProperty('users')) {
+      users = message.result.users;
+      loginInfo.hasUsers = (Object.keys(users).length > 0);
+      if (loginInfo.hasUsers) expandRoleList();
+    } else users = {};
+    for (x in message.result.users) {
+      if (!message.result.users.hasOwnProperty(x)) continue;
+      user = message.result.users[x];
+        
+      for (y = 0; y < user.clients.length; y++) {
+        clientID = parseInt(user.clients[y], 10);
+        if (nextClientID < clientID) nextClientID = clientID + 1;
+      }
+
+      firstP = true;
+
+      for (y in message.result.clients) {
+        if (!message.result.clients.hasOwnProperty(y)) continue;
+        client = message.result.clients[y];
+        if (y.indexOf(x + '/') !==  0) continue;
+
+        clientID = y.split('/').slice(1).join('/');
+
+        table += '<tr><td><span id="user_' + clientID.replace('/', '_') + '">';
+        if (firstP) {
+          firstP = false;
+          table += user.name + '</span>&nbsp;&nbsp;</td><td>' + (user.role || '******') + '&nbsp;&nbsp;</td><td>' + user.comments;
+        } else table += '</span></td><td></td><td>';
+        table += '&nbsp;&nbsp;</td><td>' + clientID + '&nbsp;&nbsp</td><td>' + client.name + '&nbsp;&nbsp;</td><td>'
+                 + client.comments + '&nbsp;&nbsp;</td><td>' + last_login(client.lastLogin) + '</td></tr>';
+      }
+
+      if (firstP) {
+        table += '<tr><td><span id="user_' + clientID.replace('/', '_') + '">' + user.name + '</span>&nbsp;&nbsp;</td><td></td><td>' + user.comments
+                 + '&nbsp;&nbsp;</td><td></td><td></td><td></td><td>' + last_login(user.lastLogin) + '</td></tr>';
+      }
+    }
+
+    if (table !== '') {
+      text = '<table><tr><td>User</td><td>Role</td><td>User Info&nbsp;&nbsp;</td>'
+              + '<td>Client</td><td>Name</td><td>Client Info&nbsp;&nbsp;</td><td>Last Login</td></tr>'
+              + table + '</table>';
+      if (!fromCreation) showLogin();
+    } else text = 'None.';
+
+    document.getElementById('user-container').innerHTML = text;
+  });
+  
+  function objHasProps(obj) {
+    for (var prop in obj) {
+      if (obj.hasOwnProperty(prop)) return true;
+    }
+    return false;
+  };
+  
+  function expandRoleList() {
+    var i, option, roles = ['resident', 'guest', 'monitor'];
+    var elem = document.getElementById('userRole');
+    if (elem.options.length === 1) {
+      for (i = 0; i < roles.length; i++) {
+        option = document.createElement('option');
+        option.textContent = roles[i];
+        elem.appendChild(option);
+      }
+    }
+  }
+};
+
+var last_login = function(time) {
+  if (!!time) return time_ago(time, true);
+  return '';
+}
+
+var showLogin = function() {
+  var div, form, table, td, tr;
+  
+  disableCreate(true);
+  
+  d3.select("#main")
+    .style("opacity", 1)
+    .transition()
+    .duration(500)
+    .style("opacity", 0);
+  div = d3.select("body")
+  	.append("div")
+  	.attr("id", "login")
+  	.classed("form-container-short", true)
+  	.style("display", "block")
+  	.style("left", function() { return ((document.body.offsetWidth / 2) - 322) + "px"; })
+  	.style("top", "-240px");
+  form = div.append("form")
+  	.attr("name", "loginForm")
+  	.attr("action", "#");
+  table = form.append("table")
+    .classed("short-form", true);
+    
+  tr = table.append("tr");
+  tr.append("td").text("Client ID:");
+  tr.append("td")
+  	.append("input")
+  	  .attr("type", "text")
+  	  .attr("name", "userName");
+  tr.append("td").text("e.g., \'root/1\'");
+  
+  tr = table.append("tr");
+  tr.append("td").text("Login code:");
+  tr.append("td")
+  	.append("input")
+  	  .attr("type", "text")
+  	  .attr("name", "userCode")
+  	  .attr("onkeyup", "javascript:submitLogin(event)");
+  tr.append("td").text("e.g., \'123456\'");
+
+  tr = table.append("tr");
+  tr.append("td");
+  td = tr.append("td")
+    .style("text-align", "center");
+  td.append("img")
+  	  .attr("src", "/images/login.svg")
+  	  .style("cursor", "pointer")
+  	  .on("click", login);
+  tr = table.append("tr")
+    .append("td")
+  	.attr("colspan", "3")
+  	.style("text-align", "center")
+  	.style("padding-bottom", "15px")
+    .attr("id", "loginStatus");
+
+  d3.select("#login")
+    .style("top", "-240px")
+    .transition().each('end', function() {
+        if (document.loginForm.userName) document.loginForm.userName.focus();
+    })
+    .duration(500)
+    .style("top", function() { var top = window.pageYOffset || document.documentElement.scrollTop; return top + 150 + "px" });
+    
+};
+
+var hideLogin = function() {
+  d3.select("#login")
+    .transition()
+    .duration(300)
+    .style("top", "-240px")
+    .remove();
+  d3.select("#main")
+    .style("opacity", 0)
+    .transition()
+    .duration(300)
+    .style("opacity", 1);
+}
+
+var submitLogin = function(evt) {
+    if (evt.keyCode === 13) login();
+}
+
+var disableCreate = function(state) {
+  document.forms["createForm"].userName.disabled = state;
+  document.forms["createForm"].userComments.disabled = state;
+  document.forms["createForm"].userRole.disabled = state;
+  document.getElementById("create-button").style.display = (state) ? "none" : "inline";
+}
+
+var login = function() {
+  var form         = document.forms.loginForm
+    , name         = form.userName.value
+    , code         = form.userCode.value
+    , loginStatus  = document.getElementById('loginStatus')
+    ;
+
+  loginStatus.innerHTML = '';
+
+  if (!!code) code = code.replace(/^\s+|\s+$/g, '');
+  if ((!code) || (code.length === 0)) {
+    return false;
+  }
+  
+  authenticate_user(ws, name, code, function(message) {
+    var client, elem;
+    if (!!message.result) {
+      loginInfo.role = message.result.role;
+      loginStatus.innerHTML = '<strong><font color="green">authorized as ' + loginInfo.role  + '.</strong></font>';
+      disableCreate(loginInfo.role !== 'master');
+      setTimeout(function() {
+        hideLogin();
+      }, 2 * 1000);
+      list_users(ws, function(message) {
+        if (loginInfo.role === 'master') {
+          if (message.hasOwnProperty('result') 
+            && message.result.hasOwnProperty('users')
+            && message.result.hasOwnProperty('clients')) {
+            loginInfo.users = message.result.users;
+            loginInfo.clients = message.result.clients;
+            if (window.location.protocol === 'https:') {
+              for (client in loginInfo.clients) {
+                elem = document.getElementById(client.replace(/\//g, '_'));
+                elem.setAttribute('class', 'clickable-text');
+                elem.addEventListener('click', replayQR);
+              }
+            }
+          }
+        }
+      });
+    }
+
+    if (!!message.error) {
+      loginStatus.innerHTML = '<strong><font color="red">' + message.error.diagnostic + '</strong></font>';
+    }
+
+    return false;
+  });
+  return false;
+};
+
+var replayQR = function(event) {
+  var client, clientID, clientInfo, div, i, img, replay, table, td, tr, user, userInfo;
+  
+  if (document.getElementById('qr-replay')) return;
+  
+  client = event.target.id.replace(/_/g, '/');
+  clientID = client.split('/').slice(1).join('/');
+  clientInfo = loginInfo.clients[client];
+  userInfo = loginInfo.users[client.split('/').slice(0,2).join('/')];
+  
+  d3.select("#main")
+    .style("opacity", 1)
+    .transition()
+    .duration(500)
+    .style("opacity", 0.3);
+  div = d3.select("body")
+  	.append("div")
+  	.attr("id", "qr-replay")
+  	.classed("form-container", true)
+  	.style("display", "block")
+  	.style("left", "-660px")
+  	.style("top", "920px");
+  div.transition()
+  	.duration(700)
+  	.style("left", function() { return ((document.body.offsetWidth / 2) - 322) + "px"; });
+  table = div.append("table")
+    .classed("short-form", true);
+    
+  div.append("img")
+    .attr("id", "closeme")
+    .attr("src", "/images/close.svg")
+    .attr("onclick", "javascript:closeReplayQR()");
+      
+  tr = table.append("tr");
+  tr.append("td").text("Short Name:");
+  tr.append("td")
+  	.append("span")
+  	  .text(userInfo.name);
+  tr.append("td")
+    .attr("width", "20")
+    .html("&nbsp;");
+  tr.append("td")
+    .attr("rowspan", "3")
+    .append("a")
+    .attr("id", "otpURLReplay")
+    .attr("href", "")
+    .append("img")
+    .attr("src", clientInfo.authenticatorURL)
+    .attr("width", "166")
+    .attr("height", "166");
+    
+  document.getElementById('otpURLReplay').addEventListener('click', function(e) { e.preventDefault(); });
+  
+  tr = table.append("tr");
+  tr.append("td").text("Descriptive Name:");
+  tr.append("td")
+  	.append("span")
+  	.text(userInfo.comments);
+  tr.append("td")
+    .attr("width", "20")
+    .html("&nbsp;");
+
+  tr = table.append("tr")
+    .style("vertical-align", "top");
+  tr.append("td").text("Permissions");
+  tr.append("td")
+  	.append("span")
+  	.text(userInfo.role);
+  tr.append("td")
+    .attr("width", "20")
+    .html("&nbsp;");
+    
+  tr = table.append("tr");
+  tr.append("td")
+    .attr("colspan", "4")
+    .attr("id", "otpWordsReplay")
+    .style("text-align", "center")
+    .style("line-height", "10px")
+    .style("margin-left", "-12px")
+    .style("color", "green");
+    
+  document.getElementById('otpURLReplay').href = clientInfo.otpURL;
+  document.getElementById('otpWordsReplay').innerHTML = extractOTP(document.getElementById('otpURLReplay'));
+}
+
+var closeReplayQR = function() {
+  d3.select("#qr-replay")
+    .transition()
+    .duration(500)
+    .style("opacity", 0)
+    .remove();
+  d3.select("#main")
+    .style("opacity", 0)
+    .transition()
+    .duration(300)
+    .style("opacity", 1);
+}
+
+// http://stackoverflow.com/questions/3177836/how-to-format-time-since-xxx-e-g-4-minutes-ago-similar-to-stack-exchange-site
+var time_ago = function(time, agoP) {
+  switch (typeof time) {
+    case 'number':
+      break;
+
+    case 'string':
+      time = +new Date(time);
+      break;
+
+    case 'object':
+      if (time.constructor === Date) time = time.getTime();
+      break;
+
+    default:
+      time = +new Date();
+      break;
+  }
+  var time_formats = [
+    [         60, 's'      ,                   1], // 60
+    [        120, '1m',            '1m from now'], // 60*2
+    [       3600, 'm',                        60], // 60*60, 60
+    [       7200, '1h',            '1h from now'], // 60*60*2
+    [      86400, 'h',                      3600], // 60*60*24, 60*60
+    [     172800, 'yesterday',        'tomorrow'], // 60*60*24*2
+    [     604800, 'd',                     86400], // 60*60*24*7, 60*60*24
+    [    1209600, 'last week',       'next week'], // 60*60*24*7*4*2
+    [    2419200, 'w',                    604800], // 60*60*24*7*4, 60*60*24*7
+    [    4838400, 'last month',     'next month'], // 60*60*24*7*4*2
+    [   29030400, 'months',              2419200], // 60*60*24*7*4*12, 60*60*24*7*4
+    [   58060800, 'last year',       'next year'], // 60*60*24*7*4*12*2
+    [ 2903040000, 'years',              29030400], // 60*60*24*7*4*12*100, 60*60*24*7*4*12
+    [ 5806080000, 'last century', 'next century'], // 60*60*24*7*4*12*100*2
+    [58060800000, 'centuries',        2903040000]  // 60*60*24*7*4*12*100*20, 60*60*24*7*4*12*100
+  ];
+  var seconds = (+new Date() - time) / 1000
+    , token = agoP ? 'ago' : ''
+    , list_choice = 1;
+
+  if (seconds < 0) {
+    seconds = Math.abs(seconds);
+    token = 'from now';
+    list_choice = 2;
+  } else if (seconds < 1) {
+    return 'now';
+  }
+
+  var i = 0
+    , format;
+  while (format = time_formats[i++])
+    if (seconds < format[0]) {
+      if (typeof format[2] == 'string') return format[list_choice];
+      return Math.floor(seconds / format[2]) + format[1] + ' ' + token;
+    }
+  return time;
+}
+
+var events = {};
+
+var go = function(steward, i) {
+  ws = new WebSocket(steward.protocol + '//' + steward.hostname + ':' + steward.port + '/manage');
+
+  ws.onopen = function(event) {
+
+    ws.send(JSON.stringify({ path        : '/api/v1/user/prime/1/1'
+                           , fingerprint : '54:cc:01:fa:af:20:c4:76:80:a7:d0:79:29:2f:13:6a'
+                           , requestID   : add_callback(function(message) { /* console.log(JSON.stringify(message)); */ })
+                           }));
+    listall(false);
+    return;
+
+/*
+    ws.send(JSON.stringify({ path         : '/api/v1/thing/pair/testing123'
+                           , name         : 'testing456'
+                           , requestID    : add_callback(function(message) { console.log(message); })
+                           }));
+    ws.send(JSON.stringify({ path         : '/api/v1/thing/hello/4'
+                           , response     : '441587'
+                           , requestID    : add_callback(function(message) { 
+      console.log(message);
+ */
+
+      ws.send(JSON.stringify({ path       : '/api/v1/thing/prototype'
+                             , things     :
+                               { '/device/presence/mobile/iOS' :
+                                 { name                        : true
+                                 , status                      : [ 'present', 'absent', 'recent' ]
+                                 }
+                               }
+                             , requestID  : add_callback(function(message) {
+        console.log(message);
+
+        ws.send(JSON.stringify({ path     : '/api/v1/thing/register'
+                               , things   :
+                                 { 'thingID1'   :
+                                   { devicetype : '/device/presence/mobile/iOS'
+                                   , name       : 'MTR\'s iPhone5'
+                                   , status     : 'present'
+                                   , device     :
+                                     { name     : 'iPhone5'
+                                     , maker    : 'Apple Inc.'
+                                     , model    :
+                                       { name   : 'iPhone5'
+                                       , number : 'MD665LL/A'
+                                       }
+                                     , unit     : 
+                                       { serial : 'F23C91AEC05E'
+                                       , udn    : '195a42b0-ef6b-11e2-99d0-f23c91aec05e'
+                                       }
+                                     }
+                                   , updated    : new Date().getTime()
+                                   }
+                                 }
+                               , requestID  : add_callback(function(message) {
+            var thingID;
+
+            console.log(message);
+            if (!message.things.thingID1) return console.log('no response for thingID1');
+            if (!message.things.thingID1.success) return console.log('not successful for thingID1');
+            if (!message.things.thingID1.thingID) return console.log('no thingID for thingID1');
+            thingID = message.things.thingID1.thingID;
+
+            setInterval(function() {
+              var eventID
+                , report = { path      : '/api/v1/thing/report'
+                           , events    : {}
+                           , requestID : add_callback(function(message) { console.log(message); })
+                           }
+                , update = { path      : '/api/v1/thing/update'
+                           , things    : {}
+                           , requestID : add_callback(function(message) { console.log(message); })
+                           };
+
+              for (eventID in events) if (events.hasOwnProperty(eventID)) report.events[eventID] = { reason : 'observe' };
+              ws.send(JSON.stringify(report));
+
+              update.things[thingID] = { name    : reqno.toString()
+                                       , status  : 'present'
+                                       , updated : new Date().getTime()
+                                       };
+              ws.send(JSON.stringify(update));
+            }, 30 * 1000);
+          })
+        }));
+      })
+                             }));
+/*
+      })}));
+ */
+  };
+
+  ws.onmessage = function(event) {
+    var eventID, id, message;
+
+    try {
+      message = JSON.parse(event.data);
+      id = message.requestID.toString();
+      if ((!!message.events) || (!!message.tasks)) {
+        switch(message.path) {
+          case '/api/v1/thing/observe':
+            for (eventID in message.events) {
+              if (!message.events.hasOwnProperty(eventID)) continue;
+              if (message.events[eventID].testOnly) console.log('testOnly');
+              else events[eventID] = { observe: message.events[eventID].observe, parameter: message.events[eventID].parameter };
+              message.events[eventID].status = 'success';
+            }
+            message.path = '/api/v1/thing/report';
+            ws.send(JSON.stringify(message));
+            break;
+
+          default:
+            console.log('unsolicited');
+            console.log(message);
+            break;
+        }
+      } else if ((!!callbacks[id]) && ((callbacks[id])(message))) delete(callbacks[id]);
+    } catch(ex) {
+      console.log(ex.message);
+    }
+  };
+
+  ws.onclose = function(event) {
+    console.log('onclose'); console.log(event);
+
+    setTimeout (function() { go(steward, i + 1); }, 2500);
+  };
+
+  ws.onerror = function(event) {
+    console.log('onerror'); console.log(event);
+
+    try { ws.close (); } catch (ex) {}
+    ws = null;
+    setTimeout (function() { go(steward, i + 1); }, 5000);
+  };
+};
+
+var insertClientButton = function() {
+  var img, td
+  var search = window.location.search.substring(1);
+  if (!!search) {
+    search = JSON.parse('{"' + decodeURI(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}')
+    if (!!search.clientURL) {
+      td = document.createElement('td');
+      img = document.createElement('img');
+      img.src = '/images/back-to-client-login.svg'
+      img.setAttribute('onclick', "javascript:window.location.href = '" + decodeURIComponent(search.clientURL) + "'");
+      td.appendChild(img);
+      document.getElementById('authTestButtons').appendChild(td);
+    }
+  }
+}
+
+var main = function() {
+	// redirect https://127.0.0.1 to http
+	if (window.location.hostname === "127.0.0.1" && window.location.protocol === "https:") {
+		var newURL = "http://127.0.0.1:8887" + window.location.pathname;
+		window.location.href = newURL;
+		return;
+	}
+	
+	insertClientButton()
+
+  var steward = { hostname : window.location.hostname
+                 , port     : window.location.port
+                 , protocol : (window.location.protocol.indexOf('https:') === 0) ? 'wss:' : 'ws:'
+                 };
+
+  go(steward, 1);
+};
+</script>
+</head>
+
+<body onload='main();'>
+<img src="/images/thing.sys.logo.black.svg" />
+
+<div id='main'>
+	<h1>Client Authentication</h1>
+
+	<p>Clients authenticate to the steward, and the user associated with a client is authorised to invoke various API calls. A single user may use multiple clients.<p>
+
+	<p>If no users are configured on the steward, then an unauthenticated API call from a device on the same network as the steward may be used to create the initial user and client with master permissions. The steward responds with <a href='http://en.wikipedia.org/wiki/Time-based_One-time_Password_Algorithm'>time-based one-time passwords</a> (TOTP) information allowing the client to authenticate itself.</p>
+
+	<p>if you are on your home network you can create authentication credentials using a smart phone running <a href='https://support.google.com/accounts/answer/1066447'>Google Authenticator</a>, <a href='https://www.authy.com/'>Authy</a>, or some other app that implements TOTP. There are several out there for all major platforms and desktops,
+	e.g., <a href='https://itunes.apple.com/us/app/securitoken/id467479279?mt=12'>SecuriToken</a> for the Mac.
+	Please see also a comprehensive
+	<a href='http://en.wikipedia.org/wiki/Google_Authenticator#Implementation'>list of implementations</a>.<p>
+
+
+<h1>Creating an Account</h1>
+<p>
+Input a short name (e.g., "user") and a longer, more descriptive name (e.g., "User Name") in the form and click on the "Submit" button. A <a href="">QR code</a> will be generated. Go ahead and launch <a href='https://support.google.com/accounts/answer/1066447'>Google Authenticator</a>, press the "+" button and then the "Scan Barcode" button and point your smart phone at the QR code on the screen. If you center the QR code in the viewfinder the application should automatically focus, scan the code, and do the rest.</p>
+
+</p>
+
+<div class="form-container">
+<form name='createForm' onsubmit='return validate_create();' action='#'>
+<table>
+<tr><td>Short Name:</td>
+    <td style="padding-left: 15px;"><input type='text' name='userName' /></td>
+    <td width='20'>&nbsp;</td>
+    <td rowspan='4'><a id='otpURL' href='' onclick="return false;"><img name='qrcode' src='qrcode.png' width='166' height='166' /></a></span></td>
+</tr>
+<tr><td>Descriptive Name:</td>
+    <td style="padding-left: 15px; padding-top: 10px;"><input type='text' name='userComments' /></td>
+</tr>
+<tr><td>Permissions:</td>
+    <td style="padding-left: 15px; padding-top: 10px;"><select id='userRole' name='userRole'>
+      <option selected>master</option>
+    </select></td>
+</tr>
+<tr valign='top'>
+    <td colspan="2" style="padding-top: 15px; padding-left: 15px; padding-right: 25px;"><span id='status'></span><input type="image" src="/images/create.svg" value='Create' id="create-button" style="float: right;" /></td>
+</tr>
+<tr><td colspan='4'><font color='green'><span id='otpWords'><br /></span></font></td></tr>
+</table>
+</form>
+</div>
+
+
+<h1>Authenticating a Client</h1>
+<p>To check that you have successfully created your authentication credentials you can enter your short name and the six digit code generated by Google Authenticator, <a href='https://www.authy.com/'>Authy</a>, 
+<a href='https://itunes.apple.com/us/app/securitoken/id467479279?mt=12'>SecuriToken</a>, etc., in the form below.
+</p>
+
+<div class="form-container-short">
+<form name='testForm' onsubmit='return validate_test();' action='#'>
+<table class="short-form">
+<tr><td>Client ID:</td>
+    <td><input type='text' name='userName' /></td>
+    <td>e.g., "root/1"</td>
+</tr>
+<tr><td>Login code:</td>
+    <td><input type='text' name='userCode' /></td>
+    <td>e.g., "123456"</td>
+</tr>
+<tr id='authTestButtons' valign='top'>
+    <td></td>
+    <td><input type="image" src="/images/test.svg" value='Test' /><br/><br/><span id='status2'></span></td>
+</tr>
+</table>
+</form>
+</div>
+
+<p><em>Note:</em> After you created an account,
+did you notice the solidus ('/') and number appended to the short name?
+That number identifies the client that is now associated with the user.
+Clients authenticate to the steward, while in turn the user associated with a client is authorized to invoke various API calls.
+</p>
+
+<h1>Listing of Users and Clients</h1>
+
+<p>A list of existing users and clients that are registered with the steward. To redisplay the QR code for a user, click the underlined user name below (master permissions and https: authentication required).</p>
+
+<div id='user-container'>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,1075 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>&#x24e3; steward console</title>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<style>
+@font-face {
+  font-family: "Monsterrat Regular";
+  src: url("images/montserrat/Montserrat-Regular.ttf");
+  }
+  
+@font-face {
+  font-family: "Roadgeek 2004 Series C";
+  src: url("images/roadgeek2005v2-complete/Roadgeek 2005 Series C.otf");
+}
+
+@font-face {
+  font-family: "Roadgeek 2005 Series D";
+  src: url("images/roadgeek2005v2-complete/Roadgeek 2005 Series D.otf");
+}
+
+body {
+  background: #16161D;
+  color: white;
+  font-size: 11pt;
+  line-height: 16pt;
+  font-family: "Monsterrat Regular";
+  text-align: center;   
+}
+  
+hr { border: 0; color: #333; background-color: #333; height: 4px; }
+  
+pre { color: #999; font-size: 11pt; }  
+  
+a { color: #fff; }  
+h1 { font-size: 22pt; font-family: "Monsterrat Regular";  }
+
+#main { text-align: left; margin: 20px 72px; }
+
+table.short-form td { padding: 10px; }
+
+.form-container { background: url('d3/popovers/assets/window.short.svg') no-repeat; width: 600px; height: 200px; padding: 40px; margin: 30px auto; }
+  
+  div { display: inline;
+  }
+
+  table { text-align: left;
+  }
+
+  td {
+    vertical-align: top;
+    padding: 2px 8px;
+  }
+
+  tr.filler {
+    background: #333;
+  }
+
+  tr.activity {
+  }
+  td.activityID { font-size: 11pt; line-height: 13pt; font-family: "Monsterrat Regular"; white-space: nowrap; padding-top: 10px;
+  }
+  td.armed { padding-top: 10px;
+  }
+  td.event {
+    vertical-align: middle;
+  }
+  td.action { color: #666; padding-top: 10px;
+  }
+  td.task {
+    vertical-align: middle;
+  }
+
+  table.event {
+  }
+  tr.event {
+  }
+  table.task {
+  }
+  tr.task {
+  }
+  td.actor {
+    vertical-align: middle;
+  }
+  td.observe {
+    vertical-align: middle;
+  }
+  td.perform {
+    vertical-align: middle;
+  }
+  td.parameter {
+  }
+  tr.task {
+  }
+  td.task {
+  }
+
+  table.children {
+  }
+  tr.child {
+  }
+  td.operator {
+  }
+  td.operand {
+  }
+
+  tr.actor {
+  }
+  td.actorType {
+  }
+  td.observe {
+  }
+  td.perform {
+  }
+  td.empty {
+  }
+  td.properties {
+  }
+  table.info {
+  }
+  tr.info {
+  }
+  td.prop {
+  }
+  td.values {
+  }
+
+  tr.entity {
+  }
+  td.name {
+  }
+  td.whoami {
+  }
+  td.status {
+    background: green;
+  }
+  td.blue {
+    background: blue;
+  }
+  td.warning {
+    background: orange;
+  }
+  td.alert {
+    background: red;
+  }
+  td.group {
+  }
+  td.info {
+  }
+
+  tr.updates {
+  }
+  tr.notice {
+  }
+  tr.warning {
+    background: orange;
+  }
+  tr.error {
+    background: red;
+  }
+  tr.crit {
+    background: red;
+  }
+  tr.alert {
+    background: red;
+  }
+  tr.emerg {
+    background: red;
+  }
+
+  td.category {
+    text-align: right;
+  }
+  td.timestamp {
+    text-align: right;
+  }
+  td.message {
+  }
+  td.metadata {
+  }
+
+  td.scheme {
+    text-align: right;
+  }
+  td.name {
+    text-align: right;
+  }
+
+  span.missing {
+    background: red;
+  }
+
+  table.short-form td { padding: 10px; }
+
+  .form-container-short { background: url('d3/popovers/assets/window.form.short.svg') no-repeat; width: 600px; height: 180px; padding: 30px; margin: 30px auto; }
+  .form-container table { width: 600px; }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.6.14/beautify.min.js"></script>
+<script>
+
+// http://stackoverflow.com/questions/3177836/how-to-format-time-since-xxx-e-g-4-minutes-ago-similar-to-stack-exchange-site
+var time_ago = function(time, agoP) {
+  switch (typeof time) {
+    case 'number':
+      break;
+
+    case 'string':
+      time = +new Date(time);
+      break;
+
+    case 'object':
+      if (time.constructor === Date) time = time.getTime();
+      break;
+
+    default:
+      time = +new Date();
+      break;
+  }
+  var time_formats = [
+    [         60, 's'      ,                   1], // 60
+    [        120, '1m',            '1m from now'], // 60*2
+    [       3600, 'm',                        60], // 60*60, 60
+    [       7200, '1h',            '1h from now'], // 60*60*2
+    [      86400, 'h',                      3600], // 60*60*24, 60*60
+    [     172800, 'yesterday',        'tomorrow'], // 60*60*24*2
+    [     604800, 'd',                     86400], // 60*60*24*7, 60*60*24
+    [    1209600, 'last week',       'next week'], // 60*60*24*7*4*2
+    [    2419200, 'w',                    604800], // 60*60*24*7*4, 60*60*24*7
+    [    4838400, 'last month',     'next month'], // 60*60*24*7*4*2
+    [   29030400, ' months',             2419200], // 60*60*24*7*4*12, 60*60*24*7*4
+    [   58060800, 'last year',       'next year'], // 60*60*24*7*4*12*2
+    [ 2903040000, ' years',             29030400], // 60*60*24*7*4*12*100, 60*60*24*7*4*12
+    [ 5806080000, 'last century', 'next century'], // 60*60*24*7*4*12*100*2
+    [58060800000, ' centuries',       2903040000]  // 60*60*24*7*4*12*100*20, 60*60*24*7*4*12*100
+  ];
+  var seconds = (+new Date() - time) / 1000
+    , token = agoP ? 'ago' : ''
+    , list_choice = 1;
+
+  if (seconds < 0) {
+    seconds = Math.abs(seconds);
+    token = 'from now';
+    list_choice = 2;
+  }
+  if (seconds < 1) return 'now';
+
+  var i = 0
+    , format;
+  while (format = time_formats[i++])
+    if (seconds < format[0]) {
+      if (typeof format[2] == 'string') return format[list_choice];
+      return Math.floor(seconds / format[2]) + format[1] + ' ' + token;
+    }
+  return time;
+}
+
+// http://phpjs.org/functions/strip_tags/
+var strip_tags = function(input, allowed) {
+  input = input ? input.toString() : '';
+
+  // making sure the allowed arg is a string containing only tags in lowercase (<a><b><c>)
+  allowed = (((allowed || "") + "").toLowerCase().match(/<[a-z][a-z0-9]*>/g) || []).join('');
+
+  var tags = /<\/?([a-z][a-z0-9]*)\b[^>]*>/gi;
+
+  return input.replace(tags, function ($0, $1) {
+    return allowed.indexOf('<' + $1.toLowerCase() + '>') > -1 ? $0 : '';
+  });
+}
+
+// from winston's common.js
+var serialize = function (obj, key) {
+  if (obj === null) {
+    obj = 'null';
+  }
+  else if (obj === undefined) {
+    obj = 'undefined';
+  }
+  else if (obj === false) {
+    obj = 'false';
+  } else if (obj === true) obj = 'true';
+
+  if (typeof obj !== 'object') {
+    return key ? (key + '=' + strip_tags(obj)) : strip_tags(obj);
+  }
+
+  var msg = '',
+      keys = Object.keys(obj),
+      length = keys.length;
+
+  for (var i = 0; i < length; i++) {
+    if (Array.isArray(obj[keys[i]])) {
+      msg += keys[i] + '=[';
+
+      for (var j = 0, l = obj[keys[i]].length; j < l; j++) {
+        msg += serialize(obj[keys[i]][j]);
+        if (j < l - 1) {
+          msg += ', ';
+        }
+      }
+
+      msg += ']';
+    }
+    else if (obj[keys[i]] instanceof Date) {
+      msg += keys[i] + '=' + obj[keys[i]];
+    }
+    else {
+      msg += serialize(obj[keys[i]], keys[i]);
+    }
+
+    if (i < length - 1) {
+      msg += ', ';
+    }
+  }
+
+  return msg;
+};
+
+
+var serialize_array = function(a) {
+  var i, result, sep;
+
+  a = a || [];
+  if (typeof a === 'string') { // 2012-12-31
+    if (parseInt(a, 10) < 1356940800000) return serialize(a);
+    if (!isNaN((result = new Date(a)).getTime())) return time_ago(result, true);
+  }
+  if (!Array.isArray(a)) return serialize(a);
+
+  sep = '';
+  result = '';
+  for (i = 0; i < a.length; i++) {
+    result += sep + serialize(a[i]);
+    sep = ', ';
+  }
+
+  return result;
+}
+
+var pretty_msg = function(category, message) {
+  var parts;
+
+  if ((category !== 'server') && (category !== 'manage')) return message;
+
+  parts = message.split(' ');
+  if ((parts.length >= 3)
+        && (   (parts[0] === 'http') || (parts[0] === 'https')
+            || (parts[0] === 'ws')   || (parts[0] === 'wss')
+            || (parts[0] === 'tls')  || (parts[0] === 'cloud'))) {
+    var scheme = '      ' + parts[0]
+      , host   = parts[1] + '                '
+      , port   = '      ' + parts[2]
+      , line   = scheme.slice(-5) + ' ' + host.slice(0,14) + ' ' + port.slice(-5);
+
+    return line.replace(/ /g, '&nbsp;');
+  }
+
+  return message;
+}
+
+
+var onactivities = function(message) {
+  var activities, activity, activityID, filler, i, names, rows;
+
+  if (!message.result) return;
+
+  filler = '';
+  rows = '';
+  activities = message.result.activities;
+
+  names = [];
+  for (activityID in activities) if (activities.hasOwnProperty(activityID)) names.push(activityID);
+  names.sort(function(a, b) {
+    var x, y;
+
+    x = a.indexOf('/');
+    y = b.indexOf('/');
+    if ((x > 0) && (y > 0)) {
+      x = parseInt(a.substr(x + 1), 10);
+      y = parseInt(b.substr(y + 1), 10);
+      return (x - y);
+    }
+
+    if (a === b) return 0;
+    return (a < b ? (-1) : 1);
+  });
+
+  for (i = 0; i < names.length; i++) {
+    activityID = names[i];
+    activity = activities[activityID];
+
+    activityID += '<br/>' + activity.name;
+    if (!!activity.lastTime) activityID += '<br/>' + 'active: ' + time_ago(activity.lastTime, true).trim();
+
+    rows += filler;
+    filler = '<tr class="filler"><td colspan="5"/></tr>';
+
+    rows += '<tr class="activity">'
+            + '<td class="activityID">' + activityID                                  + '&nbsp;&nbsp;</td>'
+            + '<td class="armed">'      + (activity.armed ? 'armed' : '')             + '&nbsp;&nbsp;</td>'
+            + '<td class="event">'      + traverse(message.result, activity.event, 0) + '&nbsp;&nbsp;</td>'
+            + '<td class="action">'     + "&rarr;"                                    + '&nbsp;&nbsp;</td>'
+            + '<td class="task">'       + traverse(message.result, activity.task,  0) + '</td>'
+            + '</tr>';
+  }
+
+  document.getElementById('activities').innerHTML = '<table>' + rows + '</table>';
+};
+
+var traverse = function(result, whoami, depth) {
+  var c1, children, entity, guard, i, operator, pair;
+
+  if (!whoami) return '';
+  pair = whoami.split('/');
+  if (!result[pair[0] + 's']) return '';
+  entity = result[pair[0] + 's'][whoami];
+  if (!entity) {
+    if (pair[0] !== 'device') return '';
+    entity = { name: '<span class="missing">' + whoami + '</span>' };
+  }
+
+  switch (pair[0]) {
+    case 'event':
+      return '<table class="event">'
+             + '<tr class="event">'
+             + '<td class="actor">'               + traverse(result, entity.actor, depth) + '</td>'
+             + '<td class="observe">&nbsp;&nbsp;' + entity.observe                        + '&nbsp;&nbsp;</td>'
+             + '<td class="parameter">'           + pretty_param(entity)                  + '</td>'
+             + '</tr>'
+             + '</table>';
+
+    case 'task':
+      if (!!entity.guard) {
+        guard = '<tr class="guard">'
+                + '<td class="guard">'            + traverse(result, entity.guard, depth) + '</td>'
+                + '</tr>';
+      } else guard = '';
+      return '<table class="task">'
+             + '<tr class="task">'
+             + '<td class="actor">'               + traverse(result, entity.actor, depth) + '</td>'
+             + '<td class="perform">&nbsp;&nbsp;' + entity.perform                        + '&nbsp;&nbsp;</td>'
+             + '<td class="parameter">'           + pretty_param(entity)                  + '</td>'
+             + '</tr>'
+             + guard
+             + '</table>';
+
+    case 'group':
+      children = '';
+      operator = entity.operator.toUpperCase();
+      c1 = (entity.members.length < 12) ? operator : '';
+      if (entity.members.length < 2) {
+        children += '<tr class="child">'
+                    + '<td class="operator">' + operator                                    + '&nbsp;&nbsp;</td>'
+                    + '<td class="operand">'  + traverse(result, entity.members[0], depth)  + '</td>'
+                    + '</tr>';
+        return '<table class="children">' + children + '</table>';
+      }
+
+      c1 = '';
+      for (i = 0; i < entity.members.length; i++) {
+        if (c1.length > 0) children += '<tr class="child"><td class="operator">' + c1       + '&nbsp;&nbsp;</td></tr>';
+        children += '<tr class="child">'
+                    + '<td class="operator">'                                               + '&nbsp;&nbsp;</td>'
+                    + '<td class="operand">'  + traverse(result, entity.members[i], depth)  + '</td>'
+                    + '</tr>';
+        c1 = operator;
+      }
+      return '<table class="children">' + children + '</table>';
+
+    default:
+      return entity.name + ((entity.name !== whoami) ? ' [' + whoami + ']' : '')
+  }
+}
+
+var pretty_param = function(entity) {
+  var beauty = entity.parameter;
+
+  if ((beauty.indexOf('{') >= 0) || (beauty.indexOf('[') >= 0)) {
+    try {
+      beauty = js_beautify(beauty, { indent_size : 2 });
+    }
+    catch (ex) {
+      onupdate({ monitor: [{ date: new Date().toISOString(), level: 'error', message: ex.message, meta: { error: ex } }] });
+    }
+  }
+
+  return '<pre>' + beauty + '</pre>';
+};
+
+
+var onactors = function(message) {
+  var actor, actorID, actors, actorType, colspan1, colspan2, devices, entity, entities, filler, i, info, names, prop, rows,
+      status, v;
+
+  if (!message.result) return;
+
+  filler = '';
+  rows = '';
+  actors = message.result.actors;
+  devices = {};
+  for (entities in message.result) {
+    if (!message.result.hasOwnProperty(entities)) ontinue;
+    if ((entities.indexOf('/device/') !== 0) && (entities.indexOf('/place') !== 0)) continue;
+
+    for (entity in message.result[entities]) {
+      if (!message.result[entities].hasOwnProperty(entity)) continue;
+      if ((entity.indexOf('device/') !== 0) && (entity.indexOf('place/') !== 0)) continue;
+
+      devices[entity] = message.result[entities][entity];
+    }
+  }
+
+  names = [];
+  for (actorType in actors) if (actors.hasOwnProperty(actorType)) names.push(actorType);
+  names.sort(function(a, b) {
+    if (a.indexOf('/place') !== -1) {
+         if (b.indexOf('/place') === -1) return (-1);
+    }
+    else if (b.indexOf('/place') !== -1) return 1;
+
+    if (a === b) return 0;
+    return (a < b ? (-1) : 1);
+  });
+
+  for (i = 0; i < names.length; i++) {
+    actorType = names[i];
+    actor = actors[actorType];
+
+    rows += filler;
+    filler = '<tr class="filler"><td colspan="5"/></tr>';
+
+    info = '';
+    if (!!actor.properties)  {
+      for (prop in actor.properties) {
+        if (!actor.properties.hasOwnProperty(prop)) continue;
+
+        info += '<tr class="info">'
+                + '<td class="prop">'   + prop                                    + '&nbsp;&nbsp;</td>'
+                + '<td class="values">' + serialize_array(actor.properties[prop]) + '</td>'
+                + '</tr>';
+      }
+
+      info = '<table class="info">' + info + '</table>';
+    }
+
+    rows += '<tr class="actor">'
+            + '<td class="actorType">'  + actorType                      + '&nbsp;&nbsp;</td>'
+            + '<td class="observe">'    + serialize_array(actor.observe) + '&nbsp;</td>'
+            + '<td class="perform">'    + serialize_array(actor.perform) + '&nbsp;</td>'
+            + '<td class="empty">'                                       + '&nbsp;</td>'
+            + '<td class="properties">' + info                           + '</td>'
+            + '</tr>';
+
+    entities = message.result[actorType];
+    if (!entities) continue;
+    for (actorID in entities) {
+      if (!entities.hasOwnProperty(actorID)) continue;
+
+      entity = entities[actorID];
+      status = entity.status || '';
+      td_status = (status.indexOf(' ') !== -1)                                                                       ? 'group'
+                  : ((status === 'error')  || (status === 'red')    || (status === 'reset')|| (status === 'unsafe')) ? 'alert'
+                  : ((status === 'orange') || (status === 'indigo') || (status === 'absent')
+                                                                    || (status === 'unlocked'))                      ? 'warning'
+                  : ((status === 'blue')   || (status === 'busy')   || (status === 'waiting'))                       ? 'blue'
+                  : 'status';
+      if (!!entity.updated) {
+        if (status.length > 0) status += '<br/>';
+        status += 'updated: ' + time_ago(entity.updated, true).trim();
+      }
+      info = (!!entity.members) ? serialize_array(entity.members) : '';
+
+      if (!!entity.info)  {
+        for (prop in entity.info) {
+          if (!entity.info.hasOwnProperty(prop)) continue;
+
+          v = entity.info[prop];
+          if (v === undefined) v = null;
+          if (v === null) v = '';
+          if ((!isNaN(v)) && typeof v === 'string') v = v * 1.0;
+          switch (prop) {
+            case 'lastSample':
+            case 'lastupdated':
+            case 'cycleTime':
+              if (!!v) v = time_ago(v, true);
+              break;
+
+            case 'nextSample':
+              if (!!v) v = time_ago(v, false);
+              break;
+
+            case 'conditions':
+              if (!!v.lastSample) v.lastSample = time_ago(v.lastSample, true);
+              v = serialize_array(v);
+              break;
+
+            case 'forecasts':
+              for (i = 0; i < v.length; i++) if (!!v[i].nextSample) v[i].nextSample = time_ago(v[i].nextSample, false);
+              v = serialize_array(v);
+              break;
+
+            case 'temperature':
+            case 'intTemperature':
+            case 'extTemperature':
+            case 'goalTemperature':
+            case 'windchill':
+              if (!isNaN(v)) v = v.toFixed(1) + '&deg;C' + ' / ' + ((v * 1.8) + 32).toFixed(1) + '&deg;F';
+              break;
+
+            case 'humidity':
+            case 'waterVolume':
+            case 'level':
+            case 'batteryLevel':
+            case 'fanSpeed':
+              if (!isNaN(v)) v = v.toFixed(2) + '%';
+              break;
+
+            case 'rainTotal':
+              if (!isNaN(v)) v = v.toFixed(1) + 'mm';
+              break;
+
+            case 'rainRate':
+              if (!isNaN(v)) v = v.toFixed(1) + 'mm/h';
+              break;
+
+            case 'windAverage':
+            case 'windGust':
+              if (!isNaN(v)) v = v.toFixed(1) + 'm/s';
+              break;
+
+	    // FIXME: should be available in both cardinal directions and in azimuth degrees???
+	    // http://en.wikipedia.org/wiki/Wind_direction
+            case 'windDirection':
+              if (!isNaN(v)) v = v.toFixed(0) + '&deg;';
+              break;
+
+            case 'battery':
+              v += ' volts';
+              break;
+
+            case 'currentUsage':
+            case 'dailyUsage':
+              if (!Array.isArray(v)) break;
+              v2 = [];
+              v.forEach(function(usage, index, array) {
+                v2.push(usage +  'watt-hours');
+              });
+              v = serialize_array(v2);
+              break;
+
+            case 'generating':
+            case 'exporting':
+              v += ' watts';
+              break;
+
+            case 'energy':
+              v += ' kW';
+              break;
+
+            case 'noise':
+            case 'rssi':
+              v += ' dB';
+              break;
+
+            case 'voc':
+              v += ' ppm';
+              break;
+
+            case 'airQuality':
+            case 'co':
+            case 'co2':
+            case 'flow':
+            case 'hcho':
+            case 'no2':
+              if (!isNaN(v)) v += (typeof v === 'string') ? '&sigma;' : 'ppm';
+              break;
+
+            case 'concentration':
+              if (!isNaN(v)) v = v.toFixed(0) + ' pcs/liter';
+              break;
+
+            case 'pressure':
+            case 'moisture':
+              if (!isNaN(v)) v = v.toFixed(0) + ' mbars';
+              break;
+
+            case 'light':
+              if (!isNaN(v)) v = v.toFixed(1) + ' lx';
+              break;
+
+            case 'altitude':
+              if (!isNaN(v)) v = Math.round(v) + ' meters';
+              break;
+
+            case 'heading':
+              v += '&deg;';
+              break;
+
+            case 'hvac':
+              if (!isNaN(v)) v += '&deg;C' + ' / ' + ((v * 1.8) + 32).toFixed(1) + '&deg;F';
+              break;
+
+            case 'velocity':
+              if ((v !== '0') && (!isNaN(v))) v = (v * 3.6).toFixed(0) + ' km/h / ' + (v * 2.23694).toFixed(0) + ' mph';
+              break;
+
+            case 'distance':
+            case 'odometer':
+            case 'range':
+              if (!isNaN(v)) v = v.toFixed(0) + ' km / ' + (v * 0.621371).toFixed(0) + ' mi';
+              break;
+
+            case 'location':
+              if (v.length > 1) {
+                v = decimal2sexagesimal(v[0], 'N', 'S') + ' / ' + decimal2sexagesimal(v[1], 'E', 'W')
+                    + ((v.length > 2) ? (' / ' + Math.round(v[2]) + ' m') : '');
+              }
+              else v = serialize_array(v);
+              break;
+
+            case 'locations':
+              v = v.length + (v.length !== 1 ? (' entries') : (' entry'));
+              break;
+
+            case 'accuracy':
+              if (!isNaN(v)) v = '&plusmn;' + v.toFixed(2) + ' meters';
+              break;
+
+            case 'actor':
+              if (!!devices[v]) v = devices[v].name + ' [' + v + ']';
+              break;
+
+            case 'gauges':
+            case 'plugs':
+            case 'rankings':
+            case 'review':
+            case 'sensors':
+              if (v.length > 0) {
+                v2 = [];
+                v.forEach(function(element, index, array) {
+                  v2.push((!!devices[element]) ? (devices[element].name + ' [' + element +']') : element);
+                });
+                v = serialize_array(v2);
+              }
+              else v = serialize_array(v);
+              break;
+
+            default:
+              v = serialize_array(v);
+              break;
+          }
+          info += '<tr class="info">'
+                  + '<td class="prop">'   + prop                               + '&nbsp;</td>'
+                  + '<td class="values">' + v                                  + '</td>'
+                  + '</tr>';
+        }
+
+        info = '<table class="info">' + info + '</table>';
+      }
+      colspan1 = (info === '') ? 3 : 1;
+      colspan2 = 3 - colspan1;
+
+      rows += '<tr class="entity">'
+              + '<td class="name">'                               + (entity.name || '') + '&nbsp;&nbsp;</td>'
+              + '<td class="whoami">'                             + actorID             + '&nbsp;</td>'
+              + '<td class="'+td_status+'" colspan='+colspan1+'>' + status              + '&nbsp;</td>'
+              + '<td class="info"   colspan='+colspan2+'>'        + info                + '</td>'
+              + '</tr>';
+      filler2 = '';
+    }
+  }
+
+  document.getElementById('actors').innerHTML = '<table>' + rows + '</table>';
+};
+
+var decimal2sexagesimal = function(v, c1, c2) {
+  var c, f, r;
+
+  if (v > 0) c = c1; else { c = c2; v = -v; }
+
+  f = Math.floor(v);
+  r = f + '&deg; ';
+  v = (v - f) * 60;
+
+  f = Math.floor(v);
+  r += ('0' + f).substr(0, 2) + '&prime; ';
+  v = (v - f) * 60;
+
+  f = Math.round(v);
+  r += ('0' + f).substr(0, 2) + '&Prime; ';
+  return (r + c);
+};
+
+
+var signals = { steward    : []
+              , wearable   : []
+              , motive     : []
+              , climate    : []
+              , lighting   : []
+              , media      : []
+              , sensor     : []
+              , 'switch'   : []
+              , presence   : []
+              , indicator  : []
+              , gateway    : []
+              , devices    : []
+              , manage     : []
+              , server     : []
+              , discovery  : []
+              };
+
+var onupdate = function(update) {
+  var category, data, datum, filler, i, j, meta, parts, prev, rows;
+
+  update = update || {};
+
+  for (category in update) {
+    if ((!update.hasOwnProperty(category)) || (category === 'requestID')) continue;
+
+    data = signals[category] || [];
+
+    for (i = 0; i < update[category].length; i++) {
+      datum = update[category][i];
+
+      if (category === '.updates') {
+        datum.level = 'updates';
+        datum.date = datum.updated;
+        datum.message = datum.whoami + ' ' + datum.name + ((!!datum.message) ? (': ' + datum.message) : '');
+        datum.meta = { status: datum.status };
+        for (j in datum.info) if (datum.info.hasOwnProperty(j)) datum.meta[j] = datum.info[j];
+        
+        data.push(datum);
+        continue;
+      }
+
+      prev = datum.meta || {};
+      meta = {};
+      for (j in prev) if ((prev.hasOwnProperty(j)) && (!!prev[j])) meta[j] = prev[j];
+
+      if (category === 'server') {
+        parts = datum.message.split(' ');
+        if ((parts.length >= 4)
+              && ((parts[0] === 'http') || (parts[0] === 'https') || (parts[0] === 'ws') || (parts[0] === 'ws'))) {
+          if ((!meta.path) && ((!meta.error) || (!meta.error.path))) {
+            meta.path = parts[3];
+          }
+        }
+      }
+
+      datum.meta = meta;
+
+      for (j = 0; j < data.length; j++) {
+        prev = data[j];
+        if ((prev.level === datum.level) && (prev.message === datum.message)) {
+          data.splice(j, 1);
+          break;
+        }
+      }
+      data.push(datum);
+      if (data.length > 5) data.splice(0, 1);
+    }
+
+    signals[category] = data;
+  }
+
+  filler = '';
+  rows = '';
+  for (category in signals) {
+    if (!signals.hasOwnProperty(category)) continue;
+
+    if (category ===  '.updates') {
+      if (signals[category].length > 10) {
+        signals[category] = signals[category].sort(function(a, b) { return (b.updated - a.updated); });
+        signals[category] = signals[category].slice(0, 10);
+      }
+      signals[category] = signals[category].sort(function(a, b) { return (a.updated - b.updated) });
+    }
+
+    rows += filler;
+    filler = '<tr class="filler"><td colspan="4"/></tr>';
+    for (i = 0; i < signals[category].length; i++) {
+      datum = signals[category][i];
+      rows += '<tr class="' + datum.level + '">'
+              +   '<td class="category">'  + ((i === 0) ? category : '')               + '&nbsp;&nbsp;</td>'
+              +   '<td class="timestamp">' + time_ago(datum.date).trim()               + '&nbsp;</td>'
+              +   '<td class="message">'   + pretty_msg(category, datum.message)       + '&nbsp;</td>'
+              +   '<td class="metadata">'  + (datum.meta ? serialize(datum.meta) : '') + '</td>'
+              + '</tr>';
+    }
+    for (; i < 5; i++) rows += '<tr><td></td><td></td><td></td><td></td></tr>';
+  }
+
+  document.getElementById('status').innerHTML = '<table>' + rows + '</table>';
+};
+
+var notice = function(message, meta) {
+  onupdate({ monitor: [{ date: new Date().toISOString(), level: 'notice', message: message, meta: (meta || {}) }] });
+};
+
+var go = function(steward, i) {
+  var firstP, readyP, waitP, ws, ws2;
+  var tag = 'connection #' + i + ' to ' + steward.protocol + '//' + steward.hostname + ':' + steward.port + '/console';
+
+  var onlogin = function(message) {
+    if (!!message.result) {
+      waitP = false;
+      status2.innerHTML = '<strong><font color="green">authorized as ' + message.result.role  + '.</strong></font>';
+      setTimeout(function() {
+        document.getElementById('login').style.display = 'none';
+        document.forms.loginForm.userCode.value = '';
+        delete(steward.primer);
+        status2.innerHTML = '';
+      }, 2 * 1000);
+      return;
+    }
+
+    if (!!message.error) {
+      status2.innerHTML = '<strong><font color="red">' + message.error.diagnostic + '</strong></font>';
+    }
+  };
+
+  notice(tag, { state: 'connecting...' });
+
+  readyP = firstP = false;
+  waitP = true;
+  ws = new WebSocket(steward.protocol + '//' + steward.hostname + ':' + steward.port + '/console');
+  ws2 = null;
+
+  ws.onopen = function(event) {
+    readyP = true;
+    notice(tag, { state: 'open' });
+
+    if (!!steward.primer) ws.send(JSON.stringify(steward.primer));
+    firstP = true;
+
+    ws2 = new WebSocket(steward.protocol + '//' + steward.hostname + ':' + steward.port + '/manage');
+
+    ws2.onopen = function(event) {
+      if (!!steward.primer) return ws2.send(JSON.stringify(steward.primer));
+
+      ws2.send(JSON.stringify({ path: '/api/v1/activity/list/', requestID: 1, options: { depth: 'all' }}));
+      ws2.send(JSON.stringify({ path: '/api/v1/actor/list/',    requestID: 2, options: { depth: 'all'  }}));
+    };
+
+    ws2.onmessage = function(event) {
+      var message, requestID;
+
+      try {
+        message = JSON.parse(event.data);
+        requestID = message.requestID.toString();
+        switch (requestID) {
+          case '1': onactivities(message); break;
+          case '2': onactors(message);     break;
+          case '7': onlogin(message);      break;
+          default:  console.log(message);  break;
+        }
+      } catch (ex) {
+        onupdate({ monitor: [{ date: new Date().toISOString(), level: 'error', message: ex.message, meta: { error: ex } }] });
+      };
+      setTimeout(function() {
+        if (waitP) return;
+
+        if (requestID !== '1') {
+          ws2.send(JSON.stringify({ path: '/api/v1/activity/list/', requestID: 1, options: { depth: 'all' }}));
+        } else {
+          ws2.send(JSON.stringify({ path: '/api/v1/actor/list/',    requestID: 2, options: { depth: 'all'  }}));
+        }
+      }, 5000);
+    };
+
+    ws2.onclose = function(event) { ws.close(); };
+
+    ws2.onerror = function(event) { ws.close(); };
+  };
+
+  ws.onmessage = function(event) {
+    var message = JSON.parse(event.data);
+
+    notice(tag, { state: 'open' });
+
+    if (firstP) {
+      firstP = false;
+
+      if ((!!message.error) && (!!message.error.permanent)) {
+        notice('error: ' + message.error.diagnostic);
+        document.getElementById('login').style.display = 'block';
+        return;
+      }
+
+      waitP = false;
+      try {
+        ws2.send(JSON.stringify({ path: '/api/v1/activity/list/', requestID: 1, options: { depth: 'all' }}));
+      } catch(ex) {}
+    }
+
+    onupdate(message);
+  };
+
+  ws.onclose = function(event) {
+    notice(tag, { state: (readyP ? 'closed' : 'error'), code: event.code, message: event.reason });
+    setTimeout (function() { go(steward, i + 1); }, 2500);
+  };
+
+  ws.onerror = function(event) {
+    notice(tag, { state: 'error', event: event });
+    try { ws.close (); } catch (ex) {}; ws = null;
+/*
+    if (!!ws2) { try { ws2.close(); } catch (ex) {}; ws2 = null; }
+*/
+    setTimeout (function() { go(steward, i + 1); }, 5000);
+  };
+};
+
+var login = function() {
+  var form     = document.forms.loginForm
+    , name     = form.userName.value
+    , code     = form.userCode.value
+    , status2  = document.getElementById('status2')
+    ;
+
+  status2.innerHTML = '';
+
+  if (!!code) code = code.replace(/^\s+|\s+$/g, '');
+  if ((!code) || (code.length === 0)) {
+    alert('invalid login code');
+    return false;
+  }
+
+  main(name, code);
+  return false;
+};
+
+var main = function(name, code) {
+  var steward = { hostname : window.location.hostname
+                , port     : window.location.port
+                , protocol : (window.location.protocol.indexOf('https:') === 0) ? 'wss:' : 'ws:'
+                , secure   : (window.location.protocol.indexOf('https:') === 0)
+                };
+  if (!!name) steward.primer = { path: '/api/v1/user/authenticate/' + name, requestID: "7", response: code };
+
+  notice('start');
+  go(steward, 1);
+  setInterval(onupdate, 10000);
+};
+</script>
+</head>
+
+<body onload='main();'>
+<img src='images/thing.sys.logo.black.svg' />
+<div id='login' class='form-container-short' style='display: none;'>
+<form name='loginForm' onsubmit='return login();' action='#'>
+<table class='short-form'>
+<tr><td>Client ID:</td>
+    <td><input type='text' name='userName' /></td>
+    <td>e.g., 'root/1'</td>
+</tr>
+<tr><td>Login code:</td>
+    <td><input type='text' name='userCode' /></td>
+    <td>e.g., '123456'</td>
+</tr>
+<tr valign='top'>
+    <td></td>
+    <td><input type='image' src='d3/popovers/assets/login.svg' value='Login' /><br/><br/><span id='status2'></span></td>
+</tr>
+</table>
+</form>
+</div>
+<hr>
+<div id='activities'></div>
+<hr/><hr/>
+<div id='actors'></div>
+<hr/><hr/>
+<div id='status'></div>
+</body>
+</html>
