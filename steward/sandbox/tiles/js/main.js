@@ -24,7 +24,8 @@ $(function() {
   $(".button-collapse").sideNav();
 
   $(window).resize(function() {
-    newsize = Math.ceil(1.0 * $(document).width() / 125);
+    var mod = window.devicePixelRatio > 1 ? window.devicePixelRatio : 1;
+    newsize = Math.ceil(1.0 * $(document).width() / 119);
     
     grid.gridList('resize', newsize);
   });
