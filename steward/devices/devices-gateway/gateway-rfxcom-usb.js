@@ -27,7 +27,7 @@ var Gateway = exports.Device = function(deviceID, deviceUID, info) {
   self.rfx = info.rfx;
   self.info = {};
 
-  utility.broker.subscribe('actors', function(request, taskID, actor, perform, parameter) {/* jshint unused: false */
+  utility.broker.on('actors', function(request, taskID, actor, perform, parameter) {/* jshint unused: false */
     if (actor !== ('device/' + self.deviceID)) return;
 
     if (request === 'perform') return devices.perform(self, taskID, perform, parameter);

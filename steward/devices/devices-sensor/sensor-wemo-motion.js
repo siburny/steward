@@ -29,7 +29,7 @@ var WeMo_Motion = exports.Device = function(deviceID, deviceUID, info) {
   self.logger = sensor.logger;
   self.events = {};
 
-  broker.subscribe('actors', function(request, eventID, actor, observe, parameter) {
+  broker.on('actors', function(request, eventID, actor, observe, parameter) {
     if (actor !== ('device/' + self.deviceID)) return;
 
     if (request === 'observe') {
@@ -39,7 +39,7 @@ var WeMo_Motion = exports.Device = function(deviceID, deviceUID, info) {
     if ((request === 'perform') && (observe === 'set')) return self.perform(self, eventID, observe, parameter);
   });
 
-  broker.subscribe('discovery', function(method, headers, content) {
+  broker.on('discovery', function(method, headers, content) {
     if (method === 'notify') self.notify(self, headers, content);
   });
 

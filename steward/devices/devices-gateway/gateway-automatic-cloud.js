@@ -33,7 +33,7 @@ var Cloud = exports.Device = function(deviceID, deviceUID, info) {
   self.timer = null;
   self.clients = {};
 
-  utility.broker.subscribe('actors', function(request, taskID, actor, perform, parameter) {
+  utility.broker.on('actors', function(request, taskID, actor, perform, parameter) {
     if (actor !== ('device/' + self.deviceID)) return;
 
     if (request === 'perform') return self.perform(self, taskID, perform, parameter);

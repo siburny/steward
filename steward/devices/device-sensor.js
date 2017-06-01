@@ -52,17 +52,15 @@ var addstream = function(measureName, deviceID, value, timestamp) {
                    addvalue(measures[measureName].id, streamID));
 
 
-    if (broker.has('readings')) {
-      broker.publish('readings', deviceID, { streamID  : streamID.toString()
-                                           , measure   : { name   : measureName
-                                                         , type   : measures[measureName].type
-                                                         , label  : measures[measureName].units
-                                                         , symbol : measures[measureName].symbol
-                                                         }
-                                           , value     : value
-                                           , timestamp : timestamp || new Date().getTime()
-                                           });
-      }
+    broker.emit('readings', deviceID, { streamID  : streamID.toString()
+                                          , measure   : { name   : measureName
+                                                        , type   : measures[measureName].type
+                                                        , label  : measures[measureName].units
+                                                        , symbol : measures[measureName].symbol
+                                                        }
+                                          , value     : value
+                                          , timestamp : timestamp || new Date().getTime()
+                                          });
   };
 };
 
@@ -106,17 +104,15 @@ var update = function(deviceID, measureName, value, timestamp) {
                    { $streamID : streamID, $value: value, $timestamp: timestamp },
                    addvalue(measureID, streamID));
 
-    if (broker.has('readings')) {
-      broker.publish('readings', deviceID, { streamID  : streamID.toString()
-                                           , measure   : { name   : measureName
-                                                         , type   : measures[measureName].type
-                                                         , label  : measures[measureName].units
-                                                         , symbol : measures[measureName].symbol
-                                                         }
-                                           , value     : value
-                                           , timestamp : timestamp || new Date().getTime()
-                                           });
-    }
+    broker.emit('readings', deviceID, { streamID  : streamID.toString()
+                                          , measure   : { name   : measureName
+                                                        , type   : measures[measureName].type
+                                                        , label  : measures[measureName].units
+                                                        , symbol : measures[measureName].symbol
+                                                        }
+                                          , value     : value
+                                          , timestamp : timestamp || new Date().getTime()
+                                          });
 
     return true;
   }

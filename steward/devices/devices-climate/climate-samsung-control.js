@@ -111,7 +111,7 @@ var Thermostat = exports.Device = function(deviceID, deviceUID, info) {
 
   self.update(self, { 'hvac': 'off', 'power': 'off', 'fan': 0, 'temperature': 0 }, 'present');
 
-  utility.broker.subscribe('actors', function(request, taskID, actor, perform, parameter) {
+  utility.broker.on('actors', function(request, taskID, actor, perform, parameter) {
     if (actor !== ('device/' + self.deviceID)) return;
 
     if (request === 'perform') return self.perform(self, taskID, perform, parameter);

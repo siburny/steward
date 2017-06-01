@@ -599,7 +599,7 @@ var perform2 = function(logger, ws, message, group /*, tag */) {
     for (device in performance.devices) {
       if (!performance.devices.hasOwnProperty(device)) continue;
 
-      broker.publish('actors', 'perform', performance.taskID, device, performance.perform, performance.parameter);
+      broker.emit('actors', 'perform', performance.taskID, device, performance.perform, performance.parameter);
     }
   }
 

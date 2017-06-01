@@ -34,9 +34,9 @@ var DweetIO = exports.Device = function(deviceID, deviceUID, info) {
 
   self.dweetio = new dweetio();
 
-  broker.subscribe('readings', function(deviceID, point) { self.update(self, deviceID, point); });
+  broker.on('readings', function(deviceID, point) { self.update(self, deviceID, point); });
 
-  broker.subscribe('actors', function(request, taskID, actor, perform, parameter) {
+  broker.on('actors', function(request, taskID, actor, perform, parameter) {
     if (actor !== ('device/' + self.deviceID)) return;
 
     if (request === 'perform') return self.perform(self, taskID, perform, parameter);

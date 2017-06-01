@@ -28,7 +28,7 @@ var LIFX = exports.Device = function(deviceID, deviceUID, info) {
   self.bulb = info.bulb;
   self.info = {};
 
-  broker.subscribe('actors', function(request, taskID, actor, perform, parameter) {
+  broker.on('actors', function(request, taskID, actor, perform, parameter) {
     if (actor !== ('device/' + self.deviceID)) return;
 
     if (request === 'perform') return self.perform(self, taskID, perform, parameter);

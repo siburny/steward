@@ -31,7 +31,7 @@ var Spotter = exports.Device = function(deviceID, deviceUID, info) {
   self.events = {};
   self.observations = {};
 
-  broker.subscribe('actors', function(request, eventID, actor, observe, parameter) {
+  broker.on('actors', function(request, eventID, actor, observe, parameter) {
     if (actor !== ('device/' + self.deviceID)) return;
 
     if (request === 'observe') {

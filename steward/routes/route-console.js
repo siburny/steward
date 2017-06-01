@@ -30,7 +30,7 @@ var consoleX = function(ws, tag) {
                              }, message, tag);
   });
 
-  broker.subscribe('beacon-egress', function(category, datum) {
+  broker.on('beacon-egress', function(category, datum) {
     var data = {};
 
     if (!steward.readP(ws.clientInfo)) return;
@@ -47,8 +47,8 @@ var consoleX = function(ws, tag) {
       ws.send(stringify({ notice: { permissions: permissions(ws.clientInfo) } }));
       ws.send(stringify(utility.signals));
     } catch(ex) {}
-    broker.publish('actors', 'attention');
-    return broker.publish('actors', 'ping');
+    broker.emit('actors', 'attention');
+    return broker.emit('actors', 'ping');
   }
 
   meta = utility.clone(ws.clientInfo);
@@ -73,8 +73,8 @@ var consoleX2 = function(logger, ws, data, tag) {/* jshint unused: false */
       ws.send(stringify({ notice: { permissions: permissions(ws.clientInfo) } }));
       ws.send(stringify(utility.signals));
     } catch(ex) {}
-    broker.publish('actors', 'attention');
-    broker.publish('actors', 'ping');
+    broker.emit('actors', 'attention');
+    broker.emit('actors', 'ping');
   }
 };
 

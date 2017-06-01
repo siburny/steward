@@ -69,7 +69,7 @@ var scan = function () {
 
     event = events.events[uuid];
     if (event.conditionP) check(event, now);
-    else if (!event.watchP) broker.publish('actors', 'observe', event.eventID, event.actor, event.observe, event.parameter);
+    else if (!event.watchP) broker.emit('actors', 'observe', event.eventID, event.actor, event.observe, event.parameter);
   }
 
   for (uuid in activities.activities) {
@@ -120,7 +120,7 @@ var scan = function () {
     for (device in performance.devices) {
       if (!performance.devices.hasOwnProperty(device)) continue;
 
-      broker.publish('actors', 'perform', performance.taskID, device, performance.perform, performance.parameter);
+      broker.emit('actors', 'perform', performance.taskID, device, performance.perform, performance.parameter);
     }
   }
 };

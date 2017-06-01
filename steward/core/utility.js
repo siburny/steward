@@ -25,11 +25,8 @@ process.addListener("uncaughtException", function (err) {
   process.exit(1);
 });
 
-
-// winston.exitErrs = false;
-
-
-var broker = exports.broker = new EventBroker();
+var EventEmitter2  = require('eventemitter2').EventEmitter2;
+var broker = exports.broker = new EventEmitter2({maxListeners: 25});
 var signals = exports.signals = {};
 
 var beacon_ingress = function(category, level, message, meta) {
@@ -42,7 +39,7 @@ var beacon_ingress = function(category, level, message, meta) {
 
   signals[category] = data;
 
-  if (broker.has('beacon-egress')) broker.publish('beacon-egress', category, datum);
+  broker.emit('beacon-egress', category, datum);
 };
 
 
@@ -54,12 +51,12 @@ exports.start = function() {
 // used to delay the server starting...
   exports.acquiring = 1;
 
-  broker.create('beacon-ingress');
-  broker.subscribe('beacon-ingress', beacon_ingress);
-  broker.create('beacon-egress');
-  broker.create('actors');
-  broker.create('discovery');
-  broker.create('readings');
+  //broker.create('beacon-ingress');
+  broker.on('beacon-ingress', beacon_ingress);
+  //broker.create('beacon-egress');
+  //broker.create('actors');
+  //broker.create('discovery');
+  //broker.create('readings');
 
   try {
     exports.configuration = JSON.parse(fs.readFileSync(__dirname + '/../db/configuration.json', { encoding: 'utf8' }));

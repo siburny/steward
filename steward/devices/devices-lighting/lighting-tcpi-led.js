@@ -39,7 +39,7 @@ var GreenWaveGOP = exports.Device = function(deviceID, deviceUID, info) {
     self.changed();
   });
 
-  broker.subscribe('actors', function(request, taskID, actor, perform, parameter) {
+  broker.on('actors', function(request, taskID, actor, perform, parameter) {
     var led;
 
     if (request !== 'perform') return;

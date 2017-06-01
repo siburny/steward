@@ -28,7 +28,7 @@ var Gauge = exports.Device = function(deviceID, deviceUID, info) {
   self.status = 'present';
   self.changed();
 
-  broker.subscribe('beacon-egress', function(category, data) {
+  broker.on('beacon-egress', function(category, data) {
     var i;
 
     if (category !== '.updates') return;
@@ -37,7 +37,7 @@ var Gauge = exports.Device = function(deviceID, deviceUID, info) {
     for (i = 0; i < data.length; i++) if (data[i].whoami === self.info.actor) self.egress(self);
   });
 
-  broker.subscribe('actors', function(request, eventID, actor, perform, parameter) {
+  broker.on('actors', function(request, eventID, actor, perform, parameter) {
     if (actor !== ('device/' + self.deviceID)) return;
 
     if (request === 'perform') return self.perform(self, eventID, perform, parameter);

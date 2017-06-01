@@ -26,7 +26,7 @@ var Vehicle = exports.device = function(deviceID, deviceUID, info) {
   self.info.locations = [];
   self.changed();
 
-  broker.subscribe('actors', function(request, taskID, actor, perform, parameter) {
+  broker.on('actors', function(request, taskID, actor, perform, parameter) {
     if (actor !== ('device/' + self.deviceID)) return;
 
     if (request === 'perform') return devices.perform(self, taskID, perform, parameter);

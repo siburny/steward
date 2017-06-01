@@ -45,7 +45,7 @@ var Insteon_Door = exports.Device = function(deviceID, deviceUID, info) {
     self.update(self, 'heartbeat');
   });
 
-  broker.subscribe('actors', function(request, eventID, actor, observe, parameter) {
+  broker.on('actors', function(request, eventID, actor, observe, parameter) {
     if (actor !== ('device/' + self.deviceID)) return;
 
     if (request === 'perform') return self.perform(self, taskID, perform, parameter);

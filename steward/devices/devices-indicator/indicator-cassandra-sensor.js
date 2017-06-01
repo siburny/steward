@@ -87,7 +87,7 @@ var Cassandra = exports.Device = function(deviceID, deviceUID, info) {
 , timestamp : 1383839241764
 }
  */
-  broker.subscribe('readings', function(deviceID, point) {
+  broker.on('readings', function(deviceID, point) {
     var actor, datetime, device, hour;
 
     if ((!self.cql) || (self.status !== 'ready') || (!steward.uuid)) return;
@@ -135,7 +135,7 @@ var Cassandra = exports.Device = function(deviceID, deviceUID, info) {
      seconds   : 1800 } }
  */
   previous = {};
-  broker.subscribe('beacon-egress', function(category, data) {
+  broker.on('beacon-egress', function(category, data) {
     var datetime, datum, hour, i, now;
 
     if ((!self.cql) || (self.status !== 'ready') || (!steward.uuid)) return;
@@ -179,7 +179,7 @@ var Cassandra = exports.Device = function(deviceID, deviceUID, info) {
     }
   });
 
-  broker.subscribe('actors', function(request, taskID, actor, perform, parameter) {
+  broker.on('actors', function(request, taskID, actor, perform, parameter) {
     if (actor !== ('device/' + self.deviceID)) return;
 
     if (request === 'perform') return devices.perform(self, taskID, perform, parameter);

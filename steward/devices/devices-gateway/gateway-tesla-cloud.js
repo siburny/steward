@@ -35,7 +35,7 @@ var Cloud = exports.Device = function(deviceID, deviceUID, info) {
   self.fails = 0;
   self.chargers = chargers;
 
-  utility.broker.subscribe('actors', function(request, taskID, actor, perform, parameter) {
+  utility.broker.on('actors', function(request, taskID, actor, perform, parameter) {
     if (request === 'attention') {
       if (self.status === 'reset') self.alert('please check login credentials at https://www.teslamotors.com/mytesla');
       return;

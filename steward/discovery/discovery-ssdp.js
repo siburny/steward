@@ -134,7 +134,7 @@ var listen = function(addr, portno) {/* jshint multistr: true */
         response.writeHead(200, {});
         response.end();
 
-        broker.publish('discovery', 'notify', request.headers, content);
+        broker.emit('discovery', 'notify', request.headers, content);
       });
     }).on('listening', function() {
       listening = 'http://' + addr + ':' + portno;

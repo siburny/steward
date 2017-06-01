@@ -26,7 +26,7 @@ var Sensor_Tick_Tock = exports.Device = function(deviceID, deviceUID, info) {
   self.changed();
   self.info = {};
 
-  broker.subscribe('actors', function(request, eventID, actor, observe, parameter) {
+  broker.on('actors', function(request, eventID, actor, observe, parameter) {
     if (actor !== ('device/' + self.deviceID)) return;
 
     if (request === 'perform') return self.perform(self, eventID, observe, parameter);

@@ -27,7 +27,7 @@ var Strip = exports.Device = function(deviceID, deviceUID, info) {
 
   self.changed();
 
-  broker.subscribe('actors', function(request, eventID, actor, perform, parameter) {
+  broker.on('actors', function(request, eventID, actor, perform, parameter) {
     if (actor !== ('device/' + self.deviceID)) return;
 
     if (request === 'perform') return self.perform(self, eventID, perform, parameter);

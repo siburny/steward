@@ -35,7 +35,7 @@ var Hue = exports.Device = function(deviceID, deviceUID, info) {
   self.inflight = 0;
   self.maxflights = 3;
 
-  broker.subscribe('actors', function(request, taskID, actor, perform, parameter) {
+  broker.on('actors', function(request, taskID, actor, perform, parameter) {
     var light;
 
     if (request === 'attention') {
@@ -472,7 +472,7 @@ Hue.prototype.refresh3 = function(self, id, results) {
     self.lights[id].updated = self.updated;
     info.updated = self.updated;
 
-    if (broker.has('beacon-egress')) broker.publish('beacon-egress', '.updates', info);
+    broker.emit('beacon-egress', '.updates', info);
   });
 };
 

@@ -52,7 +52,7 @@ var Insteon_OnOff = exports.Device = function(deviceID, deviceUID, info) {
     self.onoff(self, false);
   });
 
-  utility.broker.subscribe('actors', function(request, taskID, actor, perform, parameter) {
+  utility.broker.on('actors', function(request, taskID, actor, perform, parameter) {
     if (actor !== ('device/' + self.deviceID)) return;
 
     if (request === 'perform') return self.perform(self, taskID, perform, parameter);

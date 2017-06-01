@@ -40,7 +40,7 @@ var PowerColor = exports.Device = function(deviceID, deviceUID, info) {
     });
   }
 
-  utility.broker.subscribe('actors', function(request, taskID, actor, perform, parameter) {
+  utility.broker.on('actors', function(request, taskID, actor, perform, parameter) {
     if (actor !== ('device/' + self.deviceID)) return;
 
     if (request === 'perform') return self.perform(self, taskID, perform, parameter);

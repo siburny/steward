@@ -36,9 +36,9 @@ var GroveStreams = exports.Device = function(deviceID, deviceUID, info) {
 
   self.components = {};
 
-  broker.subscribe('readings', function(deviceID, point) { self.update(self, deviceID, point); });
+  broker.on('readings', function(deviceID, point) { self.update(self, deviceID, point); });
 
-  broker.subscribe('actors', function(request, taskID, actor, perform, parameter) {
+  broker.on('actors', function(request, taskID, actor, perform, parameter) {
     if (request === 'attention') {
       if (self.status === 'error') self.alert('please check login credentials at https://grovestreams.com/');
       return;

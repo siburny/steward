@@ -25,7 +25,7 @@ var Sensor = exports.Device = function(deviceID, deviceUID, info) {
   sensor.update(self.deviceID, info.params);
   self.changed();
 
-  utility.broker.subscribe('actors', function(request, taskID, actor, perform, parameter) {
+  utility.broker.on('actors', function(request, taskID, actor, perform, parameter) {
     if (actor !== ('device/' + self.deviceID)) return;
 
     if (request === 'perform') return devices.perform(self, taskID, perform, parameter);

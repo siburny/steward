@@ -60,7 +60,7 @@ var Sensor = exports.Device = function(deviceID, deviceUID, info) {
     logger.info('device/' + self.deviceID, { event: 'voc.get_unit', result: result });
   });
 
-  utility.broker.subscribe('actors', function(request, taskID, actor, perform, parameter) {
+  utility.broker.on('actors', function(request, taskID, actor, perform, parameter) {
     if (actor !== ('device/' + self.deviceID)) return;
 
     if (request === 'perform') return self.perform(self, taskID, perform, parameter);

@@ -28,7 +28,7 @@ var Sensor = exports.Device = function(deviceID, deviceUID, info) {
   self.roomtype = info.params.roomtype;
   self.changed();
 
-  utility.broker.subscribe('actors', function(request, taskID, actor, perform, parameter) {
+  utility.broker.on('actors', function(request, taskID, actor, perform, parameter) {
     if (actor !== ('device/' + self.deviceID)) return;
 
     if (request === 'perform') return self.perform(self, taskID, perform, parameter);

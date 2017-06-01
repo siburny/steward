@@ -38,7 +38,7 @@ var Hub = exports.Device = function(deviceID, deviceUID, info) {
   self.changed();
   self.info = {};
 
-  utility.broker.subscribe('actors', function(request, taskID, actor, perform, parameter) {/* jshint unused: false */
+  utility.broker.on('actors', function(request, taskID, actor, perform, parameter) {/* jshint unused: false */
     if (actor !== ('device/' + self.deviceID)) return;
 
     if (request === 'perform') return devices.perform(self, taskID, perform, parameter);

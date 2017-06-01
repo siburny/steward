@@ -338,7 +338,7 @@ var authenticate = exports.authenticate = function(logger, ws, api, message, tag
 
         ws2.close(1001, 'automatic close');
         delete(server.logins[entry]);
-        broker.publish('actors', 'logout', ws2.clientInfo.clientSerialNo);
+        broker.emit('actors', 'logout', ws2.clientInfo.clientSerialNo);
         break;
       }
 

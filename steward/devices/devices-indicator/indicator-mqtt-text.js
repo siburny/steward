@@ -40,7 +40,7 @@ var Mqtt = exports.Device = function(deviceID, deviceUID, info) {
   self.elide = [ 'passphrase' ];
   self.changed();
 
-  broker.subscribe('readings', function(deviceID, point) {
+  broker.on('readings', function(deviceID, point) {
     if (!self.mqtt) return;
     if (self.status !== 'ready') return;
 
@@ -52,7 +52,7 @@ var Mqtt = exports.Device = function(deviceID, deviceUID, info) {
   });
 
   previous = {};
-  broker.subscribe('beacon-egress', function(category, data) {
+  broker.on('beacon-egress', function(category, data) {
     var datum, i, now, parameter;
 
     if (!self.mqtt) return;
@@ -77,7 +77,7 @@ var Mqtt = exports.Device = function(deviceID, deviceUID, info) {
     }
   });
 
-  broker.subscribe('actors', function(request, taskID, actor, perform, parameter) {
+  broker.on('actors', function(request, taskID, actor, perform, parameter) {
     if (actor !== ('device/' + self.deviceID)) return;
 
     if (request === 'perform') return self.perform(self, taskID, perform, parameter);

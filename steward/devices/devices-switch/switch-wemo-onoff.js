@@ -28,13 +28,13 @@ var WeMo_OnOff = exports.Device = function(deviceID, deviceUID, info) {
   self.seq = 0;
   self.logger = plug.logger;
 
-  utility.broker.subscribe('actors', function(request, taskID, actor, perform, parameter) {
+  utility.broker.on('actors', function(request, taskID, actor, perform, parameter) {
     if (actor !== ('device/' + self.deviceID)) return;
 
     if (request === 'perform') return self.perform(self, taskID, perform, parameter);
   });
 
-  utility.broker.subscribe('discovery', function(method, headers, content) {
+  utility.broker.on('discovery', function(method, headers, content) {
     if (method === 'notify') self.notify(self, headers, content);
   });
 

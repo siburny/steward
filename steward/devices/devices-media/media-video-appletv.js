@@ -40,7 +40,7 @@ var AppleTV = exports.Device = function(deviceID, deviceUID, info) {
   self.timer = null;
   self.params =  url.parse(info.url);
 
-  utility.broker.subscribe('actors', function(request, taskID, actor, perform, parameter) {
+  utility.broker.on('actors', function(request, taskID, actor, perform, parameter) {
     if (actor !== ('device/' + self.deviceID)) return;
 
     if (request === 'perform') return self.perform(self, taskID, perform, parameter);

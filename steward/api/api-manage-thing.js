@@ -540,7 +540,7 @@ var Thing = function(deviceID, deviceUID, info) {
 
   self.changed();
 
-  broker.subscribe('actors', function(request, eventID, actor, observe, parameter) {
+  broker.on('actors', function(request, eventID, actor, observe, parameter) {
     if (!self.ws) return;
 
     if (request === 'logout') {

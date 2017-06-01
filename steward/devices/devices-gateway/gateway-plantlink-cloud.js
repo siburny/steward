@@ -36,7 +36,7 @@ var Cloud = exports.Device = function(deviceID, deviceUID, info) {
   self.pollsecs = 300;
   self.timer = null;
 
-  utility.broker.subscribe('actors', function(request, taskID, actor, perform, parameter) {
+  utility.broker.on('actors', function(request, taskID, actor, perform, parameter) {
     if (actor !== ('device/' + self.deviceID)) return;
 
     if (request === 'perform') return self.perform(self, taskID, perform, parameter);
@@ -299,7 +299,7 @@ var Station = function(deviceID, deviceUID, info) {
   } else self.status = 'present';
   self.changed();
 
-  utility.broker.subscribe('actors', function(request, taskID, actor, perform, parameter) {
+  utility.broker.on('actors', function(request, taskID, actor, perform, parameter) {
     if (actor !== ('device/' + self.deviceID)) return;
 
     if (request === 'perform') return devices.perform(self, taskID, perform, parameter);

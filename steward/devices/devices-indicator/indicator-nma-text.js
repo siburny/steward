@@ -56,7 +56,7 @@ var NMA = exports.Device = function(deviceID, deviceUID, info) {
   self.elide = [ 'apikey' ];
   self.changed();
 
-  broker.subscribe('beacon-egress', function(category, data) {
+  broker.on('beacon-egress', function(category, data) {
     var datum, i, now, parameter;
 
     if (!util.isArray(data)) data = [ data ];
@@ -78,7 +78,7 @@ var NMA = exports.Device = function(deviceID, deviceUID, info) {
     }
   });
 
-  broker.subscribe('actors', function(request, taskID, actor, perform, parameter) {
+  broker.on('actors', function(request, taskID, actor, perform, parameter) {
     if (request === 'attention') {
       if (self.status === 'error') self.alert('please check login credentials at https://www.notifymyandroid.com/');
       return;

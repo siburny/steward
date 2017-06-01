@@ -39,7 +39,7 @@ var ModelS = exports.device = function(deviceID, deviceUID, info) {
   self.calls = {};
   self.last6 = [];
 
-  broker.subscribe('actors', function(request, taskID, actor, perform, parameter) {
+  broker.on('actors', function(request, taskID, actor, perform, parameter) {
     if (request === 'attention') {
       if (self.status === 'reset') self.alert('please enable remote access from vehicle console');
       return;

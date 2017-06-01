@@ -34,7 +34,7 @@ var Tag = exports.Device = function(deviceID, deviceUID, info) {
 
   self.update(self, info.params.v, info.params.timestamp);
 
-  broker.subscribe('actors', function(request, eventID, actor, observe, parameter) {
+  broker.on('actors', function(request, eventID, actor, observe, parameter) {
     if (actor !== ('device/' + self.deviceID)) return;
 
     if (request === 'observe') {

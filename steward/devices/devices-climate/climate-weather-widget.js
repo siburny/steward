@@ -23,13 +23,13 @@ var Weather_Widget = exports.Device = function (deviceID, deviceUID, info) {
   self.changed();
   self.info = {};
 
-  broker.subscribe('actors', function (request, eventID, actor, observe, parameter) {
+  broker.on('actors', function (request, eventID, actor, observe, parameter) {
     if (actor !== ('device/' + self.deviceID)) return;
 
     if (request === 'perform') return self.perform(self, eventID, observe, parameter);
   });
 
-  broker.subscribe('beacon-egress', function(category, data) {
+  broker.on('beacon-egress', function(category, data) {
     if(category == '.updates'){
       if(!Array.isArray(data))
       {

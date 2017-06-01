@@ -29,7 +29,7 @@ exports.start = function () {
       + ')');
   });
 
-  utility.broker.subscribe('beacon-egress', function(category, data) {
+  utility.broker.on('beacon-egress', function(category, data) {
     if(category == '.updates'){
       if(!Array.isArray(data))
       {

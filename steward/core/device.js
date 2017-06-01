@@ -78,10 +78,10 @@ exports.start = function() {
 // cf., utility.start()
   utility.acquiring--;
 
-  broker.subscribe('actors', function(request, taskID, actor, perform, parameter) {/* jshint unused: false */
+  broker.on('actors', function(request, taskID, actor, perform, parameter) {/* jshint unused: false */
     var d, data, i, ids, info;
 
-    if ((request !== 'ping') || (!broker.has('beacon-egress'))) return;
+    if (request !== 'ping') return;
 
     ids = idlist();
     data = [];
@@ -98,7 +98,7 @@ exports.start = function() {
       try { info.updated = d.updated.getTime(); } catch(ex) { info.updated = d.updated; }
       data.push(info);
     }
-    if (data.length > 0) broker.publish('beacon-egress', '.updates', data);
+    if (data.length > 0) broker.emit('beacon-egress', '.updates', data);
   });
 
   arp.table(function(err, entry) {
@@ -580,10 +580,8 @@ Device.prototype.changed = function(now) {
   self.prev = prev;
   info.updated = updated;
 
-  if (broker.has('beacon-egress')) {
-    broker.publish('beacon-egress', '.updates', info);
-    if ((self.status === 'reset') || (self.status === 'error')) broker.publish('actors', 'attention');
-  }
+  broker.emit('beacon-egress', '.updates', info);
+  if ((self.status === 'reset') || (self.status === 'error')) broker.emit('actors', 'attention');
 };
 
 Device.prototype.alert = function(message) {
@@ -595,15 +593,13 @@ Device.prototype.alert = function(message) {
   if ((!!self.nextAlert) && (self.nextAlert > now)) return;
   self.nextAlert = now + (60 * 1000);
 
-  if (broker.has('beacon-egress')) {
-    info = self.proplist();
+  info = self.proplist();
 
-    updated = info.updated.getTime() || now;
-    delete(info.updated);
+  updated = info.updated.getTime() || now;
+  delete(info.updated);
 
-    broker.publish('beacon-egress', '.updates',
-                   { updated: updated, level: 'alert', message: message, whoami: info.whoami, name: info.name, info: info });
-  }
+  broker.emit('beacon-egress', '.updates',
+                  { updated: updated, level: 'alert', message: message, whoami: info.whoami, name: info.name, info: info });
 };
 
 Device.prototype.wake = function() {

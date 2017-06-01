@@ -175,6 +175,8 @@ var start = function (port, portSecure) {
   utility.acquire(logger, __dirname + '/../discovery', /^discovery-.*\.js$/, 10, -3, ' discovery', portSecure);
   return;
 
+  // ======================================================================================================
+
   var server = new wsServer(options).on('connection', function (ws) {
     var request = ws.upgradeReq;
     var pathname = url.parse(request.url).pathname;
@@ -197,7 +199,7 @@ var start = function (port, portSecure) {
       meta.message = message;
       logger.info(tag, meta);
 
-      broker.publish('actors', 'logout', ws.clientInfo.clientSerialNo);
+      broker.emit('actors', 'logout', ws.clientInfo.clientSerialNo);
       delete (logins[tag]);
     });
 

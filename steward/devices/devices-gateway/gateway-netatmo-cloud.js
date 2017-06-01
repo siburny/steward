@@ -39,7 +39,7 @@ var Cloud = exports.Device = function(deviceID, deviceUID, info) {
   self.timer = null;
   self.seen = {};
 
-  utility.broker.subscribe('actors', function(request, taskID, actor, perform, parameter) {
+  utility.broker.on('actors', function(request, taskID, actor, perform, parameter) {
     var macaddr;
 
     if (request === 'attention') {

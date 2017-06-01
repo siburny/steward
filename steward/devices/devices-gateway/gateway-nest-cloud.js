@@ -38,7 +38,7 @@ var Cloud = exports.Device = function(deviceID, deviceUID, info) {
 
   nest.logger = utility.logfnx(logger, 'device/' + self.deviceID);
 
-  broker.subscribe('actors', function(request, taskID, actor, perform, parameter) {
+  broker.on('actors', function(request, taskID, actor, perform, parameter) {
     var macaddr;
 
     if (request === 'attention') {
@@ -294,7 +294,7 @@ exports.start = function() {
     if (now >= later) {
       later = now + (30 * 1000);
 
-      f = function() { broker.publish('actors', 'scan', '', '/device/gateway/nest/cloud'); };
+      f = function() { broker.emit('actors', 'scan', '', '/device/gateway/nest/cloud'); };
       for (i = 0; i < 15; i++) setTimeout(f, i * 2000);
       logger.info('nest-cloud', 'begin 30-second scan');
       f();

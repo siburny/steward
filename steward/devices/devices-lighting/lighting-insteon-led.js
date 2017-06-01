@@ -39,7 +39,7 @@ var Insteon_LED = exports.Device = function(deviceID, deviceUID, info) {
 
   self.light = self.gateway.insteon.light(self.insteonID);
 
-  utility.broker.subscribe('actors', function(request, taskID, actor, perform, parameter) {
+  utility.broker.on('actors', function(request, taskID, actor, perform, parameter) {
     if (actor !== ('device/' + self.deviceID)) return;
 
     if (request === 'perform') return self.perform(self, taskID, perform, parameter);

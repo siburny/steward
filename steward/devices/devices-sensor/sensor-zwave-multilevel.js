@@ -50,7 +50,7 @@ var ZWave_MLSensor = exports.Device = function(deviceID, deviceUID, info) {
     batteryLevel: (typeof info.peripheral.classes[0x80][0].value === 'undefined') ? 0 : info.peripheral.classes[0x80][0].value
   };
 
-  utility.broker.subscribe('actors', function(request, taskID, actor, perform, parameter) {
+  utility.broker.on('actors', function(request, taskID, actor, perform, parameter) {
     if (actor !== ('device/' + self.deviceID))
       return;
 

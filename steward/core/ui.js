@@ -97,13 +97,9 @@ exports.start = function (server, serverSecure, app) {
     res.render('index');
   });
 
-  app.get('/cloud/endpoint', function (req, res) {
-    res.json({ 'index': 'ok' });
-  });
-
   app.ws('/api/', function (ws, req) {
     function renderDevice(data) {
-      if (widgets[data.whatami]) {
+      if (!!data && widgets[data.whatami]) {
         var id = data.deviceID || data.whoami.replace('device/', '');
         var resdata = widgets[data.whatami];
         resdata.id = id;
@@ -141,16 +137,20 @@ exports.start = function (server, serverSecure, app) {
       }
     });
 
-    ws.on('close', function() {
-
-    });
-
-    utility.broker.subscribe('beacon-egress', function (category, data) {
-      console.log(data);
+    var listener = function (category, data) {
       if (category == '.updates') {
         renderDevice(data);
       }
+    }
+
+    utility.broker.on('beacon-egress', listener);
+    ws.on('close', function () {
+      utility.broker.off('beacon-egress', listener);
     });
+  });
+
+  app.get('/cloud/endpoint', function (req, res) {
+    res.json({ 'index': 'ok' });
   });
 
   app.get('/cloud/auth', function (req, res) {

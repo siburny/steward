@@ -63,7 +63,7 @@ var Twitter = exports.Device = function(deviceID, deviceUID, info) {
   self.elide = [ 'consumerKey', 'consumerSecret', 'token', 'tokenSecret' ];
   self.changed();
 
-  broker.subscribe('actors', function(request, taskID, actor, perform, parameter) {
+  broker.on('actors', function(request, taskID, actor, perform, parameter) {
     if (request === 'attention') {
       if (self.status === 'error') self.alert('please check login credentials at https://dev.twitter.com/');
       return;

@@ -36,9 +36,9 @@ var Cosm = exports.Device = function(deviceID, deviceUID, info) {
   self.cosm = new cosm.Cosm(info.apikey, { server: 'https://api.xively.com' });
   self.datastreams = {};
 
-  broker.subscribe('readings', function(deviceID, point) { self.update(self, deviceID, point); });
+  broker.on('readings', function(deviceID, point) { self.update(self, deviceID, point); });
 
-  broker.subscribe('actors', function(request, taskID, actor, perform, parameter) {
+  broker.on('actors', function(request, taskID, actor, perform, parameter) {
     if (request === 'attention') {
       if (self.status === 'error') self.alert('please check login credentials at https://xively.com/login/');
       return;
