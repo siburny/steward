@@ -611,6 +611,24 @@ exports.start = function() {
            + 'DELETE FROM clients WHERE clientUserID=OLD.userID; '
            + 'END');
 
+    db.run('CREATE TABLE IF NOT EXISTS oauth_access_tokens ('
+           + 'access_token text NOT NULL PRIMARY KEY,'
+           + 'client_id text NOT NULL,'
+           + 'user_id integer NOT NULL,'
+           + 'expires CURRENT_TIMESTAMP)');
+
+    db.run('CREATE TABLE IF NOT EXISTS  oauth_clients ('
+           + 'client_id text NOT NULL,'
+           + 'client_secret text NOT NULL,'
+           + 'redirect_uri text NOT NULL,'
+           + 'PRIMARY KEY (client_id, client_secret))');
+
+    db.run('CREATE TABLE IF NOT EXISTS oauth_refresh_tokens ('
+           + 'refresh_token text NOT NULL PRIMARY KEY,'
+           + 'client_id text NOT NULL,'
+           + 'user_id uuid NOT NULL,'
+           + 'expires CURRENT_TIMESTAMP)');
+
     db.all('SELECT * FROM users ORDER BY sortOrder', function(err, rows) {
       if (err) return steward.logger.error('database', { event: 'SELECT users.*', diagnostic: err.message });
 

@@ -90,8 +90,8 @@ var checkPorts = function (port, portSecure) {
 var start = function (port, portSecure) {
   var server;
 
-  var crt = __dirname + '/../sandbox/steward.home.rub.is.chain.pem'
-    , key = __dirname + '/../db/steward.home.rub.is.key.pem'
+  var crt = __dirname + '/../sandbox/' + steward.domain + '.home.rub.is.chain.pem'
+    , key = __dirname + '/../db/' + steward.domain + '.home.rub.is.key.pem'
     , options = {}
     //, stasis = new static.Server(__dirname + '/../sandbox')
     ;
@@ -116,7 +116,10 @@ var start = function (port, portSecure) {
 
   var server, expressWs;
   server = http.createServer(app);
-  serverSecure = https.createServer({ key: fs.readFileSync(__dirname + '/../db/steward.home.rub.is.key.pem').toString(), cert: fs.readFileSync(__dirname + '/../sandbox/steward.home.rub.is.chain.pem').toString() }, app);
+  serverSecure = https.createServer({
+    key: fs.readFileSync(__dirname + '/../db/' + steward.domain + '.home.rub.is.key.pem').toString(),
+    cert: fs.readFileSync(__dirname + '/../sandbox/' + steward.domain + '.home.rub.is.chain.pem').toString()
+  }, app);
   expressWs = require('express-ws')(app, server);
   expressWss = require('express-ws')(app, serverSecure);
 
@@ -135,6 +138,9 @@ var start = function (port, portSecure) {
 
   var ui = require('./ui');
   ui.start(server, serverSecure, app);
+
+  var oauth = require('./oauth');
+  oauth.start(app);
 
   server.listen(port);
   serverSecure.listen(portSecure);
@@ -176,7 +182,7 @@ var start = function (port, portSecure) {
   return;
 
   // ======================================================================================================
-
+/*
   var server = new wsServer(options).on('connection', function (ws) {
     var request = ws.upgradeReq;
     var pathname = url.parse(request.url).pathname;
@@ -336,7 +342,8 @@ var start = function (port, portSecure) {
     }
 
     utility.acquire(logger, __dirname + '/../discovery', /^discovery-.*\.js$/, 10, -3, ' discovery', portno);
-  });
+    
+  });*/
 };
 
 var wssA

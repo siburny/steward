@@ -366,27 +366,6 @@ var report = function (module, entry, now) {
 
 var ifaces = exports.ifaces = utility.clone(os.networkInterfaces());
 
-var listen = function (ifname, ifaddr) {
-  return function (raw) {
-    var arp, packet;
-
-    packet = pcap.decode.packet(raw);
-    if ((!packet.link) || (!packet.link.arp)) return;
-    arp = packet.link.arp;
-    if ((!arp.sender_ha) || (!arp.sender_pa)) return;
-
-    ifaces[ifname].arp[arp.sender_pa] = arp.sender_ha;
-    if (arp.sender_pa === ifaddr) {
-      if (!exports.uuid) exports.uuid = '2f402f80-da50-11e1-9b23-' + arp.sender_ha.split(':').join('');
-    } else if (arp.target_pa === ifaddr) {
-      if (!exports.uuid) exports.uuid = '2f402f80-da50-11e1-9b23-' + arp.target_ha.split(':').join('');
-    }
-    discovered1(ifname, ifaddr, arp);
-    discovered2(ifname, ifaddr, arp);
-    devices.arp(ifname, ifaddr, arp);
-  };
-};
-
 var prime = function (ifaddr) {
   var i, ipaddr, prefix;
 
@@ -489,10 +468,9 @@ exports.start = function () {
 
   utility.acquire(logger, __dirname + '/../actors', /^actor-.*\.js$/, 6, -3, ' actor');
 
-  return pass2();
+  pass2();
 };
 
-var failedN = 0;
 var pass2 = function () {
   var ifname, address;
 
@@ -512,10 +490,7 @@ var pass2 = function () {
     return;
   }
 
-  failedN++;
-  if (failedN < 100) return setTimeout(pass2, 10);
-
-  logger.info('start', { diagnostic: 'determine UUID address using method #2' });
+  logger.info('start', { diagnostic: 'determine UUID address' });
 
   for (ifname in ifaces) {
     if (!!ifaces[ifname]) {
@@ -524,6 +499,7 @@ var pass2 = function () {
 
         logger.info('start', { diagnostic: 'determining UUID using method #2' });
         exports.uuid = '2f402f80-da50-11e1-9b23-' + ifaces[ifname][address].mac.split(':').join('');
+        exports.domain = ifaces[ifname][address].mac.split(':').join('');
         return pass2();
       }
     }
