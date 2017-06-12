@@ -101,16 +101,13 @@ exports.start = function (app, api) {
 
   // Post login.
   app.post('/login', function (req, res) {
-    console.log('/login ', req.body);
     let user = true;
     if (!user) {
-      console.log('not a user', user);
-      return login(req, res);
+      return res.redirect('/login?redirect=' + req.body.redirect + '&client_id=' + req.body.client_id +
+        '&redirect_uri=' + req.body.redirect_uri + '&state=' + req.body.state);
     }
 
     req.session.user = { id: 111 };
-
-    console.log('logging in ', user);
 
     let path = decodeURIComponent(req.body.redirect) || '/home';
     res.redirect(util.format('%s?client_id=%s&redirect_uri=%s&state=%s&response_type=code', path, req.body.client_id, req.body.redirect_uri, req.body.state));

@@ -20,7 +20,7 @@ function initGrid() {
   $(window).resize();
 }
 
-var callback_editor;
+var callback_editor, callback_fields;
 function open_edit_form(fields, callback) {
   callback_editor = callback;
   fields = fields || {};
@@ -33,9 +33,11 @@ function open_edit_form(fields, callback) {
   }
 
   $('#settings form').empty();
+  callback_fields = [];
   for (var field in fields) {
     $row = $('<div class="row"><div class="input-field"><input id="' + field + '" type="text" class="validate" value="' + fields[field].value + '"><label for="' + field + '">' + fields[field].name + '</label></div></div>')
     $('#settings form').append($row);
+    callback_fields.push(field);
   }
 
   $('#settings').modal('open');
@@ -43,12 +45,15 @@ function open_edit_form(fields, callback) {
 }
 
 function onclose_edit_form(cancel) {
-
+  var ret = {};
+  for (var field in callback_fields) {
+    ret[field] = $('#settings form input#'+field).value();
+  }
 
   $('#settings').modal('close');
 
-  if(!!callback_editor && !cancel) {
-    callback_editor();
+  if (!!callback_editor && !cancel) {
+    callback_editor(ret || {});
   }
 }
 
@@ -67,8 +72,8 @@ $(function () {
 
   //init editor
   $('.modal').modal({ dismissible: false });
-  $('.modal .modal-footer .modal-cancel').on('click', function() { onclose_edit_form(true); });
-  $('.modal .modal-footer .modal-save').on('click', function() { onclose_edit_form(); });
+  $('.modal .modal-footer .modal-cancel').on('click', function () { onclose_edit_form(true); });
+  $('.modal .modal-footer .modal-save').on('click', function () { onclose_edit_form(); });
 });
 
 function API() {
@@ -102,8 +107,8 @@ API.prototype.connect = function () {
       if (update_functions.hasOwnProperty('update_' + msg.id)) {
         if (msg.status !== 'waiting') {
           $('#device-' + msg.id).removeClass('waiting');
-        }+
-        update_functions['update_' + msg.id](msg);
+        } +
+          update_functions['update_' + msg.id](msg);
       }
     }
   }

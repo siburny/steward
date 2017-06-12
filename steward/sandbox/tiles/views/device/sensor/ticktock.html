@@ -26,7 +26,7 @@
 					'nickname': { 'name': 'Nickname', 'value': current_data.nickname || '' },
 					'room': { 'name': 'Room', 'value': current_data.room || ''}
 				}, function(values) {
-					alert('done', values);
+					alert('done', JSON.stringify(values));
 				});
 			});
 		})();
