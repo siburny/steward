@@ -1,6 +1,5 @@
 var db = require('../api/api-manage-user').db,
-  util = require('util'),
-  devices = require('./device');
+  util = require('util');
 
 var model = {
   getAccessToken: function (bearerToken, callback) {
@@ -50,7 +49,15 @@ var model = {
 
   getRefreshToken: function (bearerToken, callback) {
     db.all('SELECT refresh_token, client_id, expires, user_id FROM oauth_refresh_tokens WHERE refresh_token = ?', [bearerToken], function (err, result) {
-      callback(err, !!result ? result[0] : false);
+      if (!result) return callback();
+
+      var token = result[0];
+      callback(err, {
+        refreshToken: token.refresh_token,
+        clientId: token.client_id,
+        expires: token.expires,
+        userId: token.client_id
+      });
     });
   },
 
