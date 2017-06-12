@@ -113,7 +113,7 @@ exports.start = function (server, serverSecure, app) {
         resdata.info = JSON.stringify(data.info);
 
         app.render(data.whatami.replace(/^a-z0-9-/, '').substr(1), resdata, function (err, out) {
-          var msg = { 'action': 'device', 'id': id, 'html': out, 'status': data.status, 'info': data.info };
+          var msg = { 'action': 'device', 'id': id, 'html': out, 'status': data.status, 'info': data.info, 'name': data.name, 'nickname': data.nickname, 'room': data.room };
           if (!!ws && ws.readyState == 1) {
             ws.send(JSON.stringify(msg));
           }
@@ -157,4 +157,3 @@ exports.start = function (server, serverSecure, app) {
       disable_nodes(RED);
     });
 };
-

@@ -53,12 +53,12 @@
   </style>
 
   <script>
-    update_functions['update_{{id}}'] = function(status, info) {
-      if(!!info && !!info.date) {
-        var date = new Date(info.date);
+    update_functions['update_{{id}}'] = function(data) {
+      if(!!data.info && !!data.info.date) {
+        var date = new Date(data.info.date);
         $('#device-{{id}} #hour').css('transform', 'rotate('+((date.getHours() % 12)*30 + date.getMinutes()/2 - 90)+'deg) translate(0%, -3px)');
         $('#device-{{id}} #minute').css('transform', 'rotate('+(date.getMinutes()*6 - 90)+'deg) translate(0%, -2px)');
-        $('#device-{{id}} #date').text($.datepicker.formatDate('DD, MM d', new Date()));
+        $('#device-{{id}} #date').text($.datepicker.formatDate('DD, MM d', date));
       }
     }
   </script>

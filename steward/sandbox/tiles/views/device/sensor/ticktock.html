@@ -5,47 +5,30 @@
 		</div>
 	</div>
 
-  <script>
-		(function() {
+	<script>
+		(function () {
 			var current_class = '{{status}}';
-			update_functions['update_{{id}}'] = function(status, info) {
-				if(!!status) {
-					$('#device-{{id}}').removeClass(current_class).addClass(status);
-					current_class = status;
+			var current_data = {};
+			update_functions['update_{{id}}'] = function (data) {
+				if (!!data.status) {
+					$('#device-{{id}}').removeClass(current_class).addClass(data.status);
+					current_class = data.status;
+					current_data = data;
 				}
 			}
-			$('#device-{{id}}').on('click', function() {
+			$('#device-{{id}}').on('click', function () {
 				api.perform('{{id}}', 'toggle');
 			});
-			$('.modal').modal();
-			$('#device-{{id}}').on('taphold', function() {
-				$('#settings-{{id}}').modal('open');
-				Materialize.updateTextFields();
+
+			$('#device-{{id}}').on('taphold', function () {
+				open_edit_form({
+					'name': { 'name': 'Name', 'value': current_data.name || '' },
+					'nickname': { 'name': 'Nickname', 'value': current_data.nickname || '' },
+					'room': { 'name': 'Room', 'value': current_data.room || ''}
+				}, function(values) {
+					alert('done', values);
+				});
 			});
 		})();
-  </script>
-
-	<div id="settings-{{id}}" class="modal">
-    <div class="modal-content">
-      <h4>Settings</h4>
-
-			<form>
-				<div class="row">
-					<div class="col s8">
-						<div class="input-field">
-							<input id="name" type="text" class="validate" value="{{name}}">
-							<label for="name">Name</label>
-						</div>
-					</div>
-					<div class="col s4">
-						<a href="#!" class="btn waves-effect waves-light">Save</a>
-					</div>
-				</div>
-			</form>
-
-    </div>
-    <div class="modal-footer">
-      <a href="#!" class="modal-action modal-close waves-effect waves-green btn">Agree</a>
-    </div>
-  </div>
+	</script>
 </li>

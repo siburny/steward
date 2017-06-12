@@ -7,21 +7,21 @@
 
 	<script>
 		(function() {
-			var current = {'status': ''};
-			update_functions['update_{{id}}'] = function(status, info) {
-				if(!!status) {
-					current.status = status;
-					if(status === 'on') {
+			var current_data = {};
+			update_functions['update_{{id}}'] = function(data) {
+				if(!!data.status) {
+					current_data = data;
+					if(data.status === 'on') {
 						$('#device-{{id}}').removeClass('off').addClass('on');	
-					} else if(status === 'off') {
+					} else if(data.status === 'off') {
 						$('#device-{{id}}').removeClass('on').addClass('off');	
 					}
 				}
 			}
 			$('#device-{{id}}').on('click', function() {
-				if(current.status === 'on') {
+				if(current_data.status === 'on') {
 					api.perform('{{id}}', 'off');
-				} else if(current.status === 'off') {
+				} else if(current_data.status === 'off') {
 					api.perform('{{id}}', 'on');
 				}
 				return false;

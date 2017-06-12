@@ -44,7 +44,7 @@
   </style>
 
   <script>
-    update_functions['update_{{id}}'] = function(status, info) {
+    update_functions['update_{{id}}'] = function(data) {
       var weather_icons = {
         'clear-day': 'sun.svg',
         'clear-night': 'moon.svg',
@@ -58,26 +58,26 @@
         'partly-cloudy-night': 'cloudMoon.svg',
       };
 
-      if(!!info) {
-        if(!!info.conditions) {
-          $("#device-{{id}} .current #temp").text(Math.round(info.conditions.temperature));
-          $("#device-{{id}} .current #precip").text(Math.round(info.conditions.precipitation * 100));
-          if(!!weather_icons[info.conditions.code]) {
-            $("#device-{{id}} .current img").attr('src', '/modules/animated-climacons/' + weather_icons[info.conditions.code]);
+      if(!!data.info) {
+        if(!!data.info.conditions) {
+          $("#device-{{id}} .current #temp").text(Math.round(data.info.conditions.temperature));
+          $("#device-{{id}} .current #precip").text(Math.round(data.info.conditions.precipitation * 100));
+          if(!!weather_icons[data.info.conditions.code]) {
+            $("#device-{{id}} .current img").attr('src', '/modules/animated-climacons/' + weather_icons[data.info.conditions.code]);
             $.embedSVG();
           }
         }
-        if(!!info.forecasts && info.forecasts.length > 1) {
-          $("#device-{{id}} .forecast.today #high").text(Math.round(info.forecasts[0].temperatureMax));
-          $("#device-{{id}} .forecast.today #low").text(Math.round(info.forecasts[0].temperatureMin));
-          $("#device-{{id}} .forecast.today #precip").text(Math.round(info.forecasts[0].precipitation * 100));
+        if(!!data.info.forecasts && data.info.forecasts.length > 1) {
+          $("#device-{{id}} .forecast.today #high").text(Math.round(data.info.forecasts[0].temperatureMax));
+          $("#device-{{id}} .forecast.today #low").text(Math.round(data.info.forecasts[0].temperatureMin));
+          $("#device-{{id}} .forecast.today #precip").text(Math.round(data.info.forecasts[0].precipitation * 100));
 
-          $("#device-{{id}} .forecast.tomorrow #high").text(Math.round(info.forecasts[1].temperatureMax));
-          $("#device-{{id}} .forecast.tomorrow #low").text(Math.round(info.forecasts[1].temperatureMin));
-          $("#device-{{id}} .forecast.tomorrow #precip").text(Math.round(info.forecasts[1].precipitation * 100));
+          $("#device-{{id}} .forecast.tomorrow #high").text(Math.round(data.info.forecasts[1].temperatureMax));
+          $("#device-{{id}} .forecast.tomorrow #low").text(Math.round(data.info.forecasts[1].temperatureMin));
+          $("#device-{{id}} .forecast.tomorrow #precip").text(Math.round(data.info.forecasts[1].precipitation * 100));
 
-          $("#device-{{id}} .forecast.today img").attr('src', '/modules/animated-climacons/' + weather_icons[info.forecasts[0].code]);
-          $("#device-{{id}} .forecast.tomorrow img").attr('src', '/modules/animated-climacons/' + weather_icons[info.forecasts[1].code]);
+          $("#device-{{id}} .forecast.today img").attr('src', '/modules/animated-climacons/' + weather_icons[data.info.forecasts[0].code]);
+          $("#device-{{id}} .forecast.tomorrow img").attr('src', '/modules/animated-climacons/' + weather_icons[data.info.forecasts[1].code]);
           $.embedSVG();
         }
       }

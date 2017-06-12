@@ -102,7 +102,6 @@ var start = function (port, portSecure) {
       /*options.key = fs.readFileSync(key);
       options.cert = fs.readFileSync(crt);
       options.server = https.createServer(options);
-
       exports.x509 = { key: key, crt: crt };*/
     } else return logger.error('no startup certificate', { cert: crt });
   } else return logger.error('no startup key', { key: key });
@@ -136,9 +135,11 @@ var start = function (port, portSecure) {
     });
   }
 
+  //attach UI to server
   var ui = require('./ui');
   ui.start(server, serverSecure, app);
-
+  
+  //attach OAUTH2 server
   var oauth = require('./oauth');
   oauth.start(app);
 
@@ -179,171 +180,6 @@ var start = function (port, portSecure) {
   });
 
   utility.acquire(logger, __dirname + '/../discovery', /^discovery-.*\.js$/, 10, -3, ' discovery', portSecure);
-  return;
-
-  // ======================================================================================================
-/*
-  var server = new wsServer(options).on('connection', function (ws) {
-    var request = ws.upgradeReq;
-    var pathname = url.parse(request.url).pathname;
-    var tag = wssT + ' ' + request.connection.remoteAddress + ' ' + request.connection.remotePort + ' ' + pathname;
-    var meta;
-
-    ws.clientInfo = steward.clientInfo(request.connection, secureP);
-    meta = ws.clientInfo;
-    meta.event = 'connection';
-    logger.info(tag, meta);
-
-    ws.on('error', function (err) {
-      logger.info(tag, { event: 'error', message: err });
-    });
-    ws.on('close', function (code, message) {
-      var meta = utility.clone(ws.clientInfo);
-
-      meta.event = 'close';
-      meta.code = code;
-      meta.message = message;
-      logger.info(tag, meta);
-
-      broker.emit('actors', 'logout', ws.clientInfo.clientSerialNo);
-      delete (logins[tag]);
-    });
-
-    if (!routes[pathname]) {
-      logger.warning(tag, { event: 'route', transient: false, diagnostic: 'unknown path: ' + pathname });
-      return ws.close(1008, 'not found');
-    }
-
-    // NB: each route is responsible for access control, both at start and per-message
-    (routes[pathname].route)(ws, tag);
-  }).on('error', function (err) {
-    logger.error('server', { event: 'ws.error', diagnostic: err.message });
-  })._server;
-  server.removeAllListeners('request');
-  server.on('request', function (request, response) {
-    var u = url.parse(request.url);
-    var pathname = u.pathname;
-    var tag = httpsT + ' ' + request.connection.remoteAddress + ' ' + request.connection.remotePort + ' ' + pathname;
-    var meta = steward.clientInfo(request.connection, secureP);
-
-    meta.event = 'request';
-    meta.method = request.method;
-    logger.info(tag, meta);
-
-    if (!places) places = require('./../actors/actor-place');
-
-    // strict must be OFF and the request must either come from the LAN or localhost
-    if ((places.place1.info.strict === 'off') && ((request.connection.localAddress !== '127.0.0.1') || !secureP)) {
-      if ((pathname === '/oneshot') && (require('./../routes/route-oneshot').process(request, response, tag))) return;
-    }
-
-    if ((request.method !== 'GET') && (request.method !== 'HEAD')) {
-      logger.info(tag, { event: 'invalid method', code: 405, method: request.method });
-      response.writeHead(405, { Allow: 'CONNECT' });
-      return response.end();
-    }
-
-    pathname = {
-      '/client': '/client.html'
-      , '/console': '/console.html'
-    }[pathname] || pathname;
-
-    if ((places.place1.info.strict !== 'off')
-      && (!secureP)
-      && (securePort !== 0)
-      && (pathname !== '/index.xml')
-      && (request.connection.localAddress !== '127.0.0.1')) {
-      var location = 'https://' + request.connection.localAddress + ':' + securePort;
-
-      if (!!u.pathname) location += u.pathname;
-      if (!!u.hash) location += u.hash;
-
-      logger.info(tag, { event: 'request', code: 307, location: location });
-      response.writeHead(307, { location: location, 'content-length': 0 });
-      return response.end();
-    }
-
-    if ((pathname.indexOf('/') !== 0) || (pathname.indexOf('..') !== -1)) {
-      logger.info(tag, { event: 'invalid path', code: 404 });
-      response.writeHead(404, { 'Content-Type': 'text/plain' });
-      return response.end('404 not found');
-    }
-
-    u.pathname = pathname;
-    request.url = url.format(u);
-    stasis.serve(request, response, function (err, result) {
-      if (!!err) {
-        response.writeHead(err.status, err.headers);
-        response.end();
-        return logger.warning(tag, { code: err.status, message: err.message });
-      }
-
-      logger.info(tag,
-        { code: result.status, type: result.headers['Content-Type'], octets: result.headers['Content-Length'] });
-    });
-
-    if (secureP) {
-      server.listen(portno);
-    }
-
-    if (!wssP) wssP = portno;
-    advertise();
-
-    logger.info('listening on ' + wssT + '://*:' + portno);
-
-    var hack = '0.0.0.0';
-    http.createServer(function (request, response) {
-      response.writeHead(302, {
-        Location: httpsT + '://' + hack + ':' + portno
-        , Connection: 'close'
-      });
-      response.end();
-    }).on('connection', function (socket) {
-      hack = socket.localAddress;
-    }).on('listening', function () {
-      logger.info('redirecting from http://*:80 to ' + httpsT + '://*:' + portno);
-    }).on('error', function (err) {
-      logger.info('unable to listen on http://*:80', { diagnostic: err.message });
-    }).listen(80);
-
-    if (secureP) {
-      var addresses, i, ifaddr, ifaddrs, ifname;
-
-      addresses = [];
-      for (ifname in steward.ifaces) if (steward.ifaces.hasOwnProperty(ifname)) {
-        ifaddrs = steward.ifaces[ifname];
-        for (i = 0; i < ifaddrs.length; i++) {
-          ifaddr = ifaddrs[i];
-          if ((!ifaddr.internal) && (ifaddr.family === 'IPv4')) addresses.push(ifaddr.address);
-        }
-      }
-      exports.suffix = '%26hostName=' + encodeURIComponent(os.hostname())
-        + '%26name=' + encodeURIComponent('steward')
-        + '%26ipAddresses=' + encodeURIComponent(addresses)
-        + '%26port=' + encodeURIComponent(wssP);
-
-      fs.exists(__dirname + '/../db/' + steward.uuid + '.js', function (existsP) {
-        var crt2, params;
-
-        if (!existsP) return;
-        params = require(__dirname + '/../db/' + steward.uuid).params;
-
-        crt2 = __dirname + '/../sandbox/cloud.crt';
-        fs.unlink(crt2, function (err) {
-          if ((!!err) && (err.code !== 'ENOENT')) logger.error('cloud', { event: 'fs.unlink', diagnostic: err.message });
-          fs.writeFile(crt2, new Buffer(params.server.ca), { mode: 0444 }, function (err) {
-            if (!!err) logger.error('cloud', { event: 'fs.writeFile', diagnostic: err.message });
-          });
-        });
-        register(params, portno);
-      });
-
-      return;
-    }
-
-    utility.acquire(logger, __dirname + '/../discovery', /^discovery-.*\.js$/, 10, -3, ' discovery', portno);
-    
-  });*/
 };
 
 var wssA

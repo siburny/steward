@@ -17,40 +17,39 @@
   
 	<script>
 		(function() {
-			var current = {'status': '', 'level': 0};
-			update_functions['update_{{id}}'] = function(status, info) {
-				if(!!status) {
-					current.status = status;
-					current.level = info.level;
-					if(status === 'on') {
+			var current_data = {};
+			update_functions['update_{{id}}'] = function(data) {
+				if(!!data.status) {
+					current_data = data;
+					if(data.status === 'on') {
 						$('#device-{{id}}').removeClass('off').addClass('on');	
-					} else if(status === 'off') {
+					} else if(data.status === 'off') {
 						$('#device-{{id}}').removeClass('on').addClass('off');	
 					}
-					$('#device-{{id}} #level').text(info.level);	
+					$('#device-{{id}} #level').text(data.info.level);	
 				}
 			}
 			$('#device-{{id}}').on('click', function() {
-				if(current.status === 'on') {
+				if(current_data.status === 'on') {
 					api.perform('{{id}}', 'off');
-				} else if(current.status === 'off') {
+				} else if(current_data.status === 'off') {
 					api.perform('{{id}}', 'on');
 				}
 			});
 			$('#device-{{id}} .dim').on('click', function() {
-				current.level -= 10;
-				current.status = 'on';
-				if(current.level <= 0) { current.status = 'off'; current.level = 0 };
+				current_data.info.level -= 10;
+				current_data.status = 'on';
+				if(current_data.info.level <= 0) { current_data.status = 'off'; current_data.info.level = 0 };
 
-				api.perform('{{id}}', current.status, { level: current.level });
+				api.perform('{{id}}', current_data.status, { level: current_data.info.level });
 				return false;
 			});
 			$('#device-{{id}} .brighten').on('click', function() {
-				current.level += 10;
-				current.status = 'on';
-				if(current.level > 100) current.level = 100;
+				current_data.info.level += 10;
+				current_data.status = 'on';
+				if(current_data.info.level > 100) current_data.info.level = 100;
 
-				api.perform('{{id}}', current.status, { level: current.level });
+				api.perform('{{id}}', current_data.status, { level: current_data.info.level });
 				return false;
 			});
 		})();
