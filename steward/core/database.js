@@ -18,7 +18,7 @@ exports.start = function() {
   db.serialize(function() {
     db.run('CREATE TABLE IF NOT EXISTS devices('
            + 'deviceID INTEGER PRIMARY KEY ASC, deviceUID TEXT, deviceType TEXT, parentID INTEGER, childID INTEGER, '
-           + 'deviceName TEXT, deviceIkon TEXT, deviceIP TEXT, deviceMAC TEXT, '
+           + 'deviceName TEXT, deviceNickname TEXT, deviceRoom TEXT, deviceIkon TEXT, deviceIP TEXT, deviceMAC TEXT, '
            + 'sortOrder INTEGER default "0", '
            + 'created CURRENT_TIMESTAMP, updated CURRENT_TIMESTAMP'
            + ')');
@@ -156,6 +156,19 @@ exports.start = function() {
           if (row.name === 'deviceIkon') ikonP = true;
         });
         if (!ikonP) db.run('ALTER TABLE devices ADD COLUMN deviceIkon TEXT');
+      });
+
+      db.all('PRAGMA table_info(devices)', function(err, rows) {
+        var nicknameP;
+
+        if (err) return logger.error('database', { event: 'PRAGMA table_info(devices)', diagnostic: err.message });
+
+        nicknameP = false;
+        rows.forEach(function(row) {
+          if (row.name === 'deviceNickname') nicknameP = true;
+        });
+        if (!nicknameP) db.run('ALTER TABLE devices ADD COLUMN deviceNickname TEXT');
+        if (!nicknameP) db.run('ALTER TABLE devices ADD COLUMN deviceRoom TEXT');
       });
 
       exports.db = db;

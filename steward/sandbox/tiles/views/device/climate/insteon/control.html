@@ -1,11 +1,11 @@
 <li data-w="1" data-h="2" data-x="{{x}}" data-y="{{y}}" class="status z-depth-3 {{status}}" id="device-{{id}}">
 	<div class="device thermostat">
-		<div class="name">Aiden's Room</div>
+		<div class="name">{{name}}</div>
 
 		<div class="valign-wrapper" style="position:absolute;top:0;bottom:0;left:0;right:0;">
 			<div style="font-size:0.6em;text-align:center;width:100%;"><i style="font-size:1em;" class="fa fa-fire" aria-hidden="true"></i> 75&deg;<sup style="font-size:0.6em;">F</sup></div>
 		</div>
-		
+
 		<div class="valign-wrapper" style="position:absolute;top:0;bottom:0;left:0;right:0;">
 			<div style="width:100%;">
 				<div style="padding-bottom:0.4em;" class="waves-effect waves-light">
@@ -16,16 +16,31 @@
 				</div>
 			</div>
 		</div>
-		
+
 		<div style="position:absolute;bottom:0;left:0;right:0;font-size:0.2em;line-height:100%;margin:5px;text-align:right;">21&deg;, 35%, Heat</div>
 	</div>
 
-  <style>
-    .device.thermostat { background-color: #5BBBC8; }
-  </style>
+	<style>
+		.device.thermostat {
+			background-color: #5BBBC8;
+		}
+	</style>
 
-  <script>
-    update_functions['update_{{id}}'] = function(data) {
-    }
-  </script>
+	<script>
+		(function () {
+			var current_data = {};
+			update_functions['update_{{id}}'] = function (data) {
+				current_data = data;
+				$('#device-{{id}} .name').text(data.name);
+			}
+
+			$('#device-{{id}}').on('taphold', function () {
+				open_edit_form('{{id}}', {
+					'name': { 'name': 'Name', 'value': current_data.name || '' },
+					'nickname': { 'name': 'Nickname', 'value': current_data.nickname || '' },
+					'room': { 'name': 'Room', 'value': current_data.room || '' }
+				});
+			});
+		})();
+	</script>
 </li>

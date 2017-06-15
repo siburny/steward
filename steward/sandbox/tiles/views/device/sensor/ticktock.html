@@ -9,24 +9,26 @@
 		(function () {
 			var current_class = '{{status}}';
 			var current_data = {};
+
 			update_functions['update_{{id}}'] = function (data) {
+				current_data = data;
+				$('#device-{{id}} .name').text(data.name);
+
 				if (!!data.status) {
 					$('#device-{{id}}').removeClass(current_class).addClass(data.status);
 					current_class = data.status;
 					current_data = data;
 				}
+				$('#device-{{id}} .name').text(data.name);
 			}
 			$('#device-{{id}}').on('click', function () {
 				api.perform('{{id}}', 'toggle');
 			});
 
 			$('#device-{{id}}').on('taphold', function () {
-				open_edit_form({
+				open_edit_form('{{id}}', {
 					'name': { 'name': 'Name', 'value': current_data.name || '' },
-					'nickname': { 'name': 'Nickname', 'value': current_data.nickname || '' },
-					'room': { 'name': 'Room', 'value': current_data.room || ''}
-				}, function(values) {
-					alert('done', JSON.stringify(values));
+					'nickname': { 'name': 'Nickname', 'value': current_data.nickname || '' }
 				});
 			});
 		})();

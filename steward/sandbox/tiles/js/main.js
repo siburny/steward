@@ -20,9 +20,10 @@ function initGrid() {
   $(window).resize();
 }
 
-var callback_editor, callback_fields;
-function open_edit_form(fields, callback) {
-  callback_editor = callback;
+var editor_callback, callback_fields, editor_device_id;
+function open_edit_form(id, fields, callback) {
+  editor_device_id = id;
+  editor_callback = callback;
   fields = fields || {};
 
   var default_fields = { 'name': 'Name', 'nickname': 'Nickname', 'room': 'Room' };
@@ -40,20 +41,40 @@ function open_edit_form(fields, callback) {
     callback_fields.push(field);
   }
 
+  var data = {
+    "Apple": null,
+    "Microsoft": null,
+    "Google": null
+  };
+
+  $('#settings form input#room').autocomplete({
+    data: data,
+    limit: 3,
+    minLength: 1
+  });
   $('#settings').modal('open');
   Materialize.updateTextFields();
 }
 
 function onclose_edit_form(cancel) {
-  var ret = {};
-  for (var field in callback_fields) {
-    ret[field] = $('#settings form input#'+field).value();
-  }
-
   $('#settings').modal('close');
 
-  if (!!callback_editor && !cancel) {
-    callback_editor(ret || {});
+  if (cancel) {
+    return;
+  }
+
+  var ret = {};
+  for (let index in callback_fields) {
+    let field = callback_fields[index];
+    ret[field] = $('#settings form input#' + field).val();
+  }
+
+  if (!!editor_callback) {
+    editor_callback(ret || {});
+  }
+
+  if (!!editor_device_id) {
+    api.perform(editor_device_id, 'set', ret);
   }
 }
 
@@ -107,9 +128,10 @@ API.prototype.connect = function () {
       if (update_functions.hasOwnProperty('update_' + msg.id)) {
         if (msg.status !== 'waiting') {
           $('#device-' + msg.id).removeClass('waiting');
-        } +
-          update_functions['update_' + msg.id](msg);
+        }
+        update_functions['update_' + msg.id](msg);
       }
+
     }
   }
   this.websocket.onerror = function (evt) {

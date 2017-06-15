@@ -6,26 +6,38 @@
 	</div>
 
 	<script>
-		(function() {
+		(function () {
 			var current_data = {};
-			update_functions['update_{{id}}'] = function(data) {
-				if(!!data.status) {
+			update_functions['update_{{id}}'] = function (data) {
+				current_data = data;
+				$('#device-{{id}} .name').text(data.name);
+
+				if (!!data.status) {
 					current_data = data;
-					if(data.status === 'on') {
-						$('#device-{{id}}').removeClass('off').addClass('on');	
-					} else if(data.status === 'off') {
-						$('#device-{{id}}').removeClass('on').addClass('off');	
+					if (data.status === 'on') {
+						$('#device-{{id}}').removeClass('off').addClass('on');
+					} else if (data.status === 'off') {
+						$('#device-{{id}}').removeClass('on').addClass('off');
 					}
 				}
 			}
-			$('#device-{{id}}').on('click', function() {
-				if(current_data.status === 'on') {
+
+			$('#device-{{id}}').on('click', function () {
+				if (current_data.status === 'on') {
 					api.perform('{{id}}', 'off');
-				} else if(current_data.status === 'off') {
+				} else if (current_data.status === 'off') {
 					api.perform('{{id}}', 'on');
 				}
 				return false;
 			});
+
+			$('#device-{{id}}').on('taphold', function () {
+				open_edit_form('{{id}}', {
+					'name': { 'name': 'Name', 'value': current_data.name || '' },
+					'nickname': { 'name': 'Nickname', 'value': current_data.nickname || '' },
+					'room': { 'name': 'Room', 'value': current_data.room || '' }
+				});
+			});
 		})();
-  </script>
+	</script>
 </li>

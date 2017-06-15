@@ -2,64 +2,105 @@
   <div class="device clock">
     <div id="hour" style="transform: rotate(0deg) translate(0%, -3px); transform-origin: 0 0; width:20%;height:6px;background-color:#fff;position:absolute;top:50%;left:50%;border-radius:3px;"></div>
     <div id="minute" style="transform: rotate(0deg) translate(0%, -2px); transform-origin: 0 0; width:35%;height:4px;background-color:#fff;position:absolute;top:50%;left:50%;border-radius:2px;"></div>
-    
-    <div style="transform: rotate(0deg) translate(0%, -1px);" class="dots"><div class="dot"></div></div>
-    <div style="transform: rotate(30deg) translate(0%, -1px);" class="dots"><div class="dot"></div></div>
-    <div style="transform: rotate(60deg) translate(0%, -1px);" class="dots"><div class="dot"></div></div>
-    <div style="transform: rotate(90deg) translate(0%, -1px);" class="dots"><div class="dot"></div></div>
-    <div style="transform: rotate(120deg) translate(0%, -1px);" class="dots"><div class="dot"></div></div>
-    <div style="transform: rotate(150deg) translate(0%, -1px);" class="dots"><div class="dot"></div></div>
-    <div style="transform: rotate(180deg) translate(0%, -1px);" class="dots"><div class="dot"></div></div>
-    <div style="transform: rotate(210deg) translate(0%, -1px);" class="dots"><div class="dot"></div></div>
-    <div style="transform: rotate(240deg) translate(0%, -1px);" class="dots"><div class="dot"></div></div>
-    <div style="transform: rotate(270deg) translate(0%, -1px);" class="dots"><div class="dot"></div></div>
-    <div style="transform: rotate(300deg) translate(0%, -1px);" class="dots"><div class="dot"></div></div>
-    <div style="transform: rotate(330deg) translate(0%, -1px);" class="dots"><div class="dot"></div></div>
+
+    <div style="transform: rotate(0deg) translate(0%, -1px);" class="dots">
+      <div class="dot"></div>
+    </div>
+    <div style="transform: rotate(30deg) translate(0%, -1px);" class="dots">
+      <div class="dot"></div>
+    </div>
+    <div style="transform: rotate(60deg) translate(0%, -1px);" class="dots">
+      <div class="dot"></div>
+    </div>
+    <div style="transform: rotate(90deg) translate(0%, -1px);" class="dots">
+      <div class="dot"></div>
+    </div>
+    <div style="transform: rotate(120deg) translate(0%, -1px);" class="dots">
+      <div class="dot"></div>
+    </div>
+    <div style="transform: rotate(150deg) translate(0%, -1px);" class="dots">
+      <div class="dot"></div>
+    </div>
+    <div style="transform: rotate(180deg) translate(0%, -1px);" class="dots">
+      <div class="dot"></div>
+    </div>
+    <div style="transform: rotate(210deg) translate(0%, -1px);" class="dots">
+      <div class="dot"></div>
+    </div>
+    <div style="transform: rotate(240deg) translate(0%, -1px);" class="dots">
+      <div class="dot"></div>
+    </div>
+    <div style="transform: rotate(270deg) translate(0%, -1px);" class="dots">
+      <div class="dot"></div>
+    </div>
+    <div style="transform: rotate(300deg) translate(0%, -1px);" class="dots">
+      <div class="dot"></div>
+    </div>
+    <div style="transform: rotate(330deg) translate(0%, -1px);" class="dots">
+      <div class="dot"></div>
+    </div>
 
     <div id="date"></div>
   </div>
 
   <style>
-  .device.clock {
-    background-color: #5B85C8;
-  }
-  .device.clock #date {
-    font-size: 0.2em;
-    line-height: 100%;
-    color: #fff;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    text-align: center;
-    margin: 5px;
-  }
-  .device.clock .dots {
-    position:absolute;
-    top:50%;
-    left:50%;
-    width:35%;
-    height:2px;
-    transform-origin: 0 0;
-  }
-  .device.clock .dots .dot {
-    position:absolute;
-    right:0;
-    background-color:#fff;
-    border-radius:1px;
-    width:2px;
-    height: 2px;
-  }
+    .device.clock {
+      background-color: #5B85C8;
+    }
+
+    .device.clock #date {
+      font-size: 0.2em;
+      line-height: 100%;
+      color: #fff;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      text-align: center;
+      margin: 5px;
+    }
+
+    .device.clock .dots {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 35%;
+      height: 2px;
+      transform-origin: 0 0;
+    }
+
+    .device.clock .dots .dot {
+      position: absolute;
+      right: 0;
+      background-color: #fff;
+      border-radius: 1px;
+      width: 2px;
+      height: 2px;
+    }
   </style>
 
   <script>
-    update_functions['update_{{id}}'] = function(data) {
-      if(!!data.info && !!data.info.date) {
-        var date = new Date(data.info.date);
-        $('#device-{{id}} #hour').css('transform', 'rotate('+((date.getHours() % 12)*30 + date.getMinutes()/2 - 90)+'deg) translate(0%, -3px)');
-        $('#device-{{id}} #minute').css('transform', 'rotate('+(date.getMinutes()*6 - 90)+'deg) translate(0%, -2px)');
-        $('#device-{{id}} #date').text($.datepicker.formatDate('DD, MM d', date));
+    (function () {
+      var current_data = {};
+      
+      update_functions['update_{{id}}'] = function (data) {
+        current_data = data;
+				$('#device-{{id}} .name').text(data.name);
+        
+        if (!!data.info && !!data.info.date) {
+          var date = new Date(data.info.date);
+          $('#device-{{id}} #hour').css('transform', 'rotate(' + ((date.getHours() % 12) * 30 + date.getMinutes() / 2 - 90) + 'deg) translate(0%, -3px)');
+          $('#device-{{id}} #minute').css('transform', 'rotate(' + (date.getMinutes() * 6 - 90) + 'deg) translate(0%, -2px)');
+          $('#device-{{id}} #date').text($.datepicker.formatDate('DD, MM d', date));
+        }
       }
-    }
+
+      $('#device-{{id}}').on('taphold', function () {
+        open_edit_form('{{id}}', {
+          'name': { 'name': 'Name', 'value': current_data.name || '' },
+          'nickname': { 'name': 'Nickname', 'value': current_data.nickname || '' }
+        });
+      });
+    })();
   </script>
 </li>

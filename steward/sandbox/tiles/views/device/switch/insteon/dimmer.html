@@ -1,7 +1,8 @@
 <li data-w="1" data-h="1" data-x="{{x}}" data-y="{{y}}" class="status {{status}} z-depth-3" id="device-{{id}}">
 	<div class="device waves-effect waves-light">
 		<div class="name">{{name}}</div>
-		<div class="icon"><span><i class="fa fa-lightbulb-o" aria-hidden="true"></span></i></div>
+		<div class="icon"><span><i class="fa fa-lightbulb-o" aria-hidden="true"></span></i>
+		</div>
 		<div class="level">
 			<div class="brighten">+</div>
 			<span id="level">100</span>%
@@ -10,48 +11,88 @@
 	</div>
 
 	<style>
-		.device .level { font-size: 0.2em; text-align: center; position: absolute; left: 0; right: 0; bottom: 0; line-height: 150%;}
-		.device .level .dim { position: absolute; right: 0; bottom: 0; font-size: 2em; width: 2em; height: 1.5em; padding: 0.25em 0; }
-		.device .level .brighten { position: absolute; left: 0; bottom: 0; font-size: 2em; width: 2em; height: 1.5em; padding: 0.25em 0; }
+		.device .level {
+			font-size: 0.2em;
+			text-align: center;
+			position: absolute;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			line-height: 150%;
+		}
+
+		.device .level .dim {
+			position: absolute;
+			right: 0;
+			bottom: 0;
+			font-size: 2em;
+			width: 2em;
+			height: 1.5em;
+			padding: 0.25em 0;
+		}
+
+		.device .level .brighten {
+			position: absolute;
+			left: 0;
+			bottom: 0;
+			font-size: 2em;
+			width: 2em;
+			height: 1.5em;
+			padding: 0.25em 0;
+		}
 	</style>
-  
+
 	<script>
-		(function() {
+		(function () {
 			var current_data = {};
-			update_functions['update_{{id}}'] = function(data) {
-				if(!!data.status) {
+			update_functions['update_{{id}}'] = function (data) {
+				current_data = data;
+				$('#device-{{id}} .name').text(data.name);
+
+				if (!!data.status) {
 					current_data = data;
-					if(data.status === 'on') {
-						$('#device-{{id}}').removeClass('off').addClass('on');	
-					} else if(data.status === 'off') {
-						$('#device-{{id}}').removeClass('on').addClass('off');	
+					if (data.status === 'on') {
+						$('#device-{{id}}').removeClass('off').addClass('on');
+					} else if (data.status === 'off') {
+						$('#device-{{id}}').removeClass('on').addClass('off');
 					}
-					$('#device-{{id}} #level').text(data.info.level);	
+					$('#device-{{id}} #level').text(data.info.level);
 				}
 			}
-			$('#device-{{id}}').on('click', function() {
-				if(current_data.status === 'on') {
+
+			$('#device-{{id}}').on('click', function () {
+				if (current_data.status === 'on') {
 					api.perform('{{id}}', 'off');
-				} else if(current_data.status === 'off') {
+				} else if (current_data.status === 'off') {
 					api.perform('{{id}}', 'on');
 				}
 			});
-			$('#device-{{id}} .dim').on('click', function() {
+
+			$('#device-{{id}} .dim').on('click', function () {
 				current_data.info.level -= 10;
 				current_data.status = 'on';
-				if(current_data.info.level <= 0) { current_data.status = 'off'; current_data.info.level = 0 };
+				if (current_data.info.level <= 0) { current_data.status = 'off'; current_data.info.level = 0 };
 
 				api.perform('{{id}}', current_data.status, { level: current_data.info.level });
 				return false;
 			});
-			$('#device-{{id}} .brighten').on('click', function() {
+
+			$('#device-{{id}} .brighten').on('click', function () {
 				current_data.info.level += 10;
 				current_data.status = 'on';
-				if(current_data.info.level > 100) current_data.info.level = 100;
+				if (current_data.info.level > 100) current_data.info.level = 100;
 
 				api.perform('{{id}}', current_data.status, { level: current_data.info.level });
 				return false;
 			});
+
+			$('#device-{{id}}').on('taphold', function () {
+				open_edit_form('{{id}}', {
+					'name': { 'name': 'Name', 'value': current_data.name || '' },
+					'nickname': { 'name': 'Nickname', 'value': current_data.nickname || '' },
+					'room': { 'name': 'Room', 'value': current_data.room || '' }
+				});
+			});
 		})();
-  </script>
+	</script>
 </li>

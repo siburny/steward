@@ -1,86 +1,139 @@
 <li data-w="2" data-h="2" data-x="{{x}}" data-y="{{y}}" class="status z-depth-3 {{status}}" id="device-{{id}}">
-	<div class="device weather">
-		<div class="today_title">Right now</div>
-		<div class="current">
+  <div class="device weather">
+    <div class="today_title">Right now</div>
+    <div class="current">
       <div style="float:left;width:1.75em;">
-			  <img src="" />
+        <img src="" />
       </div>
       <div style="text-align: center;padding-top:0.3em;padding-right:0.5em;font-size:0.7em;line-height:0.75em;">
         <span id="temp"></span><sup style="font-size:0.6em;">&deg;F</sup><br />
         <span style="font-size:0.5em;line-height:100%;"><i class="fa fa-umbrella" aria-hidden="true"></i> <span id="precip"></span>%</span>
       </div>
-		</div>
-		
-		<hr />
+    </div>
 
-		<div class="forecast today">
-			<div class="title">Today</div>
+    <hr />
+
+    <div class="forecast today">
+      <div class="title">Today</div>
       <div style="float:left;width:2em;">
-			  <img src="" />
+        <img src="" />
       </div>
       <div class="temp"><span id="high"></span>&deg;/<span id="low"></span>&deg;</div>
-			<div class="precip"><i class="fa fa-umbrella" aria-hidden="true"></i> <span id="precip"></span>%</div>
-		</div>
-		<div class="forecast tomorrow">
-			<div class="title">Tomorrow</div>
+      <div class="precip"><i class="fa fa-umbrella" aria-hidden="true"></i> <span id="precip"></span>%</div>
+    </div>
+    <div class="forecast tomorrow">
+      <div class="title">Tomorrow</div>
       <div style="float:left;width:2em;">
-  			<img src="" />
+        <img src="" />
       </div>
       <div class="temp"><span id="high"></span>&deg;/<span id="low"></span>&deg;</div>
-			<div class="precip"><i class="fa fa-umbrella" aria-hidden="true"></i> <span id="precip"></span>%</div>
-		</div>
-	</div>
+      <div class="precip"><i class="fa fa-umbrella" aria-hidden="true"></i> <span id="precip"></span>%</div>
+    </div>
+  </div>
 
   <style>
-    .device.weather { background-color: #C8675B; }
-    .device.weather .climacon { fill: #fff; margin:-10% -10% -10% 10%;}
-    .device.weather .today_title { font-size:0.3em; margin:5px; top:0; line-height:100%; }
-    .device.weather .current { margin-top: 0.2em; margin-bottom: 0.3em; }
-    .device.weather .forecast { float:left; width:50%; height:1em; line-height:100%; margin-top:0.5em; font-size:0.4em; text-align:center; }
-    .device.weather hr { width:80%; margin:0 auto; border:1px solid #eee; }
-    .device.weather .forecast .temp { font-size:0.65em; }
-    .device.weather .forecast .title { font-size:0.55em; }
-    .device.weather .forecast .precip { font-size:0.65em; }
+    .device.weather {
+      background-color: #C8675B;
+    }
+
+    .device.weather .climacon {
+      fill: #fff;
+      margin: -10% -10% -10% 10%;
+    }
+
+    .device.weather .today_title {
+      font-size: 0.3em;
+      margin: 5px;
+      top: 0;
+      line-height: 100%;
+    }
+
+    .device.weather .current {
+      margin-top: 0.2em;
+      margin-bottom: 0.3em;
+    }
+
+    .device.weather .forecast {
+      float: left;
+      width: 50%;
+      height: 1em;
+      line-height: 100%;
+      margin-top: 0.5em;
+      font-size: 0.4em;
+      text-align: center;
+    }
+
+    .device.weather hr {
+      width: 80%;
+      margin: 0 auto;
+      border: 1px solid #eee;
+    }
+
+    .device.weather .forecast .temp {
+      font-size: 0.65em;
+    }
+
+    .device.weather .forecast .title {
+      font-size: 0.55em;
+    }
+
+    .device.weather .forecast .precip {
+      font-size: 0.65em;
+    }
   </style>
 
   <script>
-    update_functions['update_{{id}}'] = function(data) {
-      var weather_icons = {
-        'clear-day': 'sun.svg',
-        'clear-night': 'moon.svg',
-        'rain': 'cloudRainAlt.svg',
-        'snow': 'cloudSnowAlt.svg',
-        'sleet': 'cloudDrizzle.svg',
-        'wind': 'wind.svg',
-        'fog': 'cloudFog.svg',
-        'cloudy': 'cloud.svg',
-        'partly-cloudy-day': 'cloudSun.svg',
-        'partly-cloudy-night': 'cloudMoon.svg',
-      };
+    (function () {
+			var current_data = {};
 
-      if(!!data.info) {
-        if(!!data.info.conditions) {
-          $("#device-{{id}} .current #temp").text(Math.round(data.info.conditions.temperature));
-          $("#device-{{id}} .current #precip").text(Math.round(data.info.conditions.precipitation * 100));
-          if(!!weather_icons[data.info.conditions.code]) {
-            $("#device-{{id}} .current img").attr('src', '/modules/animated-climacons/' + weather_icons[data.info.conditions.code]);
+      update_functions['update_{{id}}'] = function (data) {
+        current_data = data;
+				$('#device-{{id}} .name').text(data.name);
+
+        var weather_icons = {
+          'clear-day': 'sun.svg',
+          'clear-night': 'moon.svg',
+          'rain': 'cloudRainAlt.svg',
+          'snow': 'cloudSnowAlt.svg',
+          'sleet': 'cloudDrizzle.svg',
+          'wind': 'wind.svg',
+          'fog': 'cloudFog.svg',
+          'cloudy': 'cloud.svg',
+          'partly-cloudy-day': 'cloudSun.svg',
+          'partly-cloudy-night': 'cloudMoon.svg',
+        };
+
+        if (!!data.info) {
+          if (!!data.info.conditions) {
+            $("#device-{{id}} .current #temp").text(Math.round(data.info.conditions.temperature));
+            $("#device-{{id}} .current #precip").text(Math.round(data.info.conditions.precipitation * 100));
+            if (!!weather_icons[data.info.conditions.code]) {
+              $("#device-{{id}} .current img").attr('src', '/modules/animated-climacons/' + weather_icons[data.info.conditions.code]);
+              $.embedSVG();
+            }
+          }
+          if (!!data.info.forecasts && data.info.forecasts.length > 1) {
+            $("#device-{{id}} .forecast.today #high").text(Math.round(data.info.forecasts[0].temperatureMax));
+            $("#device-{{id}} .forecast.today #low").text(Math.round(data.info.forecasts[0].temperatureMin));
+            $("#device-{{id}} .forecast.today #precip").text(Math.round(data.info.forecasts[0].precipitation * 100));
+
+            $("#device-{{id}} .forecast.tomorrow #high").text(Math.round(data.info.forecasts[1].temperatureMax));
+            $("#device-{{id}} .forecast.tomorrow #low").text(Math.round(data.info.forecasts[1].temperatureMin));
+            $("#device-{{id}} .forecast.tomorrow #precip").text(Math.round(data.info.forecasts[1].precipitation * 100));
+
+            $("#device-{{id}} .forecast.today img").attr('src', '/modules/animated-climacons/' + weather_icons[data.info.forecasts[0].code]);
+            $("#device-{{id}} .forecast.tomorrow img").attr('src', '/modules/animated-climacons/' + weather_icons[data.info.forecasts[1].code]);
             $.embedSVG();
           }
         }
-        if(!!data.info.forecasts && data.info.forecasts.length > 1) {
-          $("#device-{{id}} .forecast.today #high").text(Math.round(data.info.forecasts[0].temperatureMax));
-          $("#device-{{id}} .forecast.today #low").text(Math.round(data.info.forecasts[0].temperatureMin));
-          $("#device-{{id}} .forecast.today #precip").text(Math.round(data.info.forecasts[0].precipitation * 100));
-
-          $("#device-{{id}} .forecast.tomorrow #high").text(Math.round(data.info.forecasts[1].temperatureMax));
-          $("#device-{{id}} .forecast.tomorrow #low").text(Math.round(data.info.forecasts[1].temperatureMin));
-          $("#device-{{id}} .forecast.tomorrow #precip").text(Math.round(data.info.forecasts[1].precipitation * 100));
-
-          $("#device-{{id}} .forecast.today img").attr('src', '/modules/animated-climacons/' + weather_icons[data.info.forecasts[0].code]);
-          $("#device-{{id}} .forecast.tomorrow img").attr('src', '/modules/animated-climacons/' + weather_icons[data.info.forecasts[1].code]);
-          $.embedSVG();
-        }
       }
-    }
+
+			$('#device-{{id}}').on('taphold', function () {
+				open_edit_form('{{id}}', {
+					'name': { 'name': 'Name', 'value': current_data.name || '' },
+					'nickname': { 'name': 'Nickname', 'value': current_data.nickname || '' }
+				});
+			});
+    })();
   </script>
 </li>

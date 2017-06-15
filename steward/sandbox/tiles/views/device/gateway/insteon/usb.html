@@ -5,42 +5,20 @@
 	</div>
 
 	<script>
-		(function() {
-			$('#device-{{id}}').on('taphold', function() {
-				$('#settings-{{id}}').modal('open');
-				Materialize.updateTextFields();
+		(function () {
+			var current_data = {};
+
+			update_functions['update_{{id}}'] = function (data) {
+				current_data = data;
+				$('#device-{{id}} .name').text(data.name);
+			}
+
+			$('#device-{{id}}').on('taphold', function () {
+				open_edit_form('{{id}}', {
+					'name': { 'name': 'Name', 'value': current_data.name || '' },
+					'nickname': { 'name': 'Nickname', 'value': current_data.nickname || '' }
+				});
 			});
-
-      $('#settings-{{id}} form a.btn.save').on('click', function() {
-        $('#settings-{{id}}').modal('close');
-      });
 		})();
-  </script>
-
-	<div id="settings-{{id}}" class="modal">
-    <div class="modal-content">
-      <h4>Settings</h4>
-
-			<form>
-				<div class="row">
-					<div class="col s12">
-						<div class="input-field">
-							<input id="name" type="text" class="validate" value="{{name}}">
-							<label for="name">Name</label>
-						</div>
-					</div>
-					<div class="col s12">
-            <a href="#!" class="waves-effect waves-light btn save">Save</a>
-					</div>
-				</div>
-        <script>
-        </script>
-			</form>
-
-    </div>
-    <div class="modal-footer">
-      <a href="#!" class="modal-action modal-close waves-effect waves-light btn">Close</a>
-    </div>
-  </div>
-
+	</script>
 </li>

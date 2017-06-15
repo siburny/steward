@@ -125,10 +125,16 @@ exports.start = function (server, serverSecure, app) {
       var msg = JSON.parse(msg);
       switch (msg.action) {
         case 'loadDevices':
+          let rooms = [];
           for (var device in devices.devices) {
             renderDevice(devices.devices[device].device);
+            if (devices.devices[device].device.hasOwnProperty('room')) {
+              rooms.push(devices.devices[device].device.room);
+            }
+            ws.send(JSON.stringify({ 'action': 'room', 'rooms': rooms }));
           }
           break;
+
         case 'perform':
           if (!!msg.id) {
             var device = devices.id2device(msg.id);
