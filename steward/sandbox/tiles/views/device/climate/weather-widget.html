@@ -88,7 +88,7 @@
 
       update_functions['update_{{id}}'] = function (data) {
         current_data = data;
-				$('#device-{{id}} .name').text(data.name);
+				$('#device-{{id}} .name').text(data.name + (!!data.room ? ' in ' + data.room : ''));
 
         var weather_icons = {
           'clear-day': 'sun.svg',

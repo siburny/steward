@@ -47,7 +47,7 @@
 			var current_data = {};
 			update_functions['update_{{id}}'] = function (data) {
 				current_data = data;
-				$('#device-{{id}} .name').text(data.name);
+				$('#device-{{id}} .name').text(data.name + (!!data.room ? ' in ' + data.room : ''));
 
 				if (!!data.status) {
 					current_data = data;
