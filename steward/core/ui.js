@@ -70,7 +70,9 @@ exports.start = function (server, serverSecure, app) {
   };
 
   RED.init(server, settings);
-  RED.init(serverSecure, settings);
+  if(!!serverSecure) {
+    RED.init(serverSecure, settings);
+  }
 
   app.use(settings.httpAdminRoot, RED.httpAdmin);
   app.use(settings.httpNodeRoot, RED.httpNode);

@@ -6,7 +6,6 @@ var stringify   = require('json-stringify-safe')
   , steward     = require('./../../core/steward')
   , utility     = require('./../../core/utility')
   , broker      = utility.broker
-  , discovery   = require('./../../discovery/discovery-ssdp')
   , sensor      = require('./../device-sensor')
   ;
 

@@ -93,18 +93,20 @@ var start = function (port, portSecure) {
   var crt = __dirname + '/../sandbox/' + steward.domain + '.home.rub.is.chain.pem'
     , key = __dirname + '/../db/' + steward.domain + '.home.rub.is.key.pem'
     , options = {}
-    //, stasis = new static.Server(__dirname + '/../sandbox')
+    , serverSecure
     ;
 
 
+  var secure = false;
   if (fs.existsSync(key)) {
     if (fs.existsSync(crt)) {
       /*options.key = fs.readFileSync(key);
       options.cert = fs.readFileSync(crt);
       options.server = https.createServer(options);
       exports.x509 = { key: key, crt: crt };*/
-    } else return logger.error('no startup certificate', { cert: crt });
-  } else return logger.error('no startup key', { key: key });
+      secure = true;
+    } else logger.error('no startup certificate', { cert: crt });
+  } else logger.error('no startup key', { key: key });
 
   // Starting the server
   var http = require('http');
@@ -115,12 +117,14 @@ var start = function (port, portSecure) {
 
   var server, expressWs;
   server = http.createServer(app);
-  serverSecure = https.createServer({
-    key: fs.readFileSync(__dirname + '/../db/' + steward.domain + '.home.rub.is.key.pem').toString(),
-    cert: fs.readFileSync(__dirname + '/../sandbox/' + steward.domain + '.home.rub.is.chain.pem').toString()
-  }, app);
   expressWs = require('express-ws')(app, server);
-  expressWss = require('express-ws')(app, serverSecure);
+  if (secure) {
+    serverSecure = https.createServer({
+      key: fs.readFileSync(__dirname + '/../db/' + steward.domain + '.home.rub.is.key.pem').toString(),
+      cert: fs.readFileSync(__dirname + '/../sandbox/' + steward.domain + '.home.rub.is.chain.pem').toString()
+    }, app);
+    expressWss = require('express-ws')(app, serverSecure);
+  }
 
   for (var route in routes) {
     app.ws(route, function (ws, req) {
@@ -138,13 +142,15 @@ var start = function (port, portSecure) {
   //attach UI to server
   var ui = require('./ui');
   ui.start(server, serverSecure, app);
-  
+
   //attach OAUTH2 server
   var oauth = require('./oauth');
   oauth.start(app);
 
   server.listen(port);
-  serverSecure.listen(portSecure);
+  if (!!serverSecure) {
+    serverSecure.listen(portSecure);
+  }
 
   logger.info('listening on ws://*:' + port + ' and wss://*:' + portSecure);
 

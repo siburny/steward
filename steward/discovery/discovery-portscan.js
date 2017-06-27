@@ -1,7 +1,7 @@
-var net         = require('net')
-  , devices     = require('./../core/device')
-  , steward     = require('./../core/steward')
-  , utility     = require('./../core/utility')
+var net = require('net')
+  , devices = require('./../core/device')
+  , steward = require('./../core/steward')
+  , utility = require('./../core/utility')
   ;
 
 
@@ -13,7 +13,7 @@ var timer = null;
 
 var zero;
 
-var search = function() {
+var search = function () {
   var i, ipaddr, prefix;
 
   timer = null;
@@ -21,16 +21,17 @@ var search = function() {
   logger.info('PORT starting scan');
   zero = 0;
 
-  steward.forEachAddress(function(addr) {
+  steward.forEachAddress(function (addr) {
     prefix = addr.split('.').slice(0, 3).join('.');
-    for (i = 1; i< 255; i++) {
+    for (i = 1; i < 255; i++) {
       ipaddr = prefix + '.' + i;
-      if (ipaddr !== addr) scan(ipaddr);
+      //if (ipaddr !== addr) 
+      scan(ipaddr);
     }
   });
 };
 
-var scan = function(ipaddr) {
+var scan = function (ipaddr) {
   var device, portno, uid;
 
   zero++;
@@ -51,7 +52,7 @@ var scan = function(ipaddr) {
   if (--zero === 0) finish();
 };
 
-var test = function(ipaddr, portno) {
+var test = function (ipaddr, portno) {
   var connectedP, socket;
 
   zero++;
@@ -60,7 +61,7 @@ var test = function(ipaddr, portno) {
   socket.setTimeout(2000);
   connectedP = false;
 
-  socket.on('connect', function() {
+  socket.on('connect', function () {
     var cb, ifname, macaddr, prefix;
 
     socket.setTimeout(0);
@@ -69,20 +70,14 @@ var test = function(ipaddr, portno) {
 
     macaddr = '';
     for (ifname in steward.ifaces) {
-      if ((!steward.ifaces.hasOwnProperty(ifname)) || (!steward.ifaces[ifname].arp[ipaddr])) continue;
-        macaddr = steward.ifaces[ifname].arp[ipaddr];
-        break;
-    }
-    if (macaddr === '') {
-      logger.warning('PORT retry', { address: ipaddr, port: portno });
-      if (--zero === 0) finish();
-      return socket.destroy();
+      if ((!steward.ifaces.hasOwnProperty(ifname)) || !steward.ifaces[ifname].arp || (!steward.ifaces[ifname].arp[ipaddr])) continue;
+      macaddr = steward.ifaces[ifname].arp[ipaddr];
+      break;
     }
 
     pairings[portno].hosts[ipaddr] = true;
-    prefix = macaddr.substr(0, 8);
+    prefix = macaddr.length > 8 ? macaddr.substr(0, 8) : '';
     if (!!pairings[portno].callbacks[prefix]) cb = pairings[portno].callbacks[prefix];
-    else if (!!pairings[portno].callbacks['']) cb = pairings[portno].callbacks[prefix = ''];
     else {
       if (--zero === 0) finish();
       return socket.destroy();
@@ -91,15 +86,15 @@ var test = function(ipaddr, portno) {
     logger.info('PORT response', { address: ipaddr, port: portno, macaddr: macaddr, prefix: prefix });
     (cb)(socket, ipaddr, portno, macaddr, 'PORT ' + ipaddr + ':' + portno);
     if (--zero === 0) finish();
-  }).on('timeout', function() {
+  }).on('timeout', function () {
     if (!connectedP) socket.destroy();
-  }).on('error', function(error) {/* jshint unused: false */
-  }).on('close', function(errorP) {/* jshint unused: false */
+  }).on('error', function (error) {/* jshint unused: false */
+  }).on('close', function (errorP) {/* jshint unused: false */
     if (--zero === 0) finish();
   }).connect(portno, ipaddr);
 };
 
-var finish = function() {
+var finish = function () {
   if (timer !== null) return;
 
   logger.info('PORT finished scan');
@@ -107,7 +102,7 @@ var finish = function() {
 };
 
 
-exports.pairing = function(entries, cb) {
+exports.pairing = function (entries, cb) {
   var i, entry;
 
   for (i = 0; i < entries.length; i++) {
@@ -121,6 +116,7 @@ exports.pairing = function(entries, cb) {
 };
 
 
-exports.start = function() {
+exports.start = function () {
   timer = setTimeout(search, 5 * 1000);
+  console.log(timer);
 };
