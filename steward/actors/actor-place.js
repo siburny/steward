@@ -404,7 +404,7 @@ Place.prototype.makecode = function() {
 };
 
 Place.prototype.getWeather = function(self) {
-  if(!utility.configuration.forecastio.key)
+  if(!utility.configuration || !utility.configuration.forecastio || !utility.configuration.forecastio.key)
   {
     return logger.error('place/1', { event: 'getWeather', diagnostic: 'Forecast.io needs a secret key in the configuration.json' });
   }
