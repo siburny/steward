@@ -12,7 +12,7 @@ const supportedThings = {
     }
   },
   '/device/switch/insteon/dimmer': {
-    'type': 'action.devices.types.SWITCH',
+    'type': 'action.devices.types.LIGHT',
     'traits': ['action.devices.traits.OnOff', 'action.devices.traits.Brightness'],
     'params': function (device) {
       return {
@@ -43,9 +43,11 @@ exports.handler = function (req, res, next) {
                 'traits': supportedThings[device.whatami].traits,
                 'name': {
                   'defaultNames': [deviceUID],
-                  'name': device.name
+                  'name': device.name,
+                  'nicknames': [device.name + (!!device.room ? ' in ' + device.room : '')]
                 },
-                'willReportState': false
+                'willReportState': false,
+                'roomHint': !!device.room ? device.room.toLowerCase() : ''
               });
             }
           }
@@ -91,7 +93,7 @@ exports.handler = function (req, res, next) {
                   }
                   break;
               }
-              ret.payload.commands.push({ 'ids': devs.reduce(function(result, value) { result.push(value.deviceID); return result; }, []), 'status': 'SUCCESS', "states": { "on": execution.params.on, "online": true } });
+              ret.payload.commands.push({ 'ids': devs.reduce(function (result, value) { result.push(value.deviceID); return result; }, []), 'status': 'SUCCESS', "states": { "on": execution.params.on, "online": true } });
             }
 
             res.json(ret);
