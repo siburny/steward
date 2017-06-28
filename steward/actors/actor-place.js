@@ -165,6 +165,12 @@ var Place = exports.Place = function(info) {
     delete(self.info.coordinates);
     self.setInfo();
   }
+
+  if(!self.info.location && !!utility.configuration.location) {
+    self.info.location = utility.configuration.location;
+    self.setInfo();
+  }
+
   self.info.review = [];
   self.info.ipaddrs = [];
   steward.forEachAddress(function(addr) { self.info.ipaddrs.push(addr); });
