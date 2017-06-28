@@ -29,6 +29,10 @@ var search = function () {
       scan(ipaddr);
     }
   });
+
+  if (!!utility.configuration && !!utility.configuration.ipAddressToScan && utility.configuration.ipAddressToScan.length > 0) {
+    utility.configuration.ipAddressToScan.forEach(scan);
+  }
 };
 
 var scan = function (ipaddr) {
