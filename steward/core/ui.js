@@ -91,7 +91,7 @@ exports.start = function (server, serverSecure, app) {
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(require('res-error'));
 
-  app.use(session({ secret: 'vxhefGO8kzQt5ggdalZY3UOHJohRniw' }));
+  app.use(session({ secret: crypto.randomBytes(32), resave: false, saveUninitialized: false }));
 
   app.engine('html', mustacheExpress());
   app.set('view engine', 'html');
