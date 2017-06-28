@@ -118,5 +118,4 @@ exports.pairing = function (entries, cb) {
 
 exports.start = function () {
   timer = setTimeout(search, 5 * 1000);
-  console.log(timer);
 };
