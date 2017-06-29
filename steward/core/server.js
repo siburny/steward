@@ -90,7 +90,7 @@ var checkPorts = function (port, portSecure) {
 var start = function (port, portSecure) {
   var server;
 
-  var crt = __dirname + '/../sandbox/' + steward.domain + '.home.rub.is.chain.pem'
+  var crt = __dirname + '/../db/' + steward.domain + '.home.rub.is.chain.pem'
     , key = __dirname + '/../db/' + steward.domain + '.home.rub.is.key.pem'
     , options = {}
     , serverSecure
@@ -121,7 +121,7 @@ var start = function (port, portSecure) {
   if (secure) {
     serverSecure = https.createServer({
       key: fs.readFileSync(__dirname + '/../db/' + steward.domain + '.home.rub.is.key.pem').toString(),
-      cert: fs.readFileSync(__dirname + '/../sandbox/' + steward.domain + '.home.rub.is.chain.pem').toString()
+      cert: fs.readFileSync(__dirname + '/../db/' + steward.domain + '.home.rub.is.chain.pem').toString()
     }, app);
     expressWss = require('express-ws')(app, serverSecure);
   }
