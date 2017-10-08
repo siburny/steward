@@ -174,14 +174,6 @@ var start = function (port, portSecure) {
 
     if (!existsP) return;
     params = require(__dirname + '/../db/' + steward.uuid).params;
-
-    crt2 = __dirname + '/../sandbox/cloud.crt';
-    fs.unlink(crt2, function (err) {
-      if ((!!err) && (err.code !== 'ENOENT')) logger.error('cloud', { event: 'fs.unlink', diagnostic: err.message });
-      fs.writeFile(crt2, new Buffer(params.server.ca), { mode: 0444 }, function (err) {
-        if (!!err) logger.error('cloud', { event: 'fs.writeFile', diagnostic: err.message });
-      });
-    });
     register(params, portSecure);
   });
 

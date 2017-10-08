@@ -131,8 +131,8 @@ Insteon_Dimmer.prototype.perform = function(self, taskID, perform, parameter) {
       self.level(self, params.level);
     });
   } else {
-    self.light.turnOffFast(function(err, results) {/* jshint unused: false */
-      if (!!err) return logger.info('device/' + self.deviceID, { event: 'turnOffFast', diagnostic: err.message });
+    self.light.turnOff(function(err, results) {/* jshint unused: false */
+      if (!!err) return logger.info('device/' + self.deviceID, { event: 'turnOff', diagnostic: err.message });
 
       if (self.status !== 'off') {
         self.status = 'off';

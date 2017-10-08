@@ -21,10 +21,16 @@ function initGrid() {
 }
 
 var editor_callback, callback_fields, editor_device_id;
-function open_edit_form(id, fields, callback) {
-  editor_device_id = id;
-  editor_callback = callback;
+function open_edit_form(id, fields, actions, callback) {
+  actions = actions || {};
   fields = fields || {};
+
+  editor_device_id = id;
+  if (typeof actions === 'function') {
+    callback = actions;
+    actions = {};
+  }
+  editor_callback = callback;
 
   var default_fields = { 'name': 'Name', 'nickname': 'Nickname', 'room': 'Room' };
   for (var field in default_fields) {

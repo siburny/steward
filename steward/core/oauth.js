@@ -86,7 +86,8 @@ exports.start = function (app, api) {
   const OAuth2Server = require('node-oauth2-server');
   var oauth = new OAuth2Server({
     model: model,
-    grants: ['authorization_code', 'refresh_token']
+    grants: ['authorization_code', 'refresh_token'],
+    refreshTokenLifetime: null
   });
 
   // Get login.

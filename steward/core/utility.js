@@ -51,12 +51,7 @@ exports.start = function() {
 // used to delay the server starting...
   exports.acquiring = 1;
 
-  //broker.create('beacon-ingress');
   broker.on('beacon-ingress', beacon_ingress);
-  //broker.create('beacon-egress');
-  //broker.create('actors');
-  //broker.create('discovery');
-  //broker.create('readings');
 
   try {
     exports.configuration = JSON.parse(fs.readFileSync(__dirname + '/../db/configuration.json', { encoding: 'utf8' }));

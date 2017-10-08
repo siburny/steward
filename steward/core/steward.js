@@ -491,11 +491,10 @@ var pass2 = function () {
   logger.info('start', { diagnostic: 'determine UUID address' });
 
   for (ifname in ifaces) {
-    if (!!ifaces[ifname]) {
+    if (!!ifaces[ifname] && ifname.toLowerCase().indexOf('nat') === -1) {
       for (address in ifaces[ifname]) {
         if ((!ifaces[ifname][address].mac) || (ifaces[ifname][address].mac.length === 0) || (ifaces[ifname][address].mac === "00:00:00:00:00:00")) continue;
 
-        logger.info('start', { diagnostic: 'determining UUID using method #2' });
         exports.uuid = '2f402f80-da50-11e1-9b23-' + ifaces[ifname][address].mac.split(':').join('');
         exports.domain = ifaces[ifname][address].mac.split(':').join('');
         return pass2();
