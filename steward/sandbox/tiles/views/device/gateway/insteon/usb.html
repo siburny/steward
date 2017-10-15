@@ -1,12 +1,17 @@
 <li data-w="1" data-h="1" data-x="{{x}}" data-y="{{y}}" class="status {{status}} z-depth-3" id="device-{{id}}">
 	<div class="device">
 		<div class="name">{{name}}</div>
-		<div class="icon"><span><i class="material-icons" style="font-size:inherit;">router</i></span></div>
+		<div class="icon">
+			<span>
+				<i class="material-icons" style="font-size:inherit;">router</i>
+			</span>
+		</div>
 	</div>
 
 	<script>
 		(function () {
 			var current_data = {};
+			var current_id = '{{id}}';
 
 			update_functions['update_{{id}}'] = function (data) {
 				current_data = data;
@@ -14,10 +19,28 @@
 			}
 
 			$('#device-{{id}}').on('taphold', function () {
-				open_edit_form('{{id}}', {
-					'name': { 'name': 'Name', 'value': current_data.name || '' },
-					'nickname': { 'name': 'Nickname', 'value': current_data.nickname || '' }
-				});
+				open_edit_form('{{id}}',
+					{
+						'name': { 'name': 'Name', 'value': current_data.name || '' },
+						'nickname': { 'name': 'Nickname', 'value': current_data.nickname || '' }
+					},
+					{
+						'pairmaster': {
+							'name': 'Pair (as controller)', 'click': function (api) {
+								api.perform(current_id, 'pair_controller');
+							},
+						},
+						'pairslave': {
+							'name': 'Pair (as responder)', 'click': function (api) {
+								api.perform(current_id, 'pair_responder');
+							},
+						},
+						'paircancel': {
+							'name': 'Cancel Pairing', 'click': function (api) {
+								api.perform(current_id, 'pair_cancel');
+							},
+						}
+					});
 			});
 		})();
 	</script>

@@ -42,7 +42,38 @@ var Gateway = exports.Device = function (deviceID, deviceUID, info) {
   });
 };
 util.inherits(Gateway, require('./../device-gateway').Device);
-Gateway.prototype.perform = devices.perform;
+
+
+Gateway.prototype.perform = function (self, taskID, perform, parameter) {
+  var event, params, state;
+
+  if (perform === 'set') return devices.perform(self, taskID, perform, parameter);
+
+  switch (perform) {
+    case "pair_controller":
+      this.insteon.link(null, function (err, links) {
+      });
+      break;
+
+    case "pair_responder":
+      this.insteon.link(null, { controller: true }, function (err, links) {
+      });
+      break;
+
+    case "pair_cancel":
+      this.insteon.cancelInprogress();
+      this.insteon.cancelLinking(function() {
+        return true;
+      });
+      break;
+
+    default:
+      return false;
+  }
+
+  logger.info('device/' + self.deviceID, { perform: perform });
+  return steward.performed(taskID);
+};
 
 Gateway.prototype.setup = function (self) {
   var restart = function () {
@@ -287,7 +318,7 @@ var scanSerialPort = function (driver) {
   buffer = null;
   silentP = false;
 
-  stream = new serialport(comName, { baudrate: 19200, databits: 8, parity: 'none', stopbits: 1 });
+  stream = new serialport(comName, { baudRate: 19200, dataBits: 8, parity: 'none', stopBits: 1 });
   stream.on('open', function () {
     stream.write(new Buffer('0260', 'hex'));
   }).on('data', function (data) {

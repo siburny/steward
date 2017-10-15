@@ -95,3 +95,9 @@ nav {
   font-size: 1rem;
   text-align: left;
 }
+.modal .actions {
+  text-align: right;
+}
+.modal .actions .btn {
+  margin: 3px 0;
+}

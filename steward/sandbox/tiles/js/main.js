@@ -47,6 +47,18 @@ function open_edit_form(id, fields, actions, callback) {
     callback_fields.push(field);
   }
 
+  $('#settings .actions').empty();
+  for (var action in actions) {
+    $row = $('<a href="#!" class="modal-' + action + ' waves-effect waves-green btn">' + actions[action].name + '</a><br />');
+    $('#settings .actions').append($row);
+
+    $('#settings .actions .modal-' + action).on('click', (function (_action, _api) {
+      return function () {
+        _action.click(_api);
+      }
+    })(actions[action], api));
+  }
+
   var data = {
     "Apple": null,
     "Microsoft": null,
