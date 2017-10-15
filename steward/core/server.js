@@ -127,16 +127,18 @@ var start = function (port, portSecure) {
   }
 
   for (var route in routes) {
-    app.ws(route, function (ws, req) {
-      var tag = req.connection.remoteAddress + ' ' + req.connection.remotePort + ' ' + route;
+    app.ws(route, (function (_route) {
+      return function (ws, req) {
+        var tag = req.connection.remoteAddress + ' ' + req.connection.remotePort + ' ' + _route;
 
-      ws.clientInfo = steward.clientInfo(req.connection, true);
-      ws.on('error', function (err) {
-        logger.info(tag, { event: 'error', path: route, message: err });
-      });
+        ws.clientInfo = steward.clientInfo(req.connection, true);
+        ws.on('error', function (err) {
+          logger.info(tag, { event: 'error', path: _route, message: err });
+        });
 
-      (routes[route].route)(ws, tag);
-    });
+        (routes[_route].route)(ws, tag);
+      }
+    })(route));
   }
 
   //attach UI to server
