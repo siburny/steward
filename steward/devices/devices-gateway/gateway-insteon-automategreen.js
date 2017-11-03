@@ -51,7 +51,7 @@ Gateway.prototype.perform = function (self, taskID, perform, parameter) {
 
   switch (perform) {
     case "pair_controller":
-      this.insteon.link(null, function (err, links) {
+      this.insteon.link(null, { controller: false }, function (err, links) {
       });
       break;
 

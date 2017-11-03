@@ -40,7 +40,7 @@
     "node-pushover": "^0.2.2",
     "node-red": "0.x",
     "node-red-contrib-schedex": "*",
-    "node-red-contrib-thethingsystem": "siburny/node-red-contrib-thethingsystem",
+    "node-red-contrib-thethingsystem": "^0.1.0",
     "node-ssdp": "TheThingSystem/node-ssdp",
     "node-static": "^0.7.3",
     "node-uuid": "1.4.x",

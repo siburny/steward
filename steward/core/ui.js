@@ -110,12 +110,13 @@ exports.start = function (server, serverSecure, app) {
         resdata.id = id;
         resdata.x = -resdata.priority || id;
         resdata.y = 0;
-        resdata.name = data.nickname || data.name;
+        resdata.name = data.name;
+        resdata.nickname = data.nickname;
         resdata.status = data.status;
         resdata.info = JSON.stringify(data.info);
 
         app.render(data.whatami.replace(/^a-z0-9-/, '').substr(1), resdata, function (err, out) {
-          var msg = { 'action': 'device', 'id': id, 'html': out, 'status': data.status, 'info': data.info, 'name': data.nickname || data.name, 'room': data.room };
+          var msg = { 'action': 'device', 'id': id, 'html': out, 'status': data.status, 'info': data.info, 'name': data.name, 'nickname': data.nickname, 'room': data.room };
           if (!!ws && ws.readyState == 1) {
             ws.send(JSON.stringify(msg));
           }
