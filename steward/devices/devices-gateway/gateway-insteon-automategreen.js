@@ -51,18 +51,28 @@ Gateway.prototype.perform = function (self, taskID, perform, parameter) {
 
   switch (perform) {
     case "pair_controller":
+      self.status = 'waiting';
+      self.changed();
       this.insteon.link(null, { controller: false }, function (err, links) {
+        self.status = 'ready';
+        self.changed();
       });
       break;
 
     case "pair_responder":
+      self.status = 'waiting';
+      self.changed();
       this.insteon.link(null, { controller: true }, function (err, links) {
+        self.status = 'ready';
+        self.changed();
       });
       break;
 
     case "pair_cancel":
       this.insteon.cancelInprogress();
       this.insteon.cancelLinking(function () {
+        self.status = 'ready';
+        self.changed();
         return true;
       });
       break;
