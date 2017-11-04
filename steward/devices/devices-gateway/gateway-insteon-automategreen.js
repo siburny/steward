@@ -62,7 +62,7 @@ Gateway.prototype.perform = function (self, taskID, perform, parameter) {
 
     case "pair_cancel":
       this.insteon.cancelInprogress();
-      this.insteon.cancelLinking(function() {
+      this.insteon.cancelLinking(function () {
         return true;
       });
       break;
@@ -390,7 +390,9 @@ var scanData = function (message, info) {
   info.url = info.device.url;
   info.deviceType = '/device/gateway/insteon/';
   switch (productCode) {
-    case '0315': info.deviceType += 'usb'; break;
+    case '0315':
+    case '0320':
+      info.deviceType += 'usb'; break;
 
     case '032e':
     case '032f':
