@@ -14,8 +14,10 @@
 			var current_id = '{{id}}';
 
 			update_functions['update_{{id}}'] = function (data) {
+				$('#device-{{id}}').removeClass(current_data.status).addClass(data.status);
+				$('#device-{{id}} .name').text((data.nickname || data.name) + (!!data.room ? ' in ' + data.room : ''));
+
 				current_data = data;
-				$('#device-{{id}} .name').text(data.name + (!!data.room ? ' in ' + data.room : ''));
 			}
 
 			$('#device-{{id}}').on('taphold', function () {
@@ -28,17 +30,20 @@
 						'pairmaster': {
 							'name': 'Pair (as controller)', 'click': function (api) {
 								api.perform(current_id, 'pair_controller');
-							},
+								onclose_edit_form(true);
+							}
 						},
 						'pairslave': {
 							'name': 'Pair (as responder)', 'click': function (api) {
 								api.perform(current_id, 'pair_responder');
-							},
+								onclose_edit_form(true);
+							}
 						},
 						'paircancel': {
 							'name': 'Cancel Pairing', 'click': function (api) {
 								api.perform(current_id, 'pair_cancel');
-							},
+								onclose_edit_form(true);
+							}
 						}
 					});
 			});
