@@ -41,7 +41,7 @@
     "node-pushover": "^0.2.2",
     "node-red": "0.x",
     "node-red-contrib-schedex": "*",
-    "node-red-contrib-thethingsystem": "~0.1.1",
+    "node-red-contrib-thethingsystem": "~0.1.2",
     "node-ssdp": "github:TheThingSystem/node-ssdp",
     "node-static": "^0.7.3",
     "node-uuid": "1.4.x",
