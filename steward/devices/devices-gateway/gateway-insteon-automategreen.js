@@ -111,6 +111,11 @@ Gateway.prototype.setup = function (self) {
     self.scan(self);
   }).on('command', function (command) {
     logger.warning('device/' + self.deviceID, { event: 'command', command: command });
+  }).on('recvCommand', function (command) {
+    if (command && command.link) {
+      //logger.info('device/' + self.deviceID, { event: 'Rescanning Insteon links' });
+      //self.scan(self);
+    }
   }).on('close', function (errP) {
     logger.warning('device/' + self.deviceID, { event: 'close', errP: errP });
     restart();
@@ -123,7 +128,10 @@ Gateway.prototype.setup = function (self) {
 };
 
 Gateway.prototype.scan = function (self) {
-  self.refreshID = null;
+  if (!!self.refreshID) {
+    clearTimeout(self.refreshID);
+    self.refreshID = null;
+  }
   if (!self.insteon) return;
 
   try {
@@ -132,7 +140,7 @@ Gateway.prototype.scan = function (self) {
 
       if (!!err) return logger.error('device/' + self.deviceID, { event: 'links', diagnostic: err.message });
 
-      if (typeof links === 'undefined' || typeof links === null) return;
+      if (!links) return;
 
       var f = function (id) {
         return function (err, info) {
