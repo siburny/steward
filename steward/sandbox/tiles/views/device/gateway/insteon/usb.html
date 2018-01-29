@@ -1,4 +1,4 @@
-<li data-w="1" data-h="1" data-x="{{x}}" data-y="{{y}}" class="status {{status}} z-depth-3" id="device-{{id}}">
+<li data-w="1" data-h="1" data-x="{{x}}" data-y="{{y}}" class="status z-depth-3" data-status="{{status}}" id="device-{{id}}">
 	<div class="device">
 		<div class="name">{{name}}</div>
 		<div class="icon">
@@ -14,7 +14,6 @@
 			var current_id = '{{id}}';
 
 			update_functions['update_{{id}}'] = function (data) {
-				$('#device-{{id}}').removeClass(current_data.status).addClass(data.status);
 				$('#device-{{id}} .name').text((data.nickname || data.name) + (!!data.room ? ' in ' + data.room : ''));
 
 				current_data = data;

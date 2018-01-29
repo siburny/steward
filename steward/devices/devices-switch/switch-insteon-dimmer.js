@@ -66,7 +66,19 @@ var Insteon_Dimmer = exports.Device = function (deviceID, deviceUID, info) {
   });
 
   if (!!self.gateway.upstream) self.gateway.upstream[self.insteonID] = self;
-  self.refresh(self);
+  self.refresh(self).then(function (success) {
+    if (!success) {
+      setTimeout(function () {
+        self.refresh(self).then(function (success2) {
+          if (!success2) {
+            self.status = "unknown";
+            self.changed();
+          }
+        });
+      }, 1000 + Math.random() * 10000);
+    }
+  });
+  
   // debug
   //setInterval(function() { self.refresh(self); }, 30 * 1000);
 };
@@ -74,25 +86,26 @@ util.inherits(Insteon_Dimmer, plug.Device);
 
 
 Insteon_Dimmer.prototype.refresh = function (self) {
-  self.light.level(function (err, level) {
-    if (!!err) return logger.error('device/' + self.deviceID, { event: 'light.level', diagnostic: err.message });
-
-    self.level(self, level);
+  return self.light.level().then(function (level) {
+    return self.level(self, level);
   });
 };
 
 Insteon_Dimmer.prototype.level = function (self, level) {
+  if (typeof level === 'undefined' || level === null)
+    return false;
+
   level = devices.boundedValue(level, 0, 100);
 
   if (level === 0) {
-    if ((self.status === 'off') && (self.info.level === level)) return;
+    if ((self.status === 'off') && (self.info.level === level)) return false;
 
     self.status = 'off';
     self.info.level = 0;
     return self.changed();
   }
 
-  if ((self.status === 'on') && (self.info.level === level)) return;
+  if ((self.status === 'on') && (self.info.level === level)) return false;
 
   self.status = 'on';
   self.info.level = level;

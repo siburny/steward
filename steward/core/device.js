@@ -631,12 +631,14 @@ Device.prototype.changed = function (now) {
   try { updated = info.updated.getTime(); } catch (ex) { updated = info.updated; }
   delete (info.updated);
   prev = stringify(info);
-  if (self.prev === prev) return;
+  if (self.prev === prev) return false;
   self.prev = prev;
   info.updated = updated;
 
   broker.emit('beacon-egress', '.updates', info);
   if ((self.status === 'reset') || (self.status === 'error')) broker.emit('actors', 'attention');
+  
+  return true;
 };
 
 Device.prototype.alert = function (message) {

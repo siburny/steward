@@ -1,4 +1,4 @@
-<li data-w="1" data-h="1" data-x="{{x}}" data-y="{{y}}" class="status {{status}} z-depth-3" id="device-{{id}}">
+<li data-w="1" data-h="1" data-x="{{x}}" data-y="{{y}}" class="status z-depth-3" data-status="{{status}}" id="device-{{id}}">
 	<div class="device waves-effect waves-light">
 		<div class="name">{{name}}</div>
 		<div class="icon"><span><i class="fa fa-check-square-o" aria-hidden="true"></i></span>
@@ -7,7 +7,6 @@
 
 	<script>
 		(function () {
-			var current_class = '{{status}}';
 			var current_data = {};
 
 			update_functions['update_{{id}}'] = function (data) {
@@ -15,8 +14,6 @@
 				$('#device-{{id}} .name').text(data.name + (!!data.room ? ' in ' + data.room : ''));
 
 				if (!!data.status) {
-					$('#device-{{id}}').removeClass(current_class).addClass(data.status);
-					current_class = data.status;
 					current_data = data;
 				}
 				$('#device-{{id}} .name').text(data.name);

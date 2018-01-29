@@ -144,10 +144,10 @@ API.prototype.connect = function () {
         initGrid();
       }
       if (update_functions.hasOwnProperty('update_' + msg.id)) {
-        if (msg.status !== 'waiting') {
-          $('#device-' + msg.id).removeClass('waiting');
+        $('#device-' + msg.id).attr('data-status', msg.status);
+        if (msg.status !== 'waiting' && msg.status !== 'unknown') {
+          update_functions['update_' + msg.id](msg);
         }
-        update_functions['update_' + msg.id](msg);
       }
 
     }
