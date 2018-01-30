@@ -70,7 +70,7 @@ exports.start = function (server, serverSecure, app) {
   };
 
   RED.init(server, settings);
-  if(!!serverSecure) {
+  if (!!serverSecure) {
     RED.init(serverSecure, settings);
   }
 
@@ -130,11 +130,13 @@ exports.start = function (server, serverSecure, app) {
         case 'loadDevices':
           let rooms = [];
           for (var device in devices.devices) {
-            renderDevice(devices.devices[device].device);
-            if (devices.devices[device].device.hasOwnProperty('room')) {
-              rooms.push(devices.devices[device].device.room);
+            if (!!devices.devices[device].device) {
+              renderDevice(devices.devices[device].device);
+              if (devices.devices[device].device.hasOwnProperty('room')) {
+                rooms.push(devices.devices[device].device.room);
+              }
+              ws.send(JSON.stringify({ 'action': 'room', 'rooms': rooms }));
             }
-            ws.send(JSON.stringify({ 'action': 'room', 'rooms': rooms }));
           }
           break;
 
