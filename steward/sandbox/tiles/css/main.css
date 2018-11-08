@@ -113,3 +113,6 @@ nav {
 .modal .actions .btn {
   margin: 3px 0;
 }
+.climacon * {
+  transform-box: fill-box;
+}

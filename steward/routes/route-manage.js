@@ -20,13 +20,8 @@ var access = exports.access = { level : { read    :    1
 
 
 var route = function(ws, tag) {
-  ws.on('message', function(data, flags) {
+  ws.on('message', function(data) {
     var best, i, message, option, path, prefix;
-
-    if (!!flags.binary) {
-      loser(ws, tag, { event: 'data', diagnostic: 'binary data' });
-      return;
-    }
 
     message = null;
     try { message = JSON.parse(data); } catch(ex) {

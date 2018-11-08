@@ -207,11 +207,17 @@ exports.start = function () {
   devices.makers['Insteon.0112'] = Insteon_Dimmer;
   devices.makers['Insteon.01ef'] = Insteon_Dimmer;
   devices.makers['Insteon.0120'] = Insteon_Dimmer;
+  devices.makers['Insteon.0121'] = Insteon_Dimmer;
+  devices.makers['Insteon.0122'] = Insteon_Dimmer;
+  devices.makers['Insteon.0123'] = Insteon_Dimmer;
+  devices.makers['Insteon.0124'] = Insteon_Dimmer;
+  devices.makers['Insteon.0125'] = Insteon_Dimmer;
+  devices.makers['Insteon.012d'] = Insteon_Dimmer;
 
   pair({
     '/device/switch/insteon/dimmer': {
       maker: Insteon_Dimmer
-      , entries: ['0100', '010e', '010f', '0111', '0112', '01ef', '0120']
+      , entries: ['0100', '010e', '010f', '0111', '0112', '01ef', '0120', '0121', '0122', '0123', '0124', '0125', '012d']
     }
   });
 };
