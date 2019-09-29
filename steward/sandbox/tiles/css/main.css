@@ -1,38 +1,47 @@
 * {
-    margin: 0; padding: 0;
+  margin: 0;
+  padding: 0;
 }
-html, body {
-    background-color: #333;
-    height:100%;
-    overflow: hidden;
-    user-select: none;
+
+:root {
+  --green: #2ECC40;
+  --red: #FF4136;
 }
+
+html,
+body {
+  background-color: #333;
+  height: 100%;
+  overflow: hidden;
+  user-select: none;
+}
+
 nav {
-    background-color: #01579b;
+  background-color: #01579b;
 }
+
 .grid-container {
-  height:100%;
-  background:#111;
-  overflow: auto;
+  height: 100%;
+  background: #111;
+  overflow: scroll;
 }
+
 .grid {
   position: relative;
   list-style: none;
   -webkit-transition: width 0.2s,
-                      height 0.2s;
-          transition: width 0.2s,
-                      height 0.2s;
+    height 0.2s;
+  transition: width 0.2s,
+    height 0.2s;
 }
-  .grid li {
-    position: absolute;
-    text-align: center;
-    line-height: 100%;
-  }
-    .grid li[data-status="waiting"] .device *:not(.name):not(.today_title),
-    .grid li[data-status="unknown"] .device *:not(.name):not(.today_title) {
-      display: none;
-    }
-    .grid li[data-status="waiting"] .device:before {
+
+.grid li {
+  position: absolute;
+  text-align: center;
+  line-height: 100%;
+}
+
+/*.grid li[data-status="waiting"] .device:before {
       z-index: 10;
       font-family: FontAwesome;
       content: "\f021";
@@ -43,76 +52,115 @@ nav {
       align-items: center;
       animation: fa-spin 2s infinite linear;
       font-size: 1em;
-    }
-    .grid li[data-status="unknown"] .device:before {
-      z-index: 10;
-      font-family: FontAwesome;
-      content: "\f128";
-      position: absolute;
-      left:0;right: 0;top:0;bottom: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 1.25em;
-    }
-  li .device {
-      position:absolute;
-      top:0;
-      bottom:0;
-      left:0;
-      right:0;
-      color:#fff;
-      background-color: #444;
-      margin: 1px;
-  }
-  li.unknown .device {
-    background-color: #444;
-  }
-  .device .icon {
-    position:absolute;
-    width: 100%;
-    height: 100%;
-    display: table;
-  }
-    .device .icon span {
-      display: table-cell;
-      vertical-align: middle;
-    }
-  .device .name {
-    margin: 5px;
-    position:absolute;
-    width:100%;
-    top:0;
-    font-weight: normal;
-    font-size: 0.2em;
-    text-align: left;
-    line-height: 100%;
-    color: #fff;
-  }
+    }*/
+.grid li[data-status="unknown"] .device:before {
+  z-index: 10;
+  font-family: FontAwesome;
+  content: "\f128";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.25em;
+}
+
+.grid li .device {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  color: #fff;
+  background-color: #444;
+  margin: 1px;
+}
+
+.grid li.unknown .device {
+  background-color: #444;
+}
+
+.grid li .device .icon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: normal normal normal 14px/1 "Material Design Icons";
+  font-size: inherit;
+  z-index: 10;
+}
+
+/* Waiting */
+.grid li[data-status="waiting"] .device .icon::before {
+  animation: mdi-spin 2s infinite linear;
+  content: "\F06A";
+}
+
+/* Light */
+.grid li[data-status="on"] .device.device-light .icon::before {
+  content: "\F6E8";
+  color: var(--green, darkgreen);
+}
+
+.grid li[data-status="off"] .device.device-light .icon::before {
+  content: "\F336";
+}
+
+/* Garage */
+li[data-status="closed"] .device-garage .icon::before {
+  content: "\F6D8";
+  color: var(--red, darkred);
+}
+li[data-status="open"] .device-garage .icon::before {
+  content: "\F6D9";
+  color: var(--green, darkgreen);
+}
+
+.device .name {
+  margin: 5px;
+  position: absolute;
+  width: 100%;
+  top: 0;
+  font-weight: normal;
+  font-size: 0.2em;
+  text-align: left;
+  line-height: 100%;
+  color: #fff;
+}
 
 .status[data-status="on"] .device {
-    color: #2ECC40;
+  color: var(--green);
 }
-.status[data-status="off"] .device {
-    /*color: #FF4136;*/
-}
+
 .status[data-status="tick"] .device {
-    color: #5B85C8;
+  color: #5B85C8;
 }
+
 .status[data-status="tock"] .device {
-    color: #C8675B;
+  color: #C8675B;
 }
+
 .modal {
   line-height: 100%;
   font-size: 1rem;
   text-align: left;
 }
+
 .modal .actions {
   text-align: right;
 }
+
 .modal .actions .btn {
   margin: 3px 0;
 }
+
 .climacon * {
   transform-box: fill-box;
 }

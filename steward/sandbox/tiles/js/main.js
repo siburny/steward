@@ -145,9 +145,7 @@ API.prototype.connect = function () {
       }
       if (update_functions.hasOwnProperty('update_' + msg.id)) {
         $('#device-' + msg.id).attr('data-status', msg.status);
-        if (msg.status !== 'waiting' && msg.status !== 'unknown') {
-          update_functions['update_' + msg.id](msg);
-        }
+        update_functions['update_' + msg.id](msg);
       }
 
     }

@@ -25,7 +25,7 @@ var nodes_blacklist = [
   "node-red/mqtt",
   "node-red/tls",
   "node-red/rpi-gpio",
-  "node-red/unknown"
+  "node-red/unknown",
 ]
 
 var widgets = {
@@ -35,7 +35,8 @@ var widgets = {
   '/device/sensor/ticktock': {},
   '/device/indicator/clock-widget': { priority: 1 },
   '/device/climate/weather-widget': { priority: 3 },
-  '/device/climate/insteon/control': { priority: 2 }
+  '/device/climate/insteon/control': { priority: 2 },
+  '/device/motive/insteon/garagedoor': {}
 }
 
 function disable_nodes(RED) {
@@ -77,14 +78,16 @@ exports.start = function (server, serverSecure, app) {
   app.use(settings.httpAdminRoot, RED.httpAdmin);
   app.use(settings.httpNodeRoot, RED.httpNode);
 
-  app.use('/modules/jquery/', express.static('node_modules/jquery/dist/'));
-  app.use('/modules/jquery-ui/', express.static('node_modules/jquery-ui-bundle/'));
+  app.use('/modules/jquery/', express.static('node_modules/jquery/dist'));
+  app.use('/modules/jquery-ui/', express.static('node_modules/jquery-ui-bundle'));
   app.use('/modules/materialize/', express.static('node_modules/materialize-css/dist'));
   app.use('/modules/font-awesome/', express.static('node_modules/font-awesome'));
   app.use('/modules/material-design-icons/', express.static('node_modules/material-design-icons-iconfont/dist'));
-  app.use('/modules/grid-list/', express.static('node_modules/grid-list/src/'));
-  app.use('/modules/animated-climacons/', express.static('node_modules/animated-climacons/svgs/'));
-  app.use('/modules/jquery-taphold/', express.static('node_modules/jquery-taphold/'));
+  app.use('/modules/grid-list/', express.static('node_modules/grid-list/src'));
+  app.use('/modules/animated-climacons/', express.static('node_modules/animated-climacons/svgs'));
+  app.use('/modules/jquery-taphold/', express.static('node_modules/jquery-taphold'));
+  app.use('/modules/materialdesignicons/', express.static('node_modules/@mdi/font'));
+
   app.use('/', express.static('sandbox/tiles/'));
 
   app.use(bodyParser.json());

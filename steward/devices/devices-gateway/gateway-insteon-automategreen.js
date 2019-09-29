@@ -190,7 +190,7 @@ Gateway.prototype.announce = function (self, data) {
     };
   }
 
-  productCode = (new Buffer([data.deviceCategory.id, data.deviceSubcategory.id])).toString('hex');
+  productCode = (new Buffer.from([data.deviceCategory.id, data.deviceSubcategory.id])).toString('hex');
   address = sixtoid(data.id);
 
   info = { source: self.deviceID, gateway: self };
@@ -267,7 +267,7 @@ var pair = function (socket, ipaddr, portno, macaddr, tag) {
     if (!silentP) logger2.info(tag, { event: 'closing' });
   }).on('close', function (errorP) {
     if (!silentP) logger2.info(tag, { event: errorP ? 'reset' : 'close' });
-  }).write(new Buffer('0260', 'hex'));
+  }).write(new Buffer.from('0260', 'hex'));
   socket.setTimeout(3 * 1000);
 };
 
@@ -338,7 +338,7 @@ var scanSerialPort = function (driver) {
 
   stream = new serialport(comName, { baudRate: 19200, dataBits: 8, parity: 'none', stopBits: 1 });
   stream.on('open', function () {
-    stream.write(new Buffer('0260', 'hex'));
+    stream.write(new Buffer.from('0260', 'hex'));
   }).on('data', function (data) {
     buffer = (!!buffer) ? Buffer.concat([buffer, data]) : data;
 

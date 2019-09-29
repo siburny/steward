@@ -1,0 +1,44 @@
+<li data-w="1" data-h="1" data-x="{{x}}" data-y="{{y}}" class="status z-depth-3" data-status="{{status}}"
+	id="device-{{id}}">
+	<div class="device device-garage waves-effect waves-light">
+		<div class="name">{{name}}</div>
+		<div class="icon"></div>
+
+		<script>
+			//# sourceURL=garagedoor.html.js
+			(function () {
+				var current_data = {};
+				update_functions['update_{{id}}'] = function (data) {
+					current_data = data;
+					$('#device-{{id}} .name').text((data.nickname ? data.nickname : data.name) + (!!data.room ? ' in ' + data
+						.room : ''));
+				}
+
+				$('#device-{{id}}').on('click', function () {
+					if (current_data.status === 'open') {
+						api.perform('{{id}}', 'close');
+					} else if (current_data.status === 'closed') {
+						api.perform('{{id}}', 'open');
+					}
+					return false;
+				});
+
+				$('#device-{{id}}').on('taphold', function () {
+					open_edit_form('{{id}}', {
+						'name': {
+							'name': 'Name',
+							'value': current_data.name || ''
+						},
+						'nickname': {
+							'name': 'Nickname',
+							'value': current_data.nickname || ''
+						},
+						'room': {
+							'name': 'Room',
+							'value': current_data.room || ''
+						}
+					});
+				});
+			})();
+		</script>
+</li>

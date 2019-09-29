@@ -26,7 +26,7 @@ process.addListener("uncaughtException", function (err) {
 });
 
 var EventEmitter2  = require('eventemitter2').EventEmitter2;
-var broker = exports.broker = new EventEmitter2({maxListeners: 25});
+var broker = exports.broker = new EventEmitter2({maxListeners: 100});
 var signals = exports.signals = {};
 
 var beacon_ingress = function(category, level, message, meta) {
@@ -227,7 +227,7 @@ exports.acquire = function(logger, directory, pattern, start, stop, suffix, arg)
       if (file.match(pattern)) {
         didP = true;
         module = file.slice(start, stop);
-        if ((!!include) && (include.indexOf(module) === -1)) {
+        if (!!include && include.length > 0 && (include.indexOf(module) === -1)) {
           logger.info('not including ' + module + suffix);
           continue;
         }

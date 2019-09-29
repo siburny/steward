@@ -1,9 +1,8 @@
-<li data-w="1" data-h="1" data-x="{{x}}" data-y="{{y}}" class="status z-depth-3" data-status="{{status}}" id="device-{{id}}">
-	<div class="device waves-effect waves-light">
+<li data-w="1" data-h="1" data-x="{{x}}" data-y="{{y}}" class="status z-depth-3" data-status="{{status}}"
+	id="device-{{id}}">
+	<div class="device device-light waves-effect waves-light">
 		<div class="name">{{name}}</div>
-		<div class="icon">
-			<span><i class="fa fa-lightbulb-o" aria-hidden="true"></i></span>
-		</div>
+		<div class="icon"></div>
 		<div class="level">
 			<div class="brighten">+</div>
 			<span id="level">100</span>%
@@ -52,7 +51,8 @@
 				}
 				current_data = data;
 
-				$('#device-{{id}} .name').text((data.nickname ? data.nickname : data.name) + (!!data.room ? ' in ' + data.room : ''));
+				$('#device-{{id}} .name').text((data.nickname ? data.nickname : data.name) + (!!data.room ? ' in ' + data
+					.room : ''));
 
 				if (!!data.status) {
 					if (data.status === 'on') {
@@ -74,9 +74,14 @@
 			$('#device-{{id}} .dim').on('click', function () {
 				current_data.info.level -= 10;
 				current_data.status = 'on';
-				if (current_data.info.level <= 0) { current_data.status = 'off'; current_data.info.level = 0 };
+				if (current_data.info.level <= 0) {
+					current_data.status = 'off';
+					current_data.info.level = 0
+				};
 
-				api.perform('{{id}}', current_data.status, { level: current_data.info.level });
+				api.perform('{{id}}', current_data.status, {
+					level: current_data.info.level
+				});
 				return false;
 			});
 
@@ -85,15 +90,26 @@
 				current_data.status = 'on';
 				if (current_data.info.level > 100) current_data.info.level = 100;
 
-				api.perform('{{id}}', current_data.status, { level: current_data.info.level });
+				api.perform('{{id}}', current_data.status, {
+					level: current_data.info.level
+				});
 				return false;
 			});
 
 			$('#device-{{id}}').on('taphold', function () {
 				open_edit_form('{{id}}', {
-					'name': { 'name': 'Name', 'value': current_data.name || '' },
-					'nickname': { 'name': 'Nickname', 'value': current_data.nickname || '' },
-					'room': { 'name': 'Room', 'value': current_data.room || '' }
+					'name': {
+						'name': 'Name',
+						'value': current_data.name || ''
+					},
+					'nickname': {
+						'name': 'Nickname',
+						'value': current_data.nickname || ''
+					},
+					'room': {
+						'name': 'Room',
+						'value': current_data.room || ''
+					}
 				});
 			});
 		})();
