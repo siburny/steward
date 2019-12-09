@@ -21,6 +21,7 @@ function initGrid() {
 }
 
 var editor_callback, callback_fields, editor_device_id;
+
 function open_edit_form(id, fields, actions, callback) {
   actions = actions || {};
   fields = fields || {};
@@ -32,10 +33,17 @@ function open_edit_form(id, fields, actions, callback) {
   }
   editor_callback = callback;
 
-  var default_fields = { 'name': 'Name', 'nickname': 'Nickname', 'room': 'Room' };
+  var default_fields = {
+    'name': 'Name',
+    'nickname': 'Nickname',
+    'room': 'Room'
+  };
   for (var field in default_fields) {
     if (!fields.hasOwnProperty(field)) {
-      fields[field] = { 'name': default_fields[field], 'value': '' };
+      fields[field] = {
+        'name': default_fields[field],
+        'value': ''
+      };
     }
   }
 
@@ -71,7 +79,7 @@ function open_edit_form(id, fields, actions, callback) {
     minLength: 1
   });
   $('#settings').modal('open');
-  Materialize.updateTextFields();
+  M.updateTextFields();
 }
 
 function onclose_edit_form(cancel) {
@@ -99,7 +107,7 @@ function onclose_edit_form(cancel) {
 $(function () {
   api.connect();
 
-  $(".button-collapse").sideNav();
+  $(".sidenav").sidenav();
 
   // init grid
   initGrid();
@@ -110,9 +118,15 @@ $(function () {
   });
 
   //init editor
-  $('.modal').modal({ dismissible: false });
-  $('.modal .modal-footer .modal-cancel').on('click', function () { onclose_edit_form(true); });
-  $('.modal .modal-footer .modal-save').on('click', function () { onclose_edit_form(); });
+  $('.modal').modal({
+    dismissible: false
+  });
+  $('.modal .modal-footer .modal-cancel').on('click', function () {
+    onclose_edit_form(true);
+  });
+  $('.modal .modal-footer .modal-save').on('click', function () {
+    onclose_edit_form();
+  });
 });
 
 function API() {
@@ -125,14 +139,22 @@ API.prototype.connect = function () {
   this.websocket = new WebSocket((window.location.protocol === 'http:' ? 'ws:' : 'wss:') + '//' + window.location.host + '/api/');
   this.websocket.onopen = function (evt) {
     self.timeout = 5;
-    Materialize.toast('Connected.', 2000);
+    M.toast({
+      html: 'Connected.',
+      displayLength: 2000
+    });
 
     setTimeout(function () {
-      self.websocket.send(JSON.stringify({ 'action': 'loadDevices' }));
+      self.websocket.send(JSON.stringify({
+        'action': 'loadDevices'
+      }));
     }, 500);
   };
   this.websocket.onclose = function (evt) {
-    Materialize.toast('Connection closed.', 2000);
+    M.toast({
+      html: 'Connection closed.',
+      displayLength: 2000
+    });
     self.reconnect();
   };
   this.websocket.onmessage = function onMessage(evt) {
@@ -151,9 +173,12 @@ API.prototype.connect = function () {
     }
   }
   this.websocket.onerror = function (evt) {
-    Materialize.toast('Error connecting. Retrying ... ', 2000);
+    M.toast({
+      html: 'Error connecting. Retrying ... ',
+      displayLength: 2000
+    });
 
-    self.timeout *= 2;
+    //self.timeout *= 2;
     if (self.timeout > 60) {
       self.timeout = 60;
     }
@@ -168,7 +193,10 @@ API.prototype.close = function () {
 }
 
 API.prototype.reconnect = function () {
-  Materialize.toast('Connecting in&nbsp;<span id="RetryTimeout">' + this.timeout + '</span>&nbsp;second(s)', this.timeout * 1000);
+  M.toast({
+    html: 'Connecting in&nbsp;<span id="RetryTimeout">' + this.timeout + '</span>&nbsp;second(s)',
+    displayLength: this.timeout * 1000
+  });
 
   var timeout = this.timeout;
   var interval = setInterval(function () {
@@ -188,7 +216,12 @@ API.prototype.reconnect = function () {
 
 API.prototype.perform = function (id, action, params) {
   if (!!this.websocket) {
-    this.websocket.send(JSON.stringify({ 'id': id, 'action': 'perform', 'method': action, 'params': JSON.stringify(params) }));
+    this.websocket.send(JSON.stringify({
+      'id': id,
+      'action': 'perform',
+      'method': action,
+      'params': JSON.stringify(params)
+    }));
   }
 }
 
@@ -224,4 +257,3 @@ $.embedSVG = function () {
 
   });
 };
-

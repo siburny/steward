@@ -1,7 +1,6 @@
 # git config --global core.excludesfile ./.gitignore
 
 node_modules
-*.json
 
 .DS_Store
 .AppleDouble
@@ -40,3 +39,4 @@ typescript
 *.iml
 *.backup
 *.pem
+steward/.vscode

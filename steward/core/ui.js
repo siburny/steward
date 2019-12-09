@@ -1,9 +1,10 @@
 var utility = require('./../core/utility'),
   logger = exports.logger = utility.logger('ui'),
   devices = require('./device'),
-  utility = require('./../core/utility'),
   fs = require('fs'),
   util = require('util'),
+  ws = require('ws'), 
+  url = require('url'),
   bodyParser = require('body-parser');
 
 var nodes_blacklist = [
@@ -33,9 +34,15 @@ var widgets = {
   '/device/switch/insteon/dimmer': {},
   '/device/switch/insteon/onoff': {},
   '/device/sensor/ticktock': {},
-  '/device/indicator/clock-widget': { priority: 1 },
-  '/device/climate/weather-widget': { priority: 3 },
-  '/device/climate/insteon/control': { priority: 2 },
+  '/device/indicator/clock-widget': {
+    priority: 1
+  },
+  '/device/climate/weather-widget': {
+    priority: 3
+  },
+  '/device/climate/insteon/control': {
+    priority: 2
+  },
   '/device/motive/insteon/garagedoor': {}
 }
 
@@ -88,10 +95,16 @@ exports.start = function (server, serverSecure, app) {
   app.use('/', express.static('sandbox/tiles/'));
 
   app.use(bodyParser.json());
-  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(bodyParser.urlencoded({
+    extended: true
+  }));
   app.use(require('res-error'));
 
-  app.use(session({ secret: require('crypto').randomBytes(32).toString(), resave: false, saveUninitialized: false }));
+  app.use(session({
+    secret: require('crypto').randomBytes(32).toString(),
+    resave: false,
+    saveUninitialized: false
+  }));
 
   app.engine('html', mustacheExpress());
   app.set('view engine', 'html');
@@ -102,7 +115,11 @@ exports.start = function (server, serverSecure, app) {
     res.render('index');
   });
 
-  app.ws('/api/', function (ws, req) {
+  wss = new ws.Server({
+    noServer: true
+  });
+
+  wss.on('connection', function (ws, request) {
     function renderDevice(data) {
       if (!!data && widgets[data.whatami]) {
         var id = data.deviceID || data.whoami.replace('device/', '');
@@ -116,7 +133,16 @@ exports.start = function (server, serverSecure, app) {
         resdata.info = JSON.stringify(data.info);
 
         app.render(data.whatami.replace(/^a-z0-9-/, '').substr(1), resdata, function (err, out) {
-          var msg = { 'action': 'device', 'id': id, 'html': out, 'status': data.status, 'info': data.info, 'name': data.name, 'nickname': data.nickname, 'room': data.room };
+          var msg = {
+            'action': 'device',
+            'id': id,
+            'html': out,
+            'status': data.status,
+            'info': data.info,
+            'name': data.name,
+            'nickname': data.nickname,
+            'room': data.room
+          };
           if (!!ws && ws.readyState == 1) {
             ws.send(JSON.stringify(msg));
           }
@@ -135,7 +161,10 @@ exports.start = function (server, serverSecure, app) {
               if (devices.devices[device].device.hasOwnProperty('room')) {
                 rooms.push(devices.devices[device].device.room);
               }
-              ws.send(JSON.stringify({ 'action': 'room', 'rooms': rooms }));
+              ws.send(JSON.stringify({
+                'action': 'room',
+                'rooms': rooms
+              }));
             }
           }
           break;
@@ -161,6 +190,16 @@ exports.start = function (server, serverSecure, app) {
     ws.on('close', function () {
       utility.broker.off('beacon-egress', listener);
     });
+  });
+
+  server.on('upgrade', function upgrade(request, socket, head) {
+    const pathname = url.parse(request.url).pathname;
+
+    if (pathname === '/api/') {
+      wss.handleUpgrade(request, socket, head, function done(ws) {
+        wss.emit('connection', ws, request);
+      });
+    }
   });
 
   RED.start()
