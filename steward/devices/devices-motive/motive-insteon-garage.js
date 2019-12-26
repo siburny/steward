@@ -81,6 +81,7 @@ GarageDoor.prototype.perform = function (self, taskID, perform, parameter) {
 
     case 'open':
       this.garage.open();
+      break;
 
     case 'close':
       this.garage.close();

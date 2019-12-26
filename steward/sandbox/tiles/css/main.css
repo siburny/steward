@@ -105,12 +105,12 @@ nav {
 
 /* Light */
 .grid li[data-status="on"] .device.device-light .icon::before {
-  content: "\F6E8";
+  content: "\F6E7";
   color: var(--green, darkgreen);
 }
 
 .grid li[data-status="off"] .device.device-light .icon::before {
-  content: "\F336";
+  content: "\F6E8";
 }
 
 /* Garage */
