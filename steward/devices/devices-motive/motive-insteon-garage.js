@@ -35,6 +35,11 @@ var GarageDoor = exports.Device = function (deviceID, deviceUID, info) {
 
   self.garage = self.gateway.insteon.garage(self.insteonID);
 
+  self.garage.on('opening', () => self.update('waiting'));
+  self.garage.on('closing', () => self.update('waiting'));
+  self.garage.on('open', () => self.update('open'));
+  self.garage.on('closed', () => self.update('closed'));
+
   self.refresh();
 
   utility.broker.on('actors', function (request, taskID, actor, perform, parameter) {
@@ -91,7 +96,7 @@ GarageDoor.prototype.perform = function (self, taskID, perform, parameter) {
       return false;
   }
 
-  self.status = 'error';
+  self.status = 'waiting';
   self.changed();
 
   return steward.performed(taskID);
