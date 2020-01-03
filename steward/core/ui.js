@@ -115,7 +115,7 @@ exports.start = function (server, serverSecure, app) {
     res.render('index');
   });
 
-  wss = new ws.Server({
+  let wss = new ws.Server({
     noServer: true
   });
 

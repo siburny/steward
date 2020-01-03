@@ -135,7 +135,7 @@ var start = function (port, portSecure) {
     }, app);
   }
 
-  wss = new ws.Server({
+  let wss = new ws.Server({
     noServer: true
   });
 
