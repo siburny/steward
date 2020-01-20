@@ -50,7 +50,7 @@
     "request": "^2.88.0",
     "res-error": "^0.3.1",
     "sensable-reporter": "^0.1.1",
-    "serialport": "^6.1.1",
+    "serialport": "^8.0.6",
     "speakeasy": "TheThingSystem/speakeasy",
     "sqlite3": "^4.1.1",
     "ssh-fingerprint": "0.0.1",
@@ -63,8 +63,6 @@
     "winston": "0.6.2",
     "ws": "^5.2.2",
     "x509-keygen": "^0.4.0",
-    "xml2js": "^0.4.0",
-    "xml2json": "^0.11.2",
     "yql": "TheThingSystem/node-yql"
   }
 }
