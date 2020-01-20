@@ -1,4 +1,5 @@
-<li data-w="1" data-h="1" data-x="{{x}}" data-y="{{y}}" class="status z-depth-3" data-status="{{status}}" id="device-{{id}}">
+<li data-w="1" data-h="1" data-x="{{x}}" data-y="{{y}}" class="status z-depth-3" data-status="{{status}}"
+	id="device-{{id}}">
 	<div class="device">
 		<div class="name">{{name}}</div>
 		<div class="icon">
@@ -20,31 +21,47 @@
 			}
 
 			$('#device-{{id}}').on('taphold', function () {
-				open_edit_form('{{id}}',
-					{
-						'name': { 'name': 'Name', 'value': current_data.name || '' },
-						'nickname': { 'name': 'Nickname', 'value': current_data.nickname || '' }
+				open_edit_form('{{id}}', {
+					'name': {
+						'name': 'Name',
+						'value': current_data.name || ''
 					},
-					{
-						'pairmaster': {
-							'name': 'Pair (as controller)', 'click': function (api) {
-								api.perform(current_id, 'pair_controller');
-								onclose_edit_form(true);
-							}
-						},
-						'pairslave': {
-							'name': 'Pair (as responder)', 'click': function (api) {
-								api.perform(current_id, 'pair_responder');
-								onclose_edit_form(true);
-							}
-						},
-						'paircancel': {
-							'name': 'Cancel Pairing', 'click': function (api) {
-								api.perform(current_id, 'pair_cancel');
+					'nickname': {
+						'name': 'Nickname',
+						'value': current_data.nickname || ''
+					}
+				}, {
+					'pairmaster': {
+						'name': 'Pair (as controller)',
+						'click': function (api) {
+							api.perform(current_id, 'pair_controller');
+							onclose_edit_form(true);
+						}
+					},
+					'pairslave': {
+						'name': 'Pair (as responder)',
+						'click': function (api) {
+							api.perform(current_id, 'pair_responder');
+							onclose_edit_form(true);
+						}
+					},
+					'paircancel': {
+						'name': 'Cancel Pairing',
+						'click': function (api) {
+							api.perform(current_id, 'pair_cancel');
+							onclose_edit_form(true);
+						}
+					},
+					'reboot': {
+						'name': 'Reboot',
+						'click': function (api) {
+							if (confirm('Are you sure you want to reboot?')) {
+								api.perform(current_id, 'reboot');
 								onclose_edit_form(true);
 							}
 						}
-					});
+					}
+				});
 			});
 		})();
 	</script>

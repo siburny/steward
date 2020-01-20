@@ -77,6 +77,10 @@ Gateway.prototype.perform = function (self, taskID, perform, parameter) {
       });
       break;
 
+    case 'reboot':
+      process.exit();
+      break;
+
     default:
       return false;
   }
