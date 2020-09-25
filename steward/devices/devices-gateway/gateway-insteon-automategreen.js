@@ -128,9 +128,9 @@ Gateway.prototype.setup = function (self) {
       command: command
     });
   }).on('recvCommand', function (command) {
-    if (command && command.link) {
-      //logger.info('device/' + self.deviceID, { event: 'Rescanning Insteon links' });
-      //self.scan(self);
+    if (command && command.hasOwnProperty('link')  && command.link.hasOwnProperty('isNew') && command.link.isNew) {
+      logger.info('device/' + self.deviceID, { event: 'Rescanning Insteon links' });
+      self.scan(self);
     }
   }).on('close', function (errP) {
     logger.warning('device/' + self.deviceID, {

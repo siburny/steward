@@ -53,7 +53,7 @@ nav {
       animation: fa-spin 2s infinite linear;
       font-size: 1em;
     }*/
-.grid li[data-status="unknown"] .device:before {
+/*.grid li[data-status="unknown"] .device:before {
   z-index: 10;
   font-family: FontAwesome;
   content: "\f128";
@@ -66,7 +66,7 @@ nav {
   justify-content: center;
   align-items: center;
   font-size: 1.25em;
-}
+}*/
 
 .grid li .device {
   position: absolute;
@@ -94,32 +94,32 @@ nav {
   justify-content: center;
   font: normal normal normal 14px/1 "Material Design Icons";
   font-size: inherit;
-  z-index: 10;
 }
 
 /* Waiting */
 .grid li[data-status="waiting"] .device .icon::before {
   animation: mdi-spin 2s infinite linear;
-  content: "\F06A";
+  content: "\F006A";
 }
 
 /* Light */
 .grid li[data-status="on"] .device.device-light .icon::before {
-  content: "\F6E7";
+  content: "\F06E8";
   color: var(--green, darkgreen);
 }
 
 .grid li[data-status="off"] .device.device-light .icon::before {
-  content: "\F6E8";
+  content: "\F06E9";
 }
 
 /* Garage */
-li[data-status="closed"] .device-garage .icon::before {
-  content: "\F6D8";
+.grid li[data-status="closed"] .device-garage .icon::before {
+  content: "\F12D3";
   color: var(--red, darkred);
 }
-li[data-status="open"] .device-garage .icon::before {
-  content: "\F6D9";
+
+.grid li[data-status="open"] .device-garage .icon::before {
+  content: "\F12D4";
   color: var(--green, darkgreen);
 }
 

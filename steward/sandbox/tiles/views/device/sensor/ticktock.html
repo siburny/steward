@@ -1,8 +1,8 @@
-<li data-w="1" data-h="1" data-x="{{x}}" data-y="{{y}}" class="status z-depth-3" data-status="{{status}}" id="device-{{id}}">
-	<div class="device waves-effect waves-light">
+<li data-w="1" data-h="1" data-x="{{x}}" data-y="{{y}}" class="status z-depth-3" data-status="{{status}}"
+	id="device-{{id}}">
+	<div class="device tick-tock waves-effect waves-light">
 		<div class="name">{{name}}</div>
-		<div class="icon"><span><i class="fa fa-check-square-o" aria-hidden="true"></i></span>
-		</div>
+		<div class="icon mdi mdi-checkbox-marked-outline"></div>
 	</div>
 
 	<script>
@@ -24,8 +24,14 @@
 
 			$('#device-{{id}}').on('taphold', function () {
 				open_edit_form('{{id}}', {
-					'name': { 'name': 'Name', 'value': current_data.name || '' },
-					'nickname': { 'name': 'Nickname', 'value': current_data.nickname || '' }
+					'name': {
+						'name': 'Name',
+						'value': current_data.name || ''
+					},
+					'nickname': {
+						'name': 'Nickname',
+						'value': current_data.nickname || ''
+					}
 				});
 			});
 		})();

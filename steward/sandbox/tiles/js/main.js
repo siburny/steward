@@ -129,6 +129,18 @@ $(function () {
   });
 });
 
+function close_toast(class_name) {
+  if (class_name.length > 0) {
+    class_name = '.' + class_name;
+  }
+
+  var toastElement = document.querySelector('.toast' + class_name);
+  if (toastElement != null) {
+    var toastInstance = M.Toast.getInstance(toastElement);
+    toastInstance.dismiss();
+  }
+}
+
 function API() {
   this.websocket = null;
   this.timeout = 5;
@@ -139,9 +151,12 @@ API.prototype.connect = function () {
   this.websocket = new WebSocket((window.location.protocol === 'http:' ? 'ws:' : 'wss:') + '//' + window.location.host + '/api/');
   this.websocket.onopen = function (evt) {
     self.timeout = 5;
+
+    close_toast('connected');
     M.toast({
       html: 'Connected.',
-      displayLength: 2000
+      displayLength: 2000,
+      classes: 'connected',
     });
 
     setTimeout(function () {
@@ -150,13 +165,17 @@ API.prototype.connect = function () {
       }));
     }, 500);
   };
+
   this.websocket.onclose = function (evt) {
+    close_toast('closed');
     M.toast({
       html: 'Connection closed.',
-      displayLength: 2000
+      displayLength: 2000,
+      classes: 'closed',
     });
     self.reconnect();
   };
+
   this.websocket.onmessage = function onMessage(evt) {
     if (!!evt && !!evt.data) {
       var msg = JSON.parse(evt.data);
@@ -173,9 +192,11 @@ API.prototype.connect = function () {
     }
   }
   this.websocket.onerror = function (evt) {
+    close_toast('retrying');
     M.toast({
       html: 'Error connecting. Retrying ... ',
-      displayLength: 2000
+      displayLength: 2000,
+      classes: 'retrying',
     });
 
     //self.timeout *= 2;
@@ -193,9 +214,11 @@ API.prototype.close = function () {
 }
 
 API.prototype.reconnect = function () {
+  close_toast('connecting');
   M.toast({
     html: 'Connecting in&nbsp;<span id="RetryTimeout">' + this.timeout + '</span>&nbsp;second(s)',
-    displayLength: this.timeout * 1000
+    displayLength: this.timeout * 1000,
+    class: 'connecting',
   });
 
   var timeout = this.timeout;

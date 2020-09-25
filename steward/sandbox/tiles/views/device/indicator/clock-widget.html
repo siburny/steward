@@ -91,7 +91,7 @@
           var date = new Date(data.info.date);
           $('#device-{{id}} #hour').css('transform', 'rotate(' + ((date.getHours() % 12) * 30 + date.getMinutes() / 2 - 90) + 'deg) translate(0%, -3px)');
           $('#device-{{id}} #minute').css('transform', 'rotate(' + (date.getMinutes() * 6 - 90) + 'deg) translate(0%, -2px)');
-          $('#device-{{id}} #date').text($.datepicker.formatDate('DD, MM d', date));
+          $('#device-{{id}} #date').text($.datepicker.formatDate('D, MM d', date));
         }
       }
 
