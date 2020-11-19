@@ -103,13 +103,13 @@ nav {
 }
 
 /* Light */
-.grid li[data-status="on"] .device.device-light .icon::before {
-  content: "\F06E8";
+.grid li[data-status="on"] .device.device-light .icon::after {
+  content: "\F0335";
   color: var(--green, darkgreen);
 }
 
-.grid li[data-status="off"] .device.device-light .icon::before {
-  content: "\F06E9";
+.grid li[data-status="off"] .device.device-light .icon::after {
+  content: "\F0336";
 }
 
 /* Garage */
