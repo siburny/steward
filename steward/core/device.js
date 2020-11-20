@@ -7,7 +7,6 @@ var arp = require('arp-a')
   , suncalc = require('suncalc')
   , url = require('url')
   , util = require('util')
-  , wakeonlan = require('wake_on_lan')
   , steward = require('./steward')
   , utility = require('./utility')
   , broker = utility.broker
@@ -187,27 +186,6 @@ exports.mac2ip = function (macaddr) {
 
   for (ipaddr in arptab) if ((arptab.hasOwnProperty(ipaddr)) && (arptab[ipaddr] === macaddr)) return ipaddr;
 };
-
-exports.wake = function (params) {
-  var macaddress;
-
-  if ((!params) || (!params.ipaddress)) return false;
-
-  if (!arptab[params.ipaddress]) {
-    logger.warning('no MAC address for ' + params.ipaddress);
-    return false;
-  }
-  macaddress = arptab[params.ipaddress].toUpperCase();
-
-  wakeonlan.wake(macaddress, { ipaddress: params.ipaddress }, function (err) {
-    if (!!err) return logger.error('unable to wake ' + macaddress + ' for ' + params.ipaddress);
-
-    logger.notice('woke ' + macaddress + ' for ' + params.ipaddress);
-  });
-
-  return true;
-};
-
 
 exports.discover = function (info, callback) {
   var deviceType, deviceUID;
@@ -659,11 +637,6 @@ Device.prototype.alert = function (message) {
     { updated: updated, level: 'alert', message: message, whoami: info.whoami, name: info.name, info: info });
 };
 
-Device.prototype.wake = function () {
-  return exports.wake(devices[this.deviceUID].discovery);
-};
-
-
 var geocache = {};
 var places = null;
 var maxpts = 100;
@@ -822,8 +795,6 @@ exports.perform = function (self, taskID, perform, parameter) {
 
   try { params = JSON.parse(parameter); } catch (ex) { params = {}; }
 
-  if (perform === 'wake') return self.wake();
-
   if (perform !== 'set') return false;
 
   performedP = self.set(params);
@@ -857,11 +828,6 @@ exports.validate_perform = function (perform, parameter) {
     ;
 
   try { params = JSON.parse(parameter); } catch (ex) { result.invalid.push('parameter'); }
-
-  if (perform === 'wake') {
-    if (!params.ipaddress) result.requires.push('ipaddress');
-    return result;
-  }
 
   if (perform !== 'set') {
     result.invalid.push('perform');

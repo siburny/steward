@@ -153,9 +153,6 @@ UPnP_Audio.prototype.perform = function(self, taskID, perform, parameter) {
       }
       return true;
 
-    case 'wake':
-      return self.wake();
-
     case 'play':
       param0 = (!!params.url) && (params.url.length) ? devices.expand(params.url) : null;
       break;
@@ -337,9 +334,6 @@ var validate_perform = function(perform, parameter) {
   if (!!parameter) try { params = JSON.parse(parameter); } catch(ex) { result.invalid.push('parameter'); }
 
   switch (perform) {
-    case 'wake':
-      return true;
-
     case 'set':
       if (!parameter) {
         result.requires.push('parameter');
@@ -405,7 +399,6 @@ exports.start = function() {
                     , perform    : [ 'play'
                                    , 'stop'
                                    , 'pause'
-                                   , 'wake'
                                    ]
                     , properties : { name    : true
                                    , status  : [ 'idle', 'playing', 'paused', 'busy', 'error' ]
@@ -428,7 +421,7 @@ exports.start = function() {
   steward.actors.device.media.upnp.ignore =
       { $info     : { type       : '/device/media/upnp/ignore'
                     , observe    : [ ]
-                    , perform    : [ 'wake' ]
+                    , perform    : [ ]
                     , properties : { name    : true
                                    , status  : [ 'present' ]
                                    }

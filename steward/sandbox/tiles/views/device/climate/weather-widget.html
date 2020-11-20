@@ -2,7 +2,7 @@
   <div class="device weather">
     <div class="today_title">Right now</div>
     <div class="current">
-      <div style="float:left;width:1.75em;">
+      <div style="float:left;width:1.5em; margin-left: 0.4em;">
         <img src="" />
       </div>
       <div style="text-align: center;padding-top:0.3em;padding-right:0.5em;font-size:0.7em;line-height:0.75em;">
@@ -15,7 +15,7 @@
 
     <div class="forecast today">
       <div class="title">Today</div>
-      <div style="float:left;width:2em;">
+      <div style="float:left;width:1.5em;margin-left:0.5em;">
         <img src="" />
       </div>
       <div class="temp"><span id="high"></span>&deg;/<span id="low"></span>&deg;</div>
@@ -23,7 +23,7 @@
     </div>
     <div class="forecast tomorrow">
       <div class="title">Tomorrow</div>
-      <div style="float:left;width:2em;">
+      <div style="float:left;width:1.5em;margin-left:0.5em;">
         <img src="" />
       </div>
       <div class="temp"><span id="high"></span>&deg;/<span id="low"></span>&deg;</div>
@@ -90,27 +90,12 @@
         current_data = data;
 				$('#device-{{id}} .name').text(data.name + (!!data.room ? ' in ' + data.room : ''));
 
-        var weather_icons = {
-          'clear-day': 'sun.svg',
-          'clear-night': 'moon.svg',
-          'rain': 'cloudRainAlt.svg',
-          'snow': 'cloudSnowAlt.svg',
-          'sleet': 'cloudDrizzle.svg',
-          'wind': 'wind.svg',
-          'fog': 'cloudFog.svg',
-          'cloudy': 'cloud.svg',
-          'partly-cloudy-day': 'cloudSun.svg',
-          'partly-cloudy-night': 'cloudMoon.svg',
-        };
-
         if (!!data.info) {
           if (!!data.info.conditions) {
             $("#device-{{id}} .current #temp").text(Math.round(data.info.conditions.temperature));
             $("#device-{{id}} .current #precip").text(Math.round(data.info.conditions.precipitation * 100));
-            if (!!weather_icons[data.info.conditions.code]) {
-              $("#device-{{id}} .current img").attr('src', '/modules/animated-climacons/' + weather_icons[data.info.conditions.code]);
-              $.embedSVG();
-            }
+            $("#device-{{id}} .current img").attr('src', '/modules/weather-icons/' + data.info.conditions.code + '.svg');
+            $.embedSVG();
           }
           if (!!data.info.forecasts && data.info.forecasts.length > 1) {
             $("#device-{{id}} .forecast.today #high").text(Math.round(data.info.forecasts[0].temperatureMax));
@@ -121,8 +106,8 @@
             $("#device-{{id}} .forecast.tomorrow #low").text(Math.round(data.info.forecasts[1].temperatureMin));
             $("#device-{{id}} .forecast.tomorrow #precip").text(Math.round(data.info.forecasts[1].precipitation * 100));
 
-            $("#device-{{id}} .forecast.today img").attr('src', '/modules/animated-climacons/' + weather_icons[data.info.forecasts[0].code]);
-            $("#device-{{id}} .forecast.tomorrow img").attr('src', '/modules/animated-climacons/' + weather_icons[data.info.forecasts[1].code]);
+            $("#device-{{id}} .forecast.today img").attr('src', '/modules/weather-icons/' + data.info.forecasts[0].code + '.svg');
+            $("#device-{{id}} .forecast.tomorrow img").attr('src', '/modules/weather-icons/' + data.info.forecasts[1].code + '.svg');
             $.embedSVG();
           }
         }

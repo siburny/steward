@@ -246,7 +246,6 @@ exports.start = function() {
                     , perform    : [ 'play'
                                    , 'stop'
                                    , 'pause'
-                                   , 'wake'
                                    ]
                     , properties : { name    : true
                                    , status  : [ 'idle', 'playing', 'paused', 'waiting', 'error' ]

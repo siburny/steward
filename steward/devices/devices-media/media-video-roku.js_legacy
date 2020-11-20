@@ -113,7 +113,6 @@ exports.start = function() {
                                    , 'pause'
                                    , 'next'
                                    , 'previous'
-                                   , 'wake'
                                    ]
                     , properties : { name    : true
                                    , status  : [ 'idle' ]

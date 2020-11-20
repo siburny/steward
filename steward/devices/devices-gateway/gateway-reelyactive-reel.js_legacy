@@ -349,7 +349,7 @@ exports.start = function() {
   steward.actors.device.gateway.reelyactive.wired =
       { $info     : { type       : '/device/gateway/reelyactive/wired'
                     , observe    : [ ]
-                    , perform    : [ 'wake' ]
+                    , perform    : [ ]
                     , properties : { name       : true
                                    , status     : [ 'ready' ]
                                    }

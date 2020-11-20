@@ -252,7 +252,7 @@ exports.start = function() {
   steward.actors.device.climate.insteon.control =
       { $info     : { type       : '/device/climate/insteon/control'
                     , observe    : [ ]
-                    , perform    : [ 'wake' ]
+                    , perform    : [ ]
                     , properties : { name            : true
                                    , status          : [ 'waiting', 'absent', 'cooling', 'heating', 'highHumidity', 'lowHumidity', 'normalHumidity', 'off' ]
                                    , lastSample      : 'timestamp'

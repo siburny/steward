@@ -127,8 +127,6 @@ Hue.prototype.perform = function(self, taskID, perform, parameter, id, oops) {
 
   state = {};
   if (!id) {
-    if (perform === 'wake') return self.wake();
-
     if ((perform !== 'set') || (!params.name)) return false;
     state.name = params.name;
 
@@ -583,8 +581,6 @@ var validate_perform_hue = function(perform, parameter) {
 
   if (!!parameter) try { params = JSON.parse(parameter); } catch(ex) { result.invalid.push('parameter'); }
 
-  if (perform === 'wake') return result;
-
   if (perform !== 'set') {
     result.invalid.push('perform');
     return result;
@@ -746,7 +742,7 @@ exports.start = function() {
   steward.actors.device.gateway.hue.wired =
       { $info     : { type       : '/device/gateway/hue/wired'
                     , observe    : [ ]
-                    , perform    : [ 'wake' ]
+                    , perform    : [ ]
                     , properties : { name   : true
                                    , status : [ 'ready', 'reset', 'busy' ]
                                    }

@@ -502,7 +502,7 @@ exports.start = function() {
   steward.actors.device.gateway['heroic-robotics'].wired =
       { $info     : { type       : '/device/gateway/heroic-robotics/wired'
                     , observe    : [ ]
-                    , perform    : [ 'wake' ]
+                    , perform    : [ ]
                     , properties : { name   : true
                                    , status : [ 'ready', 'absent' ]
                                    , nodeID : []

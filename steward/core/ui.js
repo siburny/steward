@@ -88,7 +88,7 @@ exports.start = function (server, serverSecure, app) {
   app.use('/modules/font-awesome/', express.static('node_modules/font-awesome'));
   app.use('/modules/material-design-icons/', express.static('node_modules/material-design-icons-iconfont/dist'));
   app.use('/modules/grid-list/', express.static('node_modules/grid-list/src'));
-  app.use('/modules/animated-climacons/', express.static('node_modules/animated-climacons/svgs'));
+  app.use('/modules/weather-icons/', express.static('node_modules/@bybas/weather-icons/production/line/darksky'));
   app.use('/modules/jquery-taphold/', express.static('node_modules/jquery-taphold'));
   app.use('/modules/materialdesignicons/', express.static('node_modules/@mdi/font'));
 

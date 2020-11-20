@@ -73,7 +73,7 @@ exports.start = function() {
   steward.actors.device.sensor.nest.smoke =
       { $info     : { type       : '/device/sensor/nest/smoke'
                     , observe    : [ ]
-                    , perform    : [ 'wake' ]
+                    , perform    : [ ]
                     , properties : { name            : true
                                    , status          : [ 'safe', 'unsafe', 'absent' ]
                                    , lastSample      : 'timestamp'

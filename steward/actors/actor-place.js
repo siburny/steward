@@ -3,7 +3,6 @@ var fs          = require('fs')
   , parser      = require('cron-parser')
   , suncalc     = require('suncalc')
   , util        = require('util')
-  , yql         = require('yql')
   , database    = require('./../core/database')
   , devices     = require('./../core/device')
   , server      = require('./../core/server')
@@ -310,8 +309,6 @@ Place.prototype.perform = function(self, taskID, perform, parameter) {
 
   try { params = JSON.parse(parameter); } catch(ex) { params = {}; }
 
-  if (perform === 'wake') return devices.wake(params);
-
   if (perform !== 'set') return false;
 
 // do not call self.setName()... there's no entry in the devices table!
@@ -563,11 +560,6 @@ var validate_perform = function(perform, parameter) {
 
   try { params = JSON.parse(parameter); } catch(ex) { result.invalid.push('parameter'); }
 
-  if (perform === 'wake') {
-    if (!params.ipaddress) result.requires.push('ipaddress');
-    return result;
-  }
-
   if (perform !== 'set') {
     result.invalid.push('perform');
     return result;
@@ -695,7 +687,7 @@ exports.start = function() {
   steward.actors.place =
       { $info     : { type       : '/place'
                     , observe    : [ 'cron', 'solar' ]
-                    , perform    : [ 'wake' ]
+                    , perform    : [ ]
                     , properties : { name        : true
                                    , status      : colors
                                    , version     : true

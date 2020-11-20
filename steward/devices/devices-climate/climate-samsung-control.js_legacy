@@ -306,7 +306,7 @@ exports.start = function() {
   steward.actors.device.climate.samsung.control =
       { $info     : { type       : '/device/climate/samsung/control'
                     , observe    : [ ]
-                    , perform    : [ 'wake' ]
+                    , perform    : [ ]
                     , properties : { name            : true
                                    , status          : [ 'present', 'reset' ]
                                    , lastSample      : 'timestamp'

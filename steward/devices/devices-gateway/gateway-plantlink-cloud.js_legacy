@@ -344,7 +344,7 @@ exports.start = function() {
   steward.actors.device.gateway.plantlink.wired =
       { $info     : { type       : '/device/gateway/plantlink/wired'
                     , observe    : [ ]
-                    , perform    : [ 'wake' ]
+                    , perform    : [ ]
                     , properties : { name       : true
                                    , status     : [ 'present' ]
                                    , lastSample : 'timestamp'

@@ -125,12 +125,6 @@ Pioneer_AVR.operations =
                 self.avr.power(true);
                 return steward.performed(taskID);
               }
-
-, wake      : function(self, taskID, params, validateP) {
-                if (!!validateP) return true;
-
-                return devices.perform(self, taskID, 'wake', JSON.stringify(params));
-              }
 };
 
 Pioneer_AVR.prototype.perform = function(self, taskID, perform, parameter) {

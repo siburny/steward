@@ -547,7 +547,7 @@ exports.start = function () {
     $info: {
       type: '/device/gateway/insteon/hub',
       observe: [],
-      perform: ['wake'],
+      perform: [''],
       properties: {
         name: true,
         status: ['waiting', 'ready', 'reset']
